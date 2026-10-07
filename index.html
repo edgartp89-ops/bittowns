@@ -10,29 +10,47 @@
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 20px;
             box-sizing: border-box;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             position: relative;
         }
-        /* Selector de idiomas arriba a la derecha */
-        .language-selector {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+
+        /* Cabecera que contiene el Banner arriba del todo y el Selector de Idiomas a su derecha */
+        .header-top {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
             display: flex;
-            gap: 8px;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        img.banner {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4);
+            display: block;
+        }
+
+        /* Selector de idiomas arriba a la derecha, alineado con el banner */
+        .language-selector {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
         }
         .lang-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.3);
             color: #a0aec0;
-            padding: 5px 10px;
+            padding: 5px 9px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-decoration: none;
             transition: all 0.2s ease;
         }
@@ -42,29 +60,23 @@
             border-color: #00f0ff;
         }
 
+        /* Contenido central: Título, subtítulo y pilares */
         .main-container {
             display: flex;
             flex-direction: column;
             max-width: 650px;
             width: 100%;
-            padding: 10px 20px;
+            margin: 0 auto;
             gap: 12px;
             align-items: center;
+            text-align: center;
         }
         .text-block {
             display: flex;
             flex-direction: column;
             gap: 10px;
             width: 100%;
-            text-align: center;
             align-items: center;
-        }
-        img.banner {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4);
-            display: block;
         }
         h1 {
             font-size: 1.8rem;
@@ -76,13 +88,13 @@
         p.subtitle {
             color: #a0aec0;
             font-size: 0.95rem;
-            margin: 0 0 4px 0;
+            margin: 0;
         }
         .pillars {
             display: flex;
             flex-direction: row;
             gap: 12px;
-            margin: 4px 0;
+            margin: 5px 0;
             justify-content: center;
             width: 100%;
         }
@@ -92,7 +104,7 @@
             padding: 8px 10px;
             border-radius: 8px;
             flex: 1;
-            max-width: 180px;
+            max-width: 190px;
         }
         .pillar-card h3 {
             margin: 0 0 4px 0;
@@ -105,8 +117,10 @@
             font-size: 0.75rem;
             line-height: 1.2;
         }
+
+        /* Botón de X abajo con buen respiro */
         .btn-container {
-            margin-top: 10px;
+            margin: 15px 0 10px 0;
         }
         .btn {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
@@ -122,10 +136,9 @@
 
         /* Footer discreto abajo con texto legal en catalán */
         .footer-bar {
-            position: absolute;
-            bottom: 15px;
-            left: 20px;
-            right: 20px;
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
             display: flex;
             justify-content: flex-start;
             align-items: center;
@@ -136,9 +149,16 @@
         }
 
         @media (max-width: 700px) {
-            .main-container {
+            body {
                 padding: 10px;
-                gap: 8px;
+            }
+            .header-top {
+                flex-direction: column-reverse;
+                align-items: center;
+            }
+            .language-selector {
+                align-self: flex-end;
+                margin-bottom: 5px;
             }
             .pillars {
                 flex-direction: column;
@@ -149,28 +169,28 @@
                 max-width: 100%;
             }
             .footer-bar {
-                position: relative;
-                bottom: auto;
-                left: auto;
-                right: auto;
-                margin-top: 15px;
-                text-align: center;
                 justify-content: center;
+                text-align: center;
+                margin-top: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Selector de Idiomas -->
-    <div class="language-selector">
-        <a href="index.html" class="lang-btn active">ES</a>
-        <a href="ca/index.html" class="lang-btn">CAT</a>
-        <a href="en/index.html" class="lang-btn">EN</a>
-    </div>
 
-    <div class="main-container">
+    <!-- Cabecera: Banner arriba del todo y Selector de Idiomas a la derecha -->
+    <div class="header-top">
         <img src="banner.png" alt="Bit-Towns Banner" class="banner">
         
+        <div class="language-selector">
+            <a href="index.html" class="lang-btn active">ES</a>
+            <a href="ca/index.html" class="lang-btn">CAT</a>
+            <a href="en/index.html" class="lang-btn">EN</a>
+        </div>
+    </div>
+
+    <!-- Contenido Central -->
+    <div class="main-container">
         <div class="text-block">
             <h1>Bit-Towns</h1>
             <p class="subtitle">El primer constructor de ciudades Phygital.</p>
@@ -202,5 +222,6 @@
             © 2026 Bit-Towns. Tots els drets reservats. | Projecte Pilot - Amposta.
         </div>
     </footer>
+
 </body>
 </html>
