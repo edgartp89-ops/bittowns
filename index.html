@@ -19,30 +19,14 @@
             position: relative;
         }
 
-        /* Cabecera que contiene el Banner arriba del todo y el Selector de Idiomas a su derecha */
-        .header-top {
-            width: 100%;
-            max-width: 650px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        img.banner {
-            width: 100%;
-            max-width: 520px;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4);
-            display: block;
-        }
-
-        /* Selector de idiomas arriba a la derecha, alineado con el banner */
+        /* Selector de idiomas fijo arriba a la derecha de la pantalla */
         .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             display: flex;
             gap: 6px;
-            flex-shrink: 0;
+            z-index: 10;
         }
         .lang-btn {
             background: rgba(255, 255, 255, 0.05);
@@ -60,8 +44,8 @@
             border-color: #00f0ff;
         }
 
-        /* Contenido central: Título, subtítulo y pilares */
-        .main-container {
+        /* Contenedor principal centrado que envuelve todo el bloque superior y central */
+        .page-wrapper {
             display: flex;
             flex-direction: column;
             max-width: 650px;
@@ -71,6 +55,17 @@
             align-items: center;
             text-align: center;
         }
+
+        /* Banner perfectamente centrado arriba */
+        img.banner {
+            width: 100%;
+            max-width: 580px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4);
+            display: block;
+            margin: 0 auto;
+        }
+
         .text-block {
             display: flex;
             flex-direction: column;
@@ -120,7 +115,7 @@
 
         /* Botón de X abajo con buen respiro */
         .btn-container {
-            margin: 15px 0 10px 0;
+            margin: 15px 0 5px 0;
         }
         .btn {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
@@ -134,31 +129,28 @@
             font-size: 0.9rem;
         }
 
-        /* Footer discreto abajo con texto legal en catalán */
+        /* Barra inferior centrada con texto legal en catalán */
         .footer-bar {
             width: 100%;
             max-width: 650px;
             margin: 0 auto;
             display: flex;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             font-size: 0.75rem;
             color: #718096;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-top: 10px;
+            text-align: center;
         }
 
         @media (max-width: 700px) {
             body {
                 padding: 10px;
             }
-            .header-top {
-                flex-direction: column-reverse;
-                align-items: center;
-            }
             .language-selector {
-                align-self: flex-end;
-                margin-bottom: 5px;
+                top: 10px;
+                right: 10px;
             }
             .pillars {
                 flex-direction: column;
@@ -168,29 +160,23 @@
             .pillar-card {
                 max-width: 100%;
             }
-            .footer-bar {
-                justify-content: center;
-                text-align: center;
-                margin-top: 20px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Cabecera: Banner arriba del todo y Selector de Idiomas a la derecha -->
-    <div class="header-top">
-        <img src="banner.png" alt="Bit-Towns Banner" class="banner">
-        
-        <div class="language-selector">
-            <a href="index.html" class="lang-btn active">ES</a>
-            <a href="ca/index.html" class="lang-btn">CAT</a>
-            <a href="en/index.html" class="lang-btn">EN</a>
-        </div>
+    <!-- Selector de Idiomas flotante arriba a la derecha -->
+    <div class="language-selector">
+        <a href="index.html" class="lang-btn active">ES</a>
+        <a href="ca/index.html" class="lang-btn">CAT</a>
+        <a href="en/index.html" class="lang-btn">EN</a>
     </div>
 
-    <!-- Contenido Central -->
-    <div class="main-container">
+    <!-- Contenedor Principal Centrado -->
+    <div class="page-wrapper">
+        <!-- Banner arriba del todo y perfectamente centrado -->
+        <img src="banner.png" alt="Bit-Towns Banner" class="banner">
+        
         <div class="text-block">
             <h1>Bit-Towns</h1>
             <p class="subtitle">El primer constructor de ciudades Phygital.</p>
@@ -216,7 +202,7 @@
         </div>
     </div>
 
-    <!-- Barra inferior: Copyright en catalán -->
+    <!-- Barra inferior centrada: Copyright en catalán -->
     <footer class="footer-bar">
         <div>
             © 2026 Bit-Towns. Tots els drets reservats. | Projecte Pilot - Amposta.
