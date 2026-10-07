@@ -115,7 +115,7 @@
             font-size: 0.9rem;
         }
 
-        /* Footer discreto abajo: Copyright a la izquierda/centro, Contador a la derecha */
+        /* Footer discreto abajo */
         .footer-bar {
             position: absolute;
             bottom: 15px;
@@ -206,14 +206,28 @@
         </div>
     </div>
 
-    <!-- Barra inferior: Copyright y Contador de Visitas -->
+    <!-- Barra inferior: Copyright y Contador de Visitas Real -->
     <footer class="footer-bar">
         <div>
             © 2026 Bit-Towns. Todos los derechos reservados. | Proyecto Piloto - Amposta.
         </div>
         <div class="visitor-counter" title="Visitas totales">
-            👁️ Visitas: <span id="count">1,042</span>
+            👁️ Visitas: <span id="count">...</span>
         </div>
     </footer>
+
+    <!-- Script para el contador de visitas real -->
+    <script>
+        // Utiliza API gratuita para registrar y obtener visitas de forma única para bittowns
+        fetch('https://api.countapi.xyz/hit/bittowns.net/visits')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('count').innerText = data.value.toLocaleString();
+            })
+            .catch(error => {
+                // Si falla la red, muestra un valor por defecto para que no se quede en blanco
+                document.getElementById('count').innerText = "1";
+            });
+    </script>
 </body>
 </html>
