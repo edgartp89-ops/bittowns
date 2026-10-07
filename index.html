@@ -115,33 +115,19 @@
             font-size: 0.9rem;
         }
 
-        /* Footer discreto abajo */
+        /* Footer discreto abajo con copyright en catalán */
         .footer-bar {
             position: absolute;
             bottom: 15px;
             left: 20px;
             right: 20px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             font-size: 0.75rem;
             color: #718096;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-top: 10px;
-        }
-        .visitor-counter {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .visitor-counter span {
-            color: #00f0ff;
-            font-family: monospace;
-            font-weight: bold;
         }
 
         @media (max-width: 700px) {
@@ -163,9 +149,8 @@
                 left: auto;
                 right: auto;
                 margin-top: 15px;
-                flex-direction: column;
-                gap: 8px;
                 text-align: center;
+                justify-content: center;
             }
         }
     </style>
@@ -183,51 +168,34 @@
         
         <div class="text-block">
             <h1>Bit-Towns</h1>
-            <p class="subtitle">El primer constructor de ciudades Phygital.</p>
+            <p class="subtitle">El primer constructor de ciutats Phygital.</p>
             
             <div class="pillars">
                 <div class="pillar-card">
-                    <h3>🗺️ Construye</h3>
-                    <p>Fusiona el mapa real de tu ciudad con el juego.</p>
+                    <h3>🗺️ Construeix</h3>
+                    <p>Fusiona el mapa real de la teva ciutat amb el joc.</p>
                 </div>
                 <div class="pillar-card">
-                    <h3>⚖️ Gobierna</h3>
-                    <p>Decide el rumbo de tu comunidad de forma descentralizada.</p>
+                    <h3>⚖️ Governa</h3>
+                    <p>Decideix el rumb de la teva comunitat de forma descentralitzada.</p>
                 </div>
                 <div class="pillar-card">
                     <h3>🎁 Recompensa</h3>
-                    <p>Obtén tokens $TOWN y activos digitales por tu actividad física.</p>
+                    <p>Obtingues tokens $TOWN i actius digitals per la teva activitat física.</p>
                 </div>
             </div>
 
             <div>
-                <a href="https://x.com/BitTowns" class="btn" target="_blank">Síguenos en X</a>
+                <a href="https://x.com/BitTowns" class="btn" target="_blank">Segueix-nos a X</a>
             </div>
         </div>
     </div>
 
-    <!-- Barra inferior: Copyright y Contador de Visitas Real -->
+    <!-- Barra inferior: Copyright en catalán -->
     <footer class="footer-bar">
         <div>
-            © 2026 Bit-Towns. Todos los derechos reservados. | Proyecto Piloto - Amposta.
-        </div>
-        <div class="visitor-counter" title="Visitas totales">
-            👁️ Visitas: <span id="count">...</span>
+            © 2026 Bit-Towns. Tots els drets reservats. | Projecte Pilot - Amposta.
         </div>
     </footer>
-
-    <!-- Script para el contador de visitas real -->
-    <script>
-        // Utiliza API gratuita para registrar y obtener visitas de forma única para bittowns
-        fetch('https://api.countapi.xyz/hit/bittowns.net/visits')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('count').innerText = data.value.toLocaleString();
-            })
-            .catch(error => {
-                // Si falla la red, muestra un valor por defecto para que no se quede en blanco
-                document.getElementById('count').innerText = "1";
-            });
-    </script>
 </body>
 </html>
