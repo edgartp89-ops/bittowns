@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Piloto Amposta - Bit-Towns</title>
-    <!-- Importamos los estilos de Leaflet para el mapa -->
+    <!-- Estilos de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         body {
@@ -62,7 +62,6 @@
             color: #a0aec0;
             text-align: center;
         }
-        /* Contenedor del mapa con esquinas redondeadas y borde cian */
         #map {
             width: 100%;
             height: 400px;
@@ -124,7 +123,6 @@
             📍 Zona activa: <strong>Amposta (Catalunya)</strong>. Explora los nodos urbanos y realiza check-ins.
         </div>
 
-        <!-- Aquí se cargará el mapa -->
         <div id="map"></div>
 
         <div class="action-card">
@@ -138,19 +136,19 @@
         </div>
     </div>
 
-    <!-- Importamos el script de Leaflet -->
+    <!-- Script de Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
-        // Inicializamos el mapa centrado en Amposta (Coordenadas aproximadas: 40.7138, 0.5847)
+        // Inicializamos el mapa centrado en Amposta
         var map = L.map('map').setView([40.7138, 0.5847], 15);
 
-        // Añadimos una capa de mapa base (estilo limpio y moderno)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        // Capa pública y 100% gratuita de OpenStreetMap (no requiere API Key)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Añadimos un marcador interactivo en el centro de Amposta (Plaça de l'Ajuntament)
+        // Marcador en el centro de Amposta
         var marker = L.marker([40.7138, 0.5847]).addTo(map);
         marker.bindPopup("<b>Bit-Towns Hub Amposta</b><br>Punto neurálgico del piloto.").openPopup();
     </script>
