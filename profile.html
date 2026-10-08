@@ -69,10 +69,15 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
         }
         .citizen-name {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+        }
+        .citizen-email {
+            color: #a0aec0;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
         }
         .citizen-district {
             color: #00f0ff;
@@ -131,6 +136,21 @@
             font-size: 0.85rem;
             border-left: 3px solid #7000ff;
         }
+        .btn-logout {
+            background: rgba(255, 74, 74, 0.1);
+            border: 1px solid rgba(255, 74, 74, 0.4);
+            color: #ff4a4a;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-logout:hover {
+            background: rgba(255, 74, 74, 0.25);
+        }
         .legal-notice {
             color: #718096;
             font-size: 0.75rem;
@@ -151,60 +171,90 @@
 
         <div class="profile-card">
             <div class="avatar-placeholder">🏙️</div>
-            <div class="citizen-name">Citizen_89</div>
+            <div class="citizen-name" id="user-nickname">Cargando...</div>
+            <div class="citizen-email" id="user-email">...</div>
             <div class="citizen-district">Distrito Piloto: Amposta</div>
 
             <div class="stats-grid">
                 <div class="stat-box">
                     <div class="stat-label">NIVEL DE CIUDADANO</div>
-                    <div class="stat-value">Nivel 3 (Arquitecto)</div>
+                    <div class="stat-value">Nivel 1 (Iniciado)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">REPUTACIÓN (SBT)</div>
-                    <div class="stat-value">98.4% Confiable</div>
+                    <div class="stat-label">ESTADO DE CUENTA</div>
+                    <div class="stat-value" id="user-status" style="color: #00ff88;">Verificado</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">BALANCE $TOWN</div>
-                    <div class="stat-value">1,240 BT</div>
+                    <div class="stat-value">100 BT</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">ZONAS CONQUISTADAS</div>
-                    <div class="stat-value">4 Sectores</div>
+                    <div class="stat-value">0 Sectores</div>
                 </div>
             </div>
+
+            <button class="btn-logout" onclick="logout()">🚪 Cerrar Sesión</button>
         </div>
 
         <div class="section-card">
             <h2>🎒 Inventario & Activos Phygital</h2>
             <div class="inventory-item">
-                <span>🎫 Pase de Acceso Comercial - Amposta</span>
+                <span>🎫 Pase de Acceso Piloto - Amposta</span>
                 <span style="color: #00f0ff;">Activo</span>
             </div>
             <div class="inventory-item">
-                <span>🌱 Nodo Urbano: Plaça del Mercat</span>
-                <span style="color: #00f0ff;">En propiedad</span>
-            </div>
-            <div class="inventory-item">
-                <span>🏅 Medalla Fundador Piloto V1</span>
+                <span>🏅 Medalla Fundador Early Access</span>
                 <span style="color: #00f0ff;">Soulbound</span>
             </div>
         </div>
 
-        <div class="section-card">
-            <h2>⚡ Actividad Reciente</h2>
-            <div class="inventory-item" style="border-left-color: #00f0ff;">
-                <span>Check-in en zona física (Plaça Ajuntament)</span>
-                <span style="color: #a0aec0; font-size: 0.75rem;">Hace 2 horas</span>
-            </div>
-            <div class="inventory-item" style="border-left-color: #00f0ff;">
-                <span>Voto emitido en Propuesta #04</span>
-                <span style="color: #a0aec0; font-size: 0.75rem;">Ayer</span>
-            </div>
-        </div>
-
         <div class="legal-notice">
-            <p>Bit-Towns - Perfil de Ciudadano descentralizado sincronizado con la red de prueba.</p>
+            <p>Bit-Towns — Perfil de Ciudadano sincronizado con Supabase.</p>
         </div>
     </div>
+
+    <!-- Carga de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_AMqYABYgNL2QFUmr1NXLAg_nMNGp';
+
+        let supabaseClient;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (typeof supabase !== 'undefined') {
+                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    
+                    // Comprobamos la sesión activa
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+
+                    if (!session) {
+                        // Si no hay sesión iniciada, redirigir al login
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    // Cargar datos reales del usuario
+                    const user = session.user;
+                    const nickname = user.user_metadata?.nickname || 'Ciudadano';
+
+                    document.getElementById('user-nickname').textContent = nickname;
+                    document.getElementById('user-email').textContent = user.email;
+                    
+                }
+            } catch (err) {
+                console.error("Error al cargar perfil:", err);
+            }
+        });
+
+        async function logout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
 </body>
 </html>
