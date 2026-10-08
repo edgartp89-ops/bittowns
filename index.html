@@ -17,44 +17,33 @@
             min-height: 100vh;
             text-align: center;
         }
-        .container {
+        .header-bar {
+            width: 100%;
             max-width: 800px;
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-        }
-        .banner-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        img.banner {
-            width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
-            display: block;
+            padding: 15px 20px 5px 20px;
+            box-sizing: border-box;
         }
         .menu-btn {
-            position: absolute;
-            top: 12px;
-            left: 12px;
             background: rgba(11, 15, 25, 0.85);
             border: 1px solid #00f0ff;
             color: #00f0ff;
-            padding: 6px 12px;
+            padding: 6px 14px;
             font-size: 1.2rem;
             border-radius: 8px;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-btn:hover {
+            background: #00f0ff;
+            color: #0b0f19;
         }
         .lang-selector {
-            position: absolute;
-            top: 12px;
-            right: 12px;
             display: flex;
             gap: 5px;
         }
@@ -72,6 +61,25 @@
         .lang-btn:hover {
             background: #00f0ff;
             color: #0b0f19;
+        }
+        .container {
+            max-width: 800px;
+            padding: 10px 20px 20px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .banner-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        img.banner {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+            display: block;
         }
         .side-menu {
             position: fixed;
@@ -200,14 +208,17 @@
         </div>
     </div>
 
+    <div class="header-bar">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="lang-selector">
+            <a href="#" class="lang-btn">ES</a>
+            <a href="#" class="lang-btn">CAT</a>
+            <a href="#" class="lang-btn">EN</a>
+        </div>
+    </div>
+
     <div class="container">
         <div class="banner-container">
-            <button class="menu-btn" onclick="toggleMenu()">☰</button>
-            <div class="lang-selector">
-                <a href="#" class="lang-btn">ES</a>
-                <a href="#" class="lang-btn">CAT</a>
-                <a href="#" class="lang-btn">EN</a>
-            </div>
             <img src="banner.png" alt="Bit-Towns Banner" class="banner">
         </div>
         
