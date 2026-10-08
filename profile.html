@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Ciudadano - Bit-Towns</title>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+        h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .profile-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            text-align: center;
+        }
+        .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f0ff, #7000ff);
+            margin: 0 auto 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+        .citizen-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        .citizen-district {
+            color: #00f0ff;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .stat-label {
+            color: #a0aec0;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .section-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .section-card h2 {
+            margin-top: 0;
+            color: #00f0ff;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            border-left: 3px solid #7000ff;
+        }
+        .legal-notice {
+            color: #718096;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">← Volver</a>
+            <h1>Perfil Digital</h1>
+        </div>
+
+        <div class="profile-card">
+            <div class="avatar-placeholder">🏙️</div>
+            <div class="citizen-name">Citizen_89</div>
+            <div class="citizen-district">Distrito Piloto: Amposta</div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">NIVEL DE CIUDADANO</div>
+                    <div class="stat-value">Nivel 3 (Arquitecto)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">REPUTACIÓN (SBT)</div>
+                    <div class="stat-value">98.4% Confiable</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">BALANCE $TOWN</div>
+                    <div class="stat-value">1,240 BT</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">ZONAS CONQUISTADAS</div>
+                    <div class="stat-value">4 Sectores</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>🎒 Inventario & Activos Phygital</h2>
+            <div class="inventory-item">
+                <span>🎫 Pase de Acceso Comercial - Amposta</span>
+                <span style="color: #00f0ff;">Activo</span>
+            </div>
+            <div class="inventory-item">
+                <span>🌱 Nodo Urbano: Plaça del Mercat</span>
+                <span style="color: #00f0ff;">En propiedad</span>
+            </div>
+            <div class="inventory-item">
+                <span>🏅 Medalla Fundador Piloto V1</span>
+                <span style="color: #00f0ff;">Soulbound</span>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>⚡ Actividad Reciente</h2>
+            <div class="inventory-item" style="border-left-color: #00f0ff;">
+                <span>Check-in en zona física (Plaça Ajuntament)</span>
+                <span style="color: #a0aec0; font-size: 0.75rem;">Hace 2 horas</span>
+            </div>
+            <div class="inventory-item" style="border-left-color: #00f0ff;">
+                <span>Voto emitido en Propuesta #04</span>
+                <span style="color: #a0aec0; font-size: 0.75rem;">Ayer</span>
+            </div>
+        </div>
+
+        <div class="legal-notice">
+            <p>Bit-Towns - Perfil de Ciudadano descentralizado sincronizado con la red de prueba.</p>
+        </div>
+    </div>
+</body>
+</html>
