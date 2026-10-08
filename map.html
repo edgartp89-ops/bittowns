@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Piloto Amposta - Bit-Towns</title>
+    <!-- Importamos los estilos de Leaflet para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .back-btn {
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+        h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .info-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #a0aec0;
+            text-align: center;
+        }
+        /* Contenedor del mapa con esquinas redondeadas y borde cian */
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            margin-bottom: 15px;
+            z-index: 1;
+        }
+        .action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(70, 0, 255, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .action-card h3 {
+            margin: 0 0 8px 0;
+            color: #00f0ff;
+            font-size: 1rem;
+        }
+        .action-card p {
+            margin: 0 0 12px 0;
+            color: #a0aec0;
+            font-size: 0.85rem;
+        }
+        .btn-checkin {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            font-size: 0.9rem;
+        }
+        .btn-checkin:hover {
+            opacity: 0.9;
+        }
+        .legal-notice {
+            color: #718096;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">← Volver</a>
+            <h1>Mapa Piloto</h1>
+        </div>
+
+        <div class="info-panel">
+            📍 Zona activa: <strong>Amposta (Catalunya)</strong>. Explora los nodos urbanos y realiza check-ins.
+        </div>
+
+        <!-- Aquí se cargará el mapa -->
+        <div id="map"></div>
+
+        <div class="action-card">
+            <h3>🎯 Nodo Destacado: Plaça de l'Ajuntament</h3>
+            <p>Acércate físicamente o interactúa con el marcador del mapa para registrar tu visita.</p>
+            <button class="btn-checkin" onclick="alert('¡Check-in realizado con éxito! +50 XP y 10 $TOWN añadidos a tu perfil.')">Hacer Check-in Phygital</button>
+        </div>
+
+        <div class="legal-notice">
+            <p>Bit-Towns - Sistema de geolocalización de pruebas piloto.</p>
+        </div>
+    </div>
+
+    <!-- Importamos el script de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // Inicializamos el mapa centrado en Amposta (Coordenadas aproximadas: 40.7138, 0.5847)
+        var map = L.map('map').setView([40.7138, 0.5847], 15);
+
+        // Añadimos una capa de mapa base (estilo limpio y moderno)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+
+        // Añadimos un marcador interactivo en el centro de Amposta (Plaça de l'Ajuntament)
+        var marker = L.marker([40.7138, 0.5847]).addTo(map);
+        marker.bindPopup("<b>Bit-Towns Hub Amposta</b><br>Punto neurálgico del piloto.").openPopup();
+    </script>
+</body>
+</html>
