@@ -108,12 +108,32 @@
             color: #00f0ff;
             font-size: 1.5rem;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+        .user-badge {
+            width: 100%;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            text-align: left;
+            display: none; /* Se activa con JS si hay sesión */
+        }
+        .user-badge-name {
+            color: #00f0ff;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .user-badge-status {
+            color: #a0aec0;
+            font-size: 0.75rem;
         }
         .menu-title {
             color: #00f0ff;
             font-size: 1.1rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid rgba(0, 240, 255, 0.2);
             width: 100%;
             text-align: left;
@@ -145,6 +165,15 @@
             color: white;
             font-weight: bold;
             border: none;
+        }
+        .menu-item.logout-btn {
+            border-color: rgba(255, 74, 74, 0.4);
+            color: #ff4a4a;
+            background: rgba(255, 74, 74, 0.05);
+            display: none;
+        }
+        .menu-item.logout-btn:hover {
+            background: rgba(255, 74, 74, 0.2);
         }
         h1 {
             font-size: 2.2rem;
@@ -198,13 +227,20 @@
 <body>
     <div id="side-menu" class="side-menu">
         <button class="close-btn" onclick="toggleMenu()">✕</button>
+        
+        <div id="user-badge" class="user-badge">
+            <div class="user-badge-name" id="badge-name">...</div>
+            <div class="user-badge-status">● Sesión Activa (Amposta)</div>
+        </div>
+
         <div class="menu-title">Navegación Bit-Towns</div>
         <div class="menu-links">
-            <a href="register.html" class="menu-item highlight">🚀 Únete al Piloto</a>
-            <a href="login.html" class="menu-item">🔑 Iniciar Sesión</a>
+            <a href="register.html" id="link-register" class="menu-item highlight">🚀 Únete al Piloto</a>
+            <a href="login.html" id="link-login" class="menu-item">🔑 Iniciar Sesión</a>
             <a href="profile.html" class="menu-item">👤 Mi Perfil</a>
             <a href="whitepaper.html" class="menu-item">📖 Ver Whitepaper</a>
             <a href="map.html" class="menu-item">🗺️ Mapa Piloto</a>
+            <a href="#" id="link-logout" class="menu-item logout-btn" onclick="logoutUser()">🚪 Cerrar Sesión</a>
         </div>
     </div>
 
@@ -245,11 +281,33 @@
         </div>
     </div>
 
+    <!-- Carga de Supabase y script de autenticación global -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
     <script>
         function toggleMenu() {
             const menu = document.getElementById('side-menu');
             menu.classList.toggle('open');
         }
+
+        // Comprobar la sesión persistente al cargar la página
+        window.addEventListener('DOMContentLoaded', async () => {
+            const session = await getActiveSession();
+            
+            if (session) {
+                const user = session.user;
+                const nickname = user.user_metadata?.nickname || 'Ciudadano';
+
+                // Mostrar la ficha del usuario en el menú
+                document.getElementById('user-badge').style.display = 'block';
+                document.getElementById('badge-name').textContent = '👤 ' + nickname;
+
+                // Ocultar botones de registro/login y mostrar el de logout
+                document.getElementById('link-register').style.display = 'none';
+                document.getElementById('link-login').style.display = 'none';
+                document.getElementById('link-logout').style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
