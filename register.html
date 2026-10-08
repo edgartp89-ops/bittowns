@@ -134,7 +134,7 @@
 
         <div class="form-card">
             <h2>🚀 Únete al Piloto de Bit-Towns</h2>
-            <p>Crea tu identidad digital de ciudadano para reservar tu puesto en la primera fase en Amposta.</p>
+            <p>Crea tu identidad digital de ciudadano para reservar tu puesto en la primera comunidad en Amposta.</p>
 
             <form id="register-form">
                 <div class="form-group">
@@ -152,17 +152,17 @@
                     <input type="password" id="password" placeholder="••••••••" required minlength="6">
                 </div>
 
-                <button type="submit" class="btn-submit" id="btn-submit">🔑 Unirme al Piloto</button>
+                <button type="submit" class="btn-submit" id="btn-submit">🔑 Unirme a la Comunidad Amposta</button>
             </form>
             <div id="status-msg" class="status-msg"></div>
         </div>
 
         <div class="legal-notice">
-            <p>Bit-Towns — Enregistrament inicial per a la fase de prova del projecte.</p>
+            <p>Bit-Towns — Enregistrament inicial per a la fase de prova del projecte a Amposta.</p>
         </div>
     </div>
 
-    <!-- Librería de Supabase -->
+    <!-- Librería cliente de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
@@ -193,7 +193,7 @@
 
             submitBtn.disabled = true;
             statusMsg.style.color = '#00f0ff';
-            statusMsg.textContent = 'Registrando ciudadano en la red...';
+            statusMsg.textContent = 'Asignando ciudadano a la Comunidad Amposta...';
 
             if (!supabaseClient) {
                 statusMsg.style.color = '#ff4a4a';
@@ -206,7 +206,12 @@
                 email: email,
                 password: password,
                 options: {
-                    data: { nickname: nickname }
+                    data: { 
+                        nickname: nickname,
+                        community: 'Amposta',
+                        district: 'Nodo Piloto 01 - Amposta',
+                        role: 'Miembro Fundador'
+                    }
                 }
             });
 
@@ -216,7 +221,7 @@
                 submitBtn.disabled = false;
             } else {
                 statusMsg.style.color = '#00ff88';
-                statusMsg.textContent = '¡Registro completado! Revisa tu correo electrónico para confirmar la cuenta.';
+                statusMsg.textContent = '¡Registro completado! Te has unido a la Comunidad Amposta. Revisa tu correo electrónico para confirmar la cuenta.';
                 form.reset();
                 submitBtn.disabled = false;
             }
