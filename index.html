@@ -97,6 +97,14 @@
             font-size: 0.85rem;
             line-height: 1.4;
         }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 25px;
+        }
         .btn {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             color: white;
@@ -106,8 +114,17 @@
             font-weight: bold;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
             display: inline-block;
-            margin-bottom: 25px;
             font-size: 0.95rem;
+            text-align: center;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+        .btn-secondary:hover {
+            background: rgba(0, 240, 255, 0.15);
         }
         .legal-notice {
             color: #718096;
@@ -131,6 +148,9 @@
             <img src="banner.png" alt="Bit-Towns Banner" class="banner">
         </div>
         
+        <h1>Bit-Towns</h1>
+        <p class="subtitle">El primer constructor de ciudades descentralizadas</p>
+        
         <div class="pillars">
             <div class="pillar-card">
                 <h3>🗺️ Construye</h3>
@@ -146,10 +166,13 @@
             </div>
         </div>
 
-        <a href="whitepaper.html" class="btn">📖 Ver Whitepaper</a>
+        <div class="btn-group">
+            <a href="whitepaper.html" class="btn">📖 Ver Whitepaper</a>
+            <a href="profile.html" class="btn btn-secondary">⚡ Primeras impresiones</a>
+        </div>
 
         <div class="legal-notice">
-            <p>Bit-Towns és un projecte Web3 amb marca registrada. Tots els drets reservats. Amposta, 2026</p>
+            <p>Bit-Towns és un projecte en fase de desenvolupament conceptual. Els elements econòmics, de governança i tokens descrits estan subjectes a canvis durant les fases de prova i validació del pilot a Amposta.</p>
         </div>
     </div>
 </body>
