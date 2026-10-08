@@ -85,6 +85,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .stats-grid {
             display: grid;
@@ -106,7 +107,7 @@
         }
         .stat-value {
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
         }
         .section-card {
@@ -145,7 +146,7 @@
             font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
             width: 100%;
         }
         .btn-logout:hover {
@@ -173,24 +174,24 @@
             <div class="avatar-placeholder">🏙️</div>
             <div class="citizen-name" id="user-nickname">Cargando...</div>
             <div class="citizen-email" id="user-email">...</div>
-            <div class="citizen-district">Distrito Piloto: Amposta</div>
+            <div class="citizen-district" id="user-community">Comunidad: Amposta</div>
 
             <div class="stats-grid">
                 <div class="stat-box">
-                    <div class="stat-label">NIVEL DE CIUDADANO</div>
-                    <div class="stat-value">Nivel 1 (Iniciado)</div>
+                    <div class="stat-label">RANGO DE CIUDADANO</div>
+                    <div class="stat-value" id="user-role">Miembro Fundador</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">ESTADO DE CUENTA</div>
-                    <div class="stat-value" id="user-status" style="color: #00ff88;">Verificado</div>
+                    <div class="stat-label">DISTRITO ASIGNADO</div>
+                    <div class="stat-value" id="user-district">Nodo Piloto 01</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">BALANCE $TOWN</div>
                     <div class="stat-value">100 BT</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">ZONAS CONQUISTADAS</div>
-                    <div class="stat-value">0 Sectores</div>
+                    <div class="stat-label">REPUTACIÓN (SBT)</div>
+                    <div class="stat-value" style="color: #00ff88;">100% Verificado</div>
                 </div>
             </div>
 
@@ -210,7 +211,7 @@
         </div>
 
         <div class="legal-notice">
-            <p>Bit-Towns — Perfil de Ciudadano sincronizado con Supabase.</p>
+            <p>Bit-Towns — Perfil de Ciudadano sincronizado con la red de Amposta.</p>
         </div>
     </div>
 
@@ -218,7 +219,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_AMqYABYgNL2QFUmr1NXLAg_nMNGp';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
 
@@ -227,22 +228,24 @@
                 if (typeof supabase !== 'undefined') {
                     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                     
-                    // Comprobamos la sesión activa
                     const { data: { session } } = await supabaseClient.auth.getSession();
 
                     if (!session) {
-                        // Si no hay sesión iniciada, redirigir al login
                         window.location.href = 'login.html';
                         return;
                     }
 
-                    // Cargar datos reales del usuario
                     const user = session.user;
                     const nickname = user.user_metadata?.nickname || 'Ciudadano';
+                    const community = user.user_metadata?.community || 'Amposta';
+                    const district = user.user_metadata?.district || 'Nodo Piloto 01';
+                    const role = user.user_metadata?.role || 'Miembro Fundador';
 
                     document.getElementById('user-nickname').textContent = nickname;
                     document.getElementById('user-email').textContent = user.email;
-                    
+                    document.getElementById('user-community').textContent = 'Comunidad: ' + community;
+                    document.getElementById('user-district').textContent = district;
+                    document.getElementById('user-role').textContent = role;
                 }
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
