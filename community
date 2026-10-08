@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad Amposta - Bit-Towns</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header-bar {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            box-sizing: border-box;
+        }
+        .back-btn {
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+        .lang-selector {
+            display: flex;
+            gap: 5px;
+        }
+        .lang-btn {
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid #00f0ff;
+            color: #00f0ff;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 0 20px 30px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-card {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(112, 0, 255, 0.15));
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.2);
+        }
+        .hero-title {
+            font-size: 1.8rem;
+            margin: 0 0 5px 0;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00f0ff;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Secciones */
+        .section-title {
+            width: 100%;
+            text-align: left;
+            font-size: 1.2rem;
+            color: #00f0ff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Propuestas de Gobernanza */
+        .proposal-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .proposal-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .badge-active {
+            background: rgba(0, 240, 255, 0.15);
+            color: #00f0ff;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+        }
+        .badge-passed {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.4);
+        }
+        .proposal-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+        .proposal-desc {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+        .vote-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-vote {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(0, 240, 255, 0.05);
+            color: #ffffff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-vote:hover {
+            background: rgba(0, 240, 255, 0.2);
+            color: #00f0ff;
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .rank {
+            font-weight: bold;
+            color: #00f0ff;
+            width: 25px;
+        }
+        .user-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .xp-points {
+            color: #7000ff;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .legal-notice {
+            color: #718096;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            text-align: center;
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <a href="index.html" class="back-btn">← Volver</a>
+        <div class="lang-selector">
+            <a href="#" class="lang-btn">ES</a>
+            <a href="#" class="lang-btn">CAT</a>
+            <a href="#" class="lang-btn">EN</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-card">
+            <h1 class="hero-title">🏛️ Comunidad Amposta</h1>
+            <p class="hero-subtitle">Piloto N°1 — Gobernanza Phygital Descentralizada</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">142</div>
+                <div class="stat-label">Ciudadanos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">35,000</div>
+                <div class="stat-label">Tesorería $TOWN</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Votaciones Activas</div>
+            </div>
+        </div>
+
+        <div class="section-title">⚖️ Votaciones de Gobernanza</div>
+
+        <div class="proposal-card">
+            <div class="proposal-header">
+                <span class="proposal-title">Propuesta #001</span>
+                <span class="proposal-badge badge-active">Activa (Quedan 3 días)</span>
+            </div>
+            <div class="proposal-desc">
+                Instalación de un Nodo Phygital de Recarga Solar y Punto de Check-In con recompensa doble en el Parc dels Xiribecs.
+            </div>
+            <div class="vote-actions">
+                <button class="btn-vote" onclick="votar(1, 'A favor')">👍 A Favor (78%)</button>
+                <button class="btn-vote" onclick="votar(1, 'En contra')">👎 En Contra (22%)</button>
+            </div>
+        </div>
+
+        <div class="proposal-card">
+            <div class="proposal-header">
+                <span class="proposal-title">Propuesta #002</span>
+                <span class="proposal-badge badge-active">Activa (Quedan 5 días)</span>
+            </div>
+            <div class="proposal-desc">
+                Patrocinar el torneo local de eSports con 5,000 $TOWN de la tesorería comunitaria.
+            </div>
+            <div class="vote-actions">
+                <button class="btn-vote" onclick="votar(2, 'A favor')">👍 A Favor (91%)</button>
+                <button class="btn-vote" onclick="votar(2, 'En contra')">👎 En Contra (9%)</button>
+            </div>
+        </div>
+
+        <div class="section-title">🏆 Top Ciudadanos Activos</div>
+        <div class="leaderboard-list">
+            <div class="leaderboard-item">
+                <span class="rank">🥇</span>
+                <span class="user-info">CyberAmpostí</span>
+                <span class="xp-points">1,450 XP</span>
+            </div>
+            <div class="leaderboard-item">
+                <span class="rank">🥈</span>
+                <span class="user-info">EbreKnight</span>
+                <span class="xp-points">1,210 XP</span>
+            </div>
+            <div class="leaderboard-item">
+                <span class="rank">🥉</span>
+                <span class="user-info">DeltaNode</span>
+                <span class="xp-points">980 XP</span>
+            </div>
+        </div>
+
+        <div class="legal-notice">
+            <p>Bit-Towns Amposta — Les votacions de la comunitat tenen caràcter consultiu durant la fase pilot.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script>
+        async function votar(propuestaId, opcion) {
+            const session = await getActiveSession();
+            if (!session) {
+                alert("Debes iniciar sesión para poder votar en las propuestas comunitarias.");
+                window.location.href = "login.html";
+                return;
+            }
+            alert(`¡Voto registrado! Has votado "${opcion}" en la Propuesta #${propuestaId}.`);
+        }
+    </script>
+</body>
+</html>
