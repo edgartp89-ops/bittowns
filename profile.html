@@ -609,7 +609,6 @@
                 const nowIso = new Date().toISOString();
                 const newCount = userConstructors + 1;
 
-                // Actualizar en Supabase solicitando respuesta para confirmar persistencia
                 const { data, error } = await supabaseClient
                     .from('profiles')
                     .update({
@@ -620,7 +619,7 @@
                     .select();
 
                 if (error || !data || data.length === 0) {
-                    alert("Error al guardar en Supabase: " + (error ? error.message : "Comprueba los permisos RLS en Supabase."));
+                    alert("Error al guardar en Supabase: " + (error ? error.message : "Comprueba los permisos RLS."));
                     updateClaimButtonState();
                 } else {
                     userConstructors = newCount;
@@ -715,7 +714,7 @@
             }
         });
 
-        /* Lógica Nickname */
+        /* Lógica Nickname Blindada */
         function openNicknameModal() {
             const currentNick = document.getElementById('user-nickname').textContent;
             document.getElementById('custom-nickname-input').value = currentNick !== 'Cargando...' ? currentNick : '';
@@ -734,20 +733,30 @@
             }
 
             if (supabaseClient && activeTargetId) {
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ nickname: newNick })
-                    .eq('id', activeTargetId);
+                try {
+                    const { error } = await supabaseClient
+                        .from('profiles')
+                        .update({ nickname: newNick })
+                        .eq('id', activeTargetId);
 
-                if (error) {
-                    alert("Error al actualizar el apodo: " + error.message);
-                } else {
-                    await supabaseClient.auth.updateUser({
-                        data: { nickname: newNick }
-                    }).catch(e => console.log("Metadata sync:", e));
+                    if (error) {
+                        alert("Error al actualizar apodo: " + error.message);
+                        return;
+                    }
+
+                    // Intenta actualizar la metadata de sesión sin bloquear la ejecución si falla por red
+                    try {
+                        await supabaseClient.auth.updateUser({
+                            data: { nickname: newNick }
+                        });
+                    } catch (mErr) {
+                        console.warn("Metadata sync omitida:", mErr);
+                    }
 
                     document.getElementById('user-nickname').textContent = newNick;
                     closeNicknameModal();
+                } catch (err) {
+                    alert("Error de conexión: Verifica que 'www.bittowns.net' esté añadido a URL Configuration en Supabase.");
                 }
             }
         }
@@ -782,16 +791,20 @@
             const avatarToSave = customUrl || selectedAvatarVal || PRESET_AVATARS[0];
 
             if (supabaseClient && activeTargetId) {
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ avatar: avatarToSave })
-                    .eq('id', activeTargetId);
+                try {
+                    const { error } = await supabaseClient
+                        .from('profiles')
+                        .update({ avatar: avatarToSave })
+                        .eq('id', activeTargetId);
 
-                if (error) {
-                    alert("Error al guardar el avatar: " + error.message);
-                } else {
-                    renderAvatarInElement('user-avatar', avatarToSave);
-                    closeAvatarModal();
+                    if (error) {
+                        alert("Error al guardar el avatar: " + error.message);
+                    } else {
+                        renderAvatarInElement('user-avatar', avatarToSave);
+                        closeAvatarModal();
+                    }
+                } catch (err) {
+                    alert("Error de conexión al actualizar avatar.");
                 }
             }
         }
