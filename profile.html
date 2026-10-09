@@ -179,7 +179,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="index.html" class="back-btn">← Volver</a>
+            <a href="javascript:history.back()" class="back-btn">← Volver</a>
             <h1>Perfil Digital</h1>
         </div>
 
@@ -210,7 +210,7 @@
                 </div>
             </div>
 
-            <button class="btn-logout" onclick="logout()">🚪 Cerrar Sesión</button>
+            <button class="btn-logout" id="btn-logout" onclick="logout()" style="display: none;">🚪 Cerrar Sesión</button>
         </div>
 
         <div class="section-card">
@@ -242,32 +242,41 @@
                 if (typeof supabase !== 'undefined') {
                     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                     
-                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const queryUserId = urlParams.get('id');
 
-                    if (!session) {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    const loggedInUser = session?.user;
+
+                    let targetId = queryUserId || loggedInUser?.id;
+
+                    if (!targetId) {
                         window.location.href = 'login.html';
                         return;
                     }
 
-                    const user = session.user;
+                    // Si es su propio perfil, mostramos el botón de cerrar sesión
+                    if (loggedInUser && loggedInUser.id === targetId) {
+                        document.getElementById('btn-logout').style.display = 'block';
+                    }
 
-                    // Consultar los datos del usuario en la tabla 'profiles'
+                    // Consultar los datos del perfil objetivo en 'profiles'
                     let { data: profile } = await supabaseClient
                         .from('profiles')
                         .select('*')
-                        .eq('id', user.id)
+                        .eq('id', targetId)
                         .single();
 
-                    const nickname = profile?.nickname || user.user_metadata?.nickname || 'Ciudadano';
-                    const community = profile?.community || user.user_metadata?.community || 'Amposta';
+                    const nickname = profile?.nickname || 'Ciudadano';
+                    const email = (loggedInUser?.id === targetId) ? (profile?.email || loggedInUser?.email) : '••••@••••.com';
+                    const community = profile?.community || 'Amposta';
                     const role = profile?.role || 'Miembro Fundador';
                     const xp = profile?.xp !== undefined ? profile.xp : 50;
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
 
                     document.getElementById('user-nickname').textContent = nickname;
-                    document.getElementById('user-email').textContent = user.email;
+                    document.getElementById('user-email').textContent = email;
                     
-                    // Configurar el enlace dinámico a la comunidad
                     const communityLink = document.getElementById('user-community-link');
                     communityLink.textContent = community;
                     
