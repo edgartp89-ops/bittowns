@@ -20,7 +20,7 @@
         }
         .header-bar {
             width: 100%;
-            max-width: 800px;
+            max-width: 1100px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -64,7 +64,7 @@
             color: #0b0f19;
         }
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             padding: 10px 20px 20px 20px;
             width: 100%;
             box-sizing: border-box;
@@ -74,7 +74,7 @@
         }
         .banner-container {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         img.banner {
             width: 100%;
@@ -176,22 +176,10 @@
         .menu-item.logout-btn:hover {
             background: rgba(255, 74, 74, 0.2);
         }
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p.subtitle {
-            color: #a0aec0;
-            font-size: 1rem;
-            margin-bottom: 25px;
-        }
         .pillars {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
             margin-bottom: 25px;
             text-align: center;
             width: 100%;
@@ -199,26 +187,29 @@
         .pillar-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(0, 240, 255, 0.2);
-            padding: 15px;
+            padding: 20px 15px;
             border-radius: 12px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .pillar-card h3 {
-            margin: 0 0 5px 0;
+            margin: 0 0 8px 0;
             color: #00f0ff;
-            font-size: 1rem;
+            font-size: 1.05rem;
         }
         .pillar-card p {
             margin: 0;
             color: #a0aec0;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             line-height: 1.4;
         }
         .legal-notice {
             color: #718096;
             font-size: 0.75rem;
             line-height: 1.4;
-            max-width: 600px;
+            max-width: 800px;
             margin-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-top: 15px;
@@ -259,9 +250,6 @@
         <div class="banner-container">
             <img src="banner.png" alt="Bit-Towns Banner" class="banner">
         </div>
-        
-        <h1>Bit-Towns</h1>
-        <p class="subtitle">El primer constructor de ciudades descentralizadas</p>
         
         <div class="pillars">
             <div class="pillar-card">
