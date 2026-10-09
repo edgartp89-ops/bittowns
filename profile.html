@@ -104,11 +104,31 @@
         .edit-avatar-btn:hover {
             transform: scale(1.15);
         }
+        .nickname-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
         .citizen-name {
             font-size: 1.3rem;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 6px;
+        }
+        .edit-nickname-btn {
+            background: transparent;
+            border: none;
+            color: #00f0ff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .edit-nickname-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            transform: scale(1.15);
         }
         .citizen-district {
             color: #a0aec0;
@@ -254,7 +274,7 @@
             background: rgba(255, 74, 74, 0.25);
         }
 
-        /* Modal Personalización de Avatar */
+        /* Modales */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -378,7 +398,11 @@
                 <button class="edit-avatar-btn" id="edit-avatar-btn" style="display: none;" onclick="openAvatarModal()" title="Editar Avatar">✏️</button>
             </div>
 
-            <div class="citizen-name" id="user-nickname">Cargando...</div>
+            <div class="nickname-wrapper">
+                <div class="citizen-name" id="user-nickname">Cargando...</div>
+                <button class="edit-nickname-btn" id="edit-nickname-btn" style="display: none;" onclick="openNicknameModal()" title="Editar Nickname">✏️</button>
+            </div>
+
             <div class="citizen-district">
                 Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
             </div>
@@ -449,6 +473,21 @@
             <div class="modal-actions">
                 <button class="btn-modal btn-cancel" onclick="closeAvatarModal()">Cancelar</button>
                 <button class="btn-modal btn-save" onclick="saveAvatar()">Guardar Avatar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Cambiar Nickname -->
+    <div class="modal-overlay" id="nickname-modal">
+        <div class="modal-card">
+            <h3 class="modal-title">✏️ Cambiar Nombre / Nickname</h3>
+            <p style="color: #a0aec0; font-size: 0.8rem; margin-bottom: 15px;">Escribe tu nuevo apodo de ciudadano en Bit-Towns:</p>
+            
+            <input type="text" id="custom-nickname-input" class="custom-avatar-input" placeholder="Tu nuevo nick..." maxlength="25">
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeNicknameModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="saveNickname()">Guardar Nick</button>
             </div>
         </div>
     </div>
@@ -621,6 +660,7 @@
                     if (isOwnProfile) {
                         document.getElementById('btn-logout').style.display = 'block';
                         document.getElementById('edit-avatar-btn').style.display = 'flex';
+                        document.getElementById('edit-nickname-btn').style.display = 'inline-block';
                         document.getElementById('daily-claim-container').style.display = 'block';
                     }
 
@@ -673,6 +713,44 @@
             }
         });
 
+        /* Lógica Nickname */
+        function openNicknameModal() {
+            const currentNick = document.getElementById('user-nickname').textContent;
+            document.getElementById('custom-nickname-input').value = currentNick !== 'Cargando...' ? currentNick : '';
+            document.getElementById('nickname-modal').style.display = 'flex';
+        }
+
+        function closeNicknameModal() {
+            document.getElementById('nickname-modal').style.display = 'none';
+        }
+
+        async function saveNickname() {
+            const newNick = document.getElementById('custom-nickname-input').value.trim();
+            if (!newNick) {
+                alert("El apodo no puede estar vacío.");
+                return;
+            }
+
+            if (supabaseClient && activeTargetId) {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ nickname: newNick })
+                    .eq('id', activeTargetId);
+
+                if (error) {
+                    alert("Error al actualizar el apodo: " + error.message);
+                } else {
+                    await supabaseClient.auth.updateUser({
+                        data: { nickname: newNick }
+                    }).catch(e => console.log("Metadata sync:", e));
+
+                    document.getElementById('user-nickname').textContent = newNick;
+                    closeNicknameModal();
+                }
+            }
+        }
+
+        /* Lógica Avatar */
         function openAvatarModal() {
             document.getElementById('avatar-modal').style.display = 'flex';
         }
