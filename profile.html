@@ -609,16 +609,18 @@
                 const nowIso = new Date().toISOString();
                 const newCount = userConstructors + 1;
 
-                const { error } = await supabaseClient
+                // Actualizar en Supabase solicitando respuesta para confirmar persistencia
+                const { data, error } = await supabaseClient
                     .from('profiles')
                     .update({
                         constructors: newCount,
                         last_daily_claim: nowIso
                     })
-                    .eq('id', activeTargetId);
+                    .eq('id', activeTargetId)
+                    .select();
 
-                if (error) {
-                    alert("Error al reclamar: " + error.message);
+                if (error || !data || data.length === 0) {
+                    alert("Error al guardar en Supabase: " + (error ? error.message : "Comprueba los permisos RLS en Supabase."));
                     updateClaimButtonState();
                 } else {
                     userConstructors = newCount;
