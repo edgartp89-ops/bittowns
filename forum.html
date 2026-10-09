@@ -147,7 +147,6 @@
             padding: 20px;
             margin-bottom: 16px;
             transition: border-color 0.2s;
-            position: relative;
         }
         .thread-card:hover {
             border-color: rgba(0, 240, 255, 0.4);
@@ -157,6 +156,11 @@
             font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 6px;
+            text-decoration: none;
+            display: block;
+        }
+        .thread-title:hover {
+            color: #00f0ff;
         }
         .thread-meta {
             display: flex;
@@ -172,6 +176,7 @@
             font-size: 0.92rem;
             line-height: 1.5;
             white-space: pre-wrap;
+            margin-bottom: 14px;
         }
         .btn-delete {
             background: rgba(255, 75, 75, 0.12);
@@ -183,10 +188,30 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 12px;
         }
         .btn-delete:hover {
             background: rgba(255, 75, 75, 0.25);
+        }
+        .reply-card {
+            background: rgba(11, 15, 25, 0.6);
+            border-left: 3px solid #00ff88;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
+        }
+        .back-link {
+            display: inline-block;
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -203,22 +228,9 @@
         </div>
     </div>
 
-    <div class="container">
-        <!-- Crear nuevo tema -->
-        <div class="forum-post-card">
-            <div style="color: #00ff88; font-weight: 700; margin-bottom: 6px; font-size: 1.1rem;">✍️ Abrir Nuevo Tema de Debate</div>
-            <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 18px;">Crea un título claro para tu propuesta y comparte los detalles con la comunidad.</div>
-            
-            <input type="text" id="thread-title" class="form-input" placeholder="Título del tema (ej. Propuesta para el Pont Colgant)..." />
-            <textarea id="thread-content" class="form-textarea" placeholder="Escribe el contenido de tu mensaje..."></textarea>
-            <button class="btn-action" onclick="createThread()">Publicar Tema</button>
-        </div>
-
-        <div class="section-title">Temas Activos</div>
-        <div class="section-desc">Debates organizados por los ciudadanos de Amposta.</div>
-        <div id="threads-container">
-            <div style="text-align: center; color: #94a3b8; padding: 40px;">Cargando debates...</div>
-        </div>
+    <div class="container" id="main-container">
+        <!-- El contenido se cargará dinámicamente según si estamos viendo la lista o un hilo específico -->
+        <div style="text-align: center; color: #94a3b8; padding: 40px;">Cargando foro...</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -228,8 +240,6 @@
 
         let supabaseClient;
         let currentUser = null;
-        
-        // Define aquí tu correo o ID de administrador para la moderación
         const ADMIN_EMAIL = 'edgartp89@gmail.com'; 
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -243,11 +253,39 @@
             }
 
             currentUser = session.user;
-            loadThreads();
+
+            // Comprobar si la URL tiene un parámetro ?id=X para ver un hilo o la lista general
+            const urlParams = new URLSearchParams(window.location.search);
+            const threadId = urlParams.get('id');
+
+            if (threadId) {
+                loadThreadDetail(threadId);
+            } else {
+                loadThreadsList();
+            }
         });
 
-        async function loadThreads() {
-            const container = document.getElementById('threads-container');
+        // VISTA 1: Lista de hilos y formulario para crear nuevo tema
+        async function loadThreadsList() {
+            const container = document.getElementById('main-container');
+            container.innerHTML = `
+                <div class="forum-post-card">
+                    <div style="color: #00ff88; font-weight: 700; margin-bottom: 6px; font-size: 1.1rem;">✍️ Abrir Nuevo Tema de Debate</div>
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 18px;">Crea un título claro para tu propuesta y comparte los detalles con la comunidad.</div>
+                    
+                    <input type="text" id="thread-title" class="form-input" placeholder="Título del tema (ej. Propuesta para el Pont Colgant)..." />
+                    <textarea id="thread-content" class="form-textarea" placeholder="Escribe el contenido de tu mensaje..."></textarea>
+                    <button class="btn-action" onclick="createThread()">Publicar Tema</button>
+                </div>
+
+                <div class="section-title">Temas Activos</div>
+                <div class="section-desc">Debates organizados por los ciudadanos de Amposta. Pincha en un título para ver las respuestas.</div>
+                <div id="threads-container">
+                    <div style="text-align: center; color: #94a3b8; padding: 40px;">Cargando debates...</div>
+                </div>
+            `;
+
+            const threadsContainer = document.getElementById('threads-container');
             try {
                 const { data, error } = await supabaseClient
                     .from('forum_threads')
@@ -255,7 +293,7 @@
                     .order('created_at', { ascending: false });
 
                 if (!error && data && data.length > 0) {
-                    container.innerHTML = '';
+                    threadsContainer.innerHTML = '';
                     const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                     data.forEach(thread => {
@@ -264,100 +302,218 @@
                         card.className = 'thread-card';
                         
                         let modButtonHtml = '';
-                        // Si eres el admin o el autor del hilo, puedes borrarlo
                         if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
-                            modButtonHtml = `<button class="btn-delete" onclick="deleteThread(${thread.id})">🗑️ Borrar Tema (Moderación)</button>`;
+                            modButtonHtml = `<button class="btn-delete" onclick="deleteThread(${thread.id})">🗑️ Borrar Tema</button>`;
                         }
 
                         card.innerHTML = `
-                            <div class="thread-title">📌 ${escapeHtml(thread.title)}</div>
+                            <a href="forum.html?id=${thread.id}" class="thread-title">📌 ${escapeHtml(thread.title)}</a>
                             <div class="thread-meta">
                                 <span>👤 ${thread.author_name || 'Ciudadano'}</span>
                                 <span>${dateFormatted}</span>
                             </div>
                             <div class="thread-content">${escapeHtml(thread.content)}</div>
-                            ${modButtonHtml}
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                                <a href="forum.html?id=${thread.id}" style="color: #00f0ff; text-decoration: none; font-size: 0.88rem; font-weight: 600;">💬 Ver y responder al debate &rarr;</a>
+                                ${modButtonHtml}
+                            </div>
                         `;
-                        container.appendChild(card);
+                        threadsContainer.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 40px; background: rgba(15, 23, 42, 0.4); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);">Aún no hay temas de debate creados. ¡Sé el primero en abrir uno!</div>`;
+                    threadsContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 40px; background: rgba(15, 23, 42, 0.4); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);">Aún no hay temas de debate creados. ¡Sé el primero en abrir uno!</div>`;
                 }
             } catch (err) {
-                container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Error al cargar los temas.</div>`;
+                threadsContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Error al cargar los temas.</div>`;
             }
         }
 
+        // VISTA 2: Detalle del hilo y respuestas
+        async function loadThreadDetail(threadId) {
+            const container = document.getElementById('main-container');
+            container.innerHTML = `
+                <a href="forum.html" class="back-link">&larr; Volver a la lista de debates</a>
+                <div id="single-thread-container"></div>
+                
+                <div class="forum-post-card" style="margin-top: 30px;">
+                    <div style="color: #00ff88; font-weight: 700; margin-bottom: 6px; font-size: 1.05rem;">💬 Escribe una respuesta</div>
+                    <textarea id="reply-content" class="form-textarea" placeholder="Escribe tu opinión o aportación al debate..."></textarea>
+                    <button class="btn-action" onclick="createReply(${threadId})">Enviar Respuesta</button>
+                </div>
+
+                <div class="section-title" style="margin-top: 30px;">Respuestas de la Comunidad</div>
+                <div id="replies-container">
+                    <div style="text-align: center; color: #94a3b8; padding: 30px;">Cargando respuestas...</div>
+                </div>
+            `;
+
+            try {
+                // Cargar datos del hilo principal
+                const { data: thread, error: threadError } = await supabaseClient
+                    .from('forum_threads')
+                    .select('*')
+                    .eq('id', threadId)
+                    .single();
+
+                if (threadError || !thread) {
+                    container.innerHTML = `<a href="forum.html" class="back-link">&larr; Volver</a><div style="color: #ff4b4b; text-align: center; padding: 40px;">El tema de debate no existe o ha sido eliminado.</div>`;
+                    return;
+                }
+
+                const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+                const threadContainer = document.getElementById('single-thread-container');
+                let modButtonHtml = '';
+                if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
+                    modButtonHtml = `<button class="btn-delete" onclick="deleteThread(${thread.id}, true)">🗑️ Borrar Tema Principal</button>`;
+                }
+
+                threadContainer.innerHTML = `
+                    <div class="thread-card" style="border-color: #00ff88;">
+                        <div class="thread-title" style="font-size: 1.3rem;">📌 ${escapeHtml(thread.title)}</div>
+                        <div class="thread-meta">
+                            <span>👤 ${thread.author_name || 'Ciudadano'}</span>
+                            <span>${new Date(thread.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="thread-content" style="font-size: 1rem;">${escapeHtml(thread.content)}</div>
+                        ${modButtonHtml}
+                    </div>
+                `;
+
+                // Cargar respuestas del hilo
+                loadReplies(threadId);
+
+            } catch (err) {
+                console.error("Error cargando detalle:", err);
+            }
+        }
+
+        async function loadReplies(threadId) {
+            const repliesContainer = document.getElementById('replies-container');
+            try {
+                const { data: replies, error } = await supabaseClient
+                    .from('forum_replies')
+                    .select('*')
+                    .eq('thread_id', threadId)
+                    .order('created_at', { ascending: true });
+
+                if (!error && replies && replies.length > 0) {
+                    repliesContainer.innerHTML = '';
+                    const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+
+                    replies.forEach(reply => {
+                        const card = document.createElement('div');
+                        card.className = 'reply-card';
+
+                        let deleteReplyBtn = '';
+                        if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
+                            deleteReplyBtn = `<button class="btn-delete" style="padding: 4px 10px; font-size: 0.75rem; margin-top: 8px;" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Borrar Respuesta</button>`;
+                        }
+
+                        card.innerHTML = `
+                            <div class="thread-meta" style="margin-bottom: 8px;">
+                                <span style="color: #00ff88; font-weight: 600;">👤 ${reply.author_name || 'Ciudadano'}</span>
+                                <span>${new Date(reply.created_at).toLocaleString()}</span>
+                            </div>
+                            <div style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(reply.content)}</div>
+                            ${deleteReplyBtn}
+                        `;
+                        repliesContainer.appendChild(card);
+                    });
+                } else {
+                    repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 25px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.08);">Aún no hay respuestas en este debate. ¡Sé el primero en contestar!</div>`;
+                }
+            } catch (err) {
+                repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Error al cargar las respuestas.</div>`;
+            }
+        }
+
+        // Acciones de creación y borrado
         async function createThread() {
             if (!currentUser) return;
-
             const title = document.getElementById('thread-title').value.trim();
             const content = document.getElementById('thread-content').value.trim();
 
             if (!title || !content) {
-                alert("El título y el contenido son obligatorios para abrir un tema.");
+                alert("El título y el contenido son obligatorios.");
                 return;
             }
 
             try {
                 const authorName = currentUser.email ? currentUser.email.split('@')[0] : 'Ciudadano';
+                const { error } = await supabaseClient.from('forum_threads').insert({
+                    user_id: currentUser.id,
+                    author_name: authorName,
+                    title: title,
+                    content: content
+                });
 
-                const { error } = await supabaseClient
-                    .from('forum_threads')
-                    .insert({
-                        user_id: currentUser.id,
-                        author_name: authorName,
-                        title: title,
-                        content: content
-                    });
-
-                if (error) {
-                    alert("Error al publicar el tema.");
-                    return;
-                }
-
-                document.getElementById('thread-title').value = '';
-                document.getElementById('thread-content').value = '';
-                loadThreads();
+                if (error) { alert("Error al publicar el tema."); return; }
+                loadThreadsList();
             } catch (err) {
-                console.error("Error creando tema:", err);
-                alert("Hubo un error al enviar el tema.");
+                console.error("Error:", err);
             }
         }
 
-        async function deleteThread(threadId) {
-            if (!confirm("¿Estás seguro de que deseas eliminar este hilo de debate?")) return;
+        async function createReply(threadId) {
+            if (!currentUser) return;
+            const content = document.getElementById('reply-content').value.trim();
+
+            if (!content) {
+                alert("La respuesta no puede estar vacía.");
+                return;
+            }
 
             try {
-                const { error } = await supabaseClient
-                    .from('forum_threads')
-                    .delete()
-                    .eq('id', threadId);
+                const authorName = currentUser.email ? currentUser.email.split('@')[0] : 'Ciudadano';
+                const { error } = await supabaseClient.from('forum_replies').insert({
+                    thread_id: threadId,
+                    user_id: currentUser.id,
+                    author_name: authorName,
+                    content: content
+                });
 
-                if (error) {
-                    alert("Error al eliminar el tema.");
-                    return;
-                }
-
-                alert("Tema eliminado correctamente.");
-                loadThreads();
+                if (error) { alert("Error al enviar la respuesta."); return; }
+                document.getElementById('reply-content').value = '';
+                loadReplies(threadId);
             } catch (err) {
-                console.error("Error borrando hilo:", err);
-                alert("Hubo un error al procesar el borrado.");
+                console.error("Error:", err);
+            }
+        }
+
+        async function deleteThread(threadId, redirectToList = false) {
+            if (!confirm("¿Seguro que deseas eliminar este hilo completo y todas sus respuestas?")) return;
+
+            try {
+                const { error } = await supabaseClient.from('forum_threads').delete().eq('id', threadId);
+                if (error) { alert("Error al eliminar el tema."); return; }
+
+                alert("Tema eliminado.");
+                if (redirectToList) {
+                    window.location.href = 'forum.html';
+                } else {
+                    loadThreadsList();
+                }
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        }
+
+        async function deleteReply(replyId, threadId) {
+            if (!confirm("¿Deseas eliminar esta respuesta?")) return;
+
+            try {
+                const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
+                if (error) { alert("Error al eliminar la respuesta."); return; }
+                loadReplies(threadId);
+            } catch (err) {
+                console.error("Error:", err);
             }
         }
 
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
     </script>
 </body>
 </html>
-
