@@ -135,6 +135,8 @@
             border-bottom-style: solid;
             text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
         }
+
+        /* Rejilla de Estadísticas */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -148,6 +150,9 @@
             border-radius: 10px;
             text-align: left;
         }
+        .stat-box.full-width {
+            grid-column: span 2;
+        }
         .stat-label {
             color: #a0aec0;
             font-size: 0.75rem;
@@ -158,6 +163,54 @@
             font-size: 0.95rem;
             font-weight: bold;
         }
+
+        /* Tarjeta de Reclamo Diario */
+        .daily-claim-card {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(112, 0, 255, 0.12));
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+        }
+        .daily-claim-title {
+            color: #00f0ff;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+        .daily-claim-desc {
+            color: #a0aec0;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+        .btn-claim {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 280px;
+        }
+        .btn-claim:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+        }
+        .btn-claim:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #718096;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
         .section-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -347,12 +400,23 @@
                     <div class="stat-value" id="user-balance">100 BT</div>
                 </div>
                 <div class="stat-box">
+                    <div class="stat-label">CONSTRUCTORS (🏗️)</div>
+                    <div class="stat-value" id="user-constructors" style="color: #ffb703;">1</div>
+                </div>
+                <div class="stat-box full-width">
                     <div class="stat-label">REPUTACIÓN (SBT)</div>
                     <div class="stat-value" style="color: #00ff88;">100% Verificado</div>
                 </div>
             </div>
 
             <button class="btn-logout" id="btn-logout" onclick="logout()" style="display: none;">🚪 Cerrar Sesión</button>
+        </div>
+
+        <!-- Módulo de Reclamo Diario -->
+        <div class="daily-claim-card" id="daily-claim-container" style="display: none;">
+            <div class="daily-claim-title">🎁 Recompensa Diaria de Ciudadano</div>
+            <div class="daily-claim-desc">Obtén 1 Constructor cada día para edificar Amposta Digital con tus vecinos.</div>
+            <button class="btn-claim" id="btn-claim-daily" onclick="claimDailyConstructor()">🎁 Reclamar 1 Constructor</button>
         </div>
 
         <div class="section-card">
@@ -378,9 +442,7 @@
             <h3 class="modal-title">👾 Elige tu Avatar Cyberpunk</h3>
             <p style="color: #a0aec0; font-size: 0.8rem; margin-bottom: 15px;">Selecciona una identidad visual de la red o pega una URL de imagen:</p>
             
-            <div class="avatar-grid" id="avatar-presets-grid">
-                <!-- Se llena dinámicamente con las imágenes de DiceBear -->
-            </div>
+            <div class="avatar-grid" id="avatar-presets-grid"></div>
 
             <input type="url" id="custom-avatar-url" class="custom-avatar-input" placeholder="O pega URL de imagen personalizada (https://...)" oninput="clearPresetSelection()">
 
@@ -396,7 +458,6 @@
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
-        // Catálogo de Avatares Cyberpunk SVG (DiceBear API)
         const PRESET_AVATARS = [
             'https://api.dicebear.com/7.x/bottts/svg?seed=CyberAmposta&backgroundColor=0b0f19',
             'https://api.dicebear.com/7.x/bottts/svg?seed=NeonPioneer&backgroundColor=0b0f19',
@@ -415,6 +476,9 @@
         let supabaseClient;
         let selectedAvatarVal = PRESET_AVATARS[0];
         let activeTargetId = null;
+        let userConstructors = 1;
+        let lastDailyClaim = null;
+        let claimInterval = null;
 
         function formatearFecha(dateString) {
             if (!dateString) return null;
@@ -433,7 +497,6 @@
             if (avatarVal && (avatarVal.startsWith('http://') || avatarVal.startsWith('https://') || avatarVal.startsWith('data:'))) {
                 el.innerHTML = `<img src="${avatarVal}" alt="Avatar">`;
             } else {
-                // Si es un emoji antiguo o texto plano, renderiza el primer preset
                 el.innerHTML = `<img src="${PRESET_AVATARS[0]}" alt="Avatar">`;
             }
         }
@@ -450,6 +513,87 @@
                 item.onclick = () => selectPreset(url, item);
                 container.appendChild(item);
             });
+        }
+
+        function updateClaimButtonState() {
+            const btn = document.getElementById('btn-claim-daily');
+            if (!btn) return;
+
+            if (claimInterval) clearInterval(claimInterval);
+
+            if (!lastDailyClaim) {
+                btn.disabled = false;
+                btn.textContent = '🎁 Reclamar 1 Constructor';
+                return;
+            }
+
+            const now = new Date().getTime();
+            const lastClaimTime = new Date(lastDailyClaim).getTime();
+            const cooldownMs = 24 * 60 * 60 * 1000;
+            const diffMs = cooldownMs - (now - lastClaimTime);
+
+            if (diffMs <= 0) {
+                btn.disabled = false;
+                btn.textContent = '🎁 Reclamar 1 Constructor';
+            } else {
+                btn.disabled = true;
+                
+                const updateCountdown = () => {
+                    const currentNow = new Date().getTime();
+                    const remainingMs = cooldownMs - (currentNow - lastClaimTime);
+
+                    if (remainingMs <= 0) {
+                        btn.disabled = false;
+                        btn.textContent = '🎁 Reclamar 1 Constructor';
+                        clearInterval(claimInterval);
+                    } else {
+                        const hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+                        const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                        const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                        btn.textContent = `⏳ Reclamado (Disponible en ${hrs}h ${mins}m ${secs}s)`;
+                    }
+                };
+
+                updateCountdown();
+                claimInterval = setInterval(updateCountdown, 1000);
+            }
+        }
+
+        async function claimDailyConstructor() {
+            const btn = document.getElementById('btn-claim-daily');
+            if (!btn || btn.disabled) return;
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Procesando...';
+
+            try {
+                const nowIso = new Date().toISOString();
+                const newCount = userConstructors + 1;
+
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({
+                        constructors: newCount,
+                        last_daily_claim: nowIso
+                    })
+                    .eq('id', activeTargetId);
+
+                if (error) {
+                    alert("Error al reclamar: " + error.message);
+                    updateClaimButtonState();
+                } else {
+                    userConstructors = newCount;
+                    lastDailyClaim = nowIso;
+
+                    document.getElementById('user-constructors').textContent = userConstructors;
+                    updateClaimButtonState();
+
+                    alert("🎉 ¡Has recibido 1 Constructor! Úsalo para edificar Amposta.");
+                }
+            } catch (err) {
+                console.error("Error al reclamar:", err);
+                updateClaimButtonState();
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -472,14 +616,17 @@
                         return;
                     }
 
-                    if (loggedInUser && loggedInUser.id === activeTargetId) {
+                    const isOwnProfile = loggedInUser && loggedInUser.id === activeTargetId;
+
+                    if (isOwnProfile) {
                         document.getElementById('btn-logout').style.display = 'block';
                         document.getElementById('edit-avatar-btn').style.display = 'flex';
+                        document.getElementById('daily-claim-container').style.display = 'block';
                     }
 
                     let { data: profile } = await supabaseClient
                         .from('profiles')
-                        .select('id, nickname, community, role, xp, town_balance, created_at, avatar')
+                        .select('id, nickname, community, role, xp, town_balance, created_at, avatar, constructors, last_daily_claim')
                         .eq('id', activeTargetId)
                         .single();
 
@@ -490,6 +637,9 @@
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
                     const avatarVal = profile?.avatar || PRESET_AVATARS[0];
                     
+                    userConstructors = profile?.constructors !== undefined && profile?.constructors !== null ? profile.constructors : 1;
+                    lastDailyClaim = profile?.last_daily_claim || null;
+
                     const rawDate = profile?.created_at || (loggedInUser?.id === activeTargetId ? loggedInUser?.created_at : null);
                     const fechaRegistro = formatearFecha(rawDate) || 'Reciente';
 
@@ -512,6 +662,11 @@
                     document.getElementById('user-role').textContent = role;
                     document.getElementById('user-xp').textContent = xp + ' XP';
                     document.getElementById('user-balance').textContent = balance + ' BT';
+                    document.getElementById('user-constructors').textContent = userConstructors;
+
+                    if (isOwnProfile) {
+                        updateClaimButtonState();
+                    }
                 }
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
