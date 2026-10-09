@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Amposta - Bit-Towns</title>
+    <title>Tablero de Inversiones - Bit-Towns</title>
     <link rel="icon" type="image/png" href="favicon.png?v=1">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         body {
             background-color: #0b0f19;
@@ -16,17 +14,15 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
         }
         .header {
             background: rgba(11, 15, 25, 0.95);
             border-bottom: 1px solid rgba(0, 240, 255, 0.2);
-            padding: 12px 20px;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
         }
         .header-title {
             display: flex;
@@ -34,7 +30,7 @@
             gap: 12px;
         }
         h1 {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -47,9 +43,9 @@
         .btn-nav {
             color: #00f0ff;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             border: 1px solid rgba(0, 240, 255, 0.3);
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 20px;
             background: rgba(0, 240, 255, 0.05);
             font-weight: bold;
@@ -70,18 +66,17 @@
         .tabs-bar {
             display: flex;
             background: rgba(0, 0, 0, 0.4);
-            padding: 8px 20px;
-            gap: 10px;
+            padding: 12px 30px;
+            gap: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            z-index: 999;
         }
         .tab-btn {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #a0aec0;
-            padding: 6px 16px;
+            padding: 8px 18px;
             border-radius: 16px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -93,96 +88,69 @@
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
 
-        .main-container {
-            display: flex;
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-        #map {
-            flex: 1;
-            height: 100%;
-            background: #0b0f19;
-        }
-
-        /* Panel lateral con listado de propiedades y progreso */
-        .side-panel {
-            width: 400px;
-            background: rgba(11, 15, 25, 0.96);
-            border-left: 1px solid rgba(0, 240, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 20px;
             box-sizing: border-box;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .panel-title {
-            color: #00f0ff;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .panel-desc {
-            color: #a0aec0;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            margin-bottom: 15px;
+            flex: 1;
         }
 
         .user-constructors-box {
             background: rgba(255, 183, 3, 0.08);
             border: 1px solid rgba(255, 183, 3, 0.3);
-            padding: 10px 14px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        /* Tarjeta de cada propiedad en el listado lateral */
-        .plot-list-item {
+        .section-title {
+            color: #00f0ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .section-desc {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        /* Tarjetas de propiedades / parcelas */
+        .plot-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
             transition: all 0.2s ease;
         }
-        .plot-list-item:hover {
-            background: rgba(0, 240, 255, 0.08);
+        .plot-card:hover {
             border-color: #00f0ff;
-            transform: translateX(2px);
-        }
-        .plot-list-item.selected {
-            background: rgba(0, 240, 255, 0.12);
-            border-color: #00f0ff;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
         }
         .plot-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
         }
-        .plot-title-text {
+        .plot-title {
+            font-size: 1.1rem;
             font-weight: bold;
             color: #ffffff;
-            font-size: 0.95rem;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .plot-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 8px;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 10px;
             font-weight: bold;
         }
         .badge-active { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); }
@@ -190,11 +158,11 @@
 
         .progress-bar-bg {
             background: rgba(0, 0, 0, 0.5);
-            border-radius: 6px;
-            height: 8px;
+            border-radius: 8px;
+            height: 10px;
             overflow: hidden;
-            margin: 8px 0;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .progress-bar-fill {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
@@ -202,41 +170,45 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+
         .plot-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.75rem;
+            margin-top: 15px;
+            font-size: 0.85rem;
             color: #a0aec0;
-            margin-top: 6px;
         }
 
-        .btn-action-small {
+        .btn-action {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             color: #ffffff;
             border: none;
-            padding: 5px 12px;
-            border-radius: 12px;
+            padding: 8px 18px;
+            border-radius: 16px;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
-        .btn-action-small:hover:not(:disabled) {
-            transform: scale(1.05);
+        .btn-action:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
         }
-        .btn-action-small:disabled {
+        .btn-action:disabled {
             background: rgba(255, 255, 255, 0.08);
             color: #718096;
             cursor: not-allowed;
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-title">
-            <span style="font-size: 1.5rem;">🎲</span>
-            <h1>Tablero Phygital — Amposta</h1>
+            <span style="font-size: 1.6rem;">🏛️</span>
+            <h1>Tablero de Inversiones Colectivas (DAO)</h1>
         </div>
         <div class="nav-links">
             <a href="profile.html" class="btn-profile">👤 Mi Perfil</a>
@@ -244,56 +216,45 @@
         </div>
     </div>
 
-    <!-- Pestañas de modo -->
+    <!-- Pestañas -->
     <div class="tabs-bar">
-        <button class="tab-btn active" id="tab-colective" onclick="switchTab('colective')">🏛️ Mapa Colectivo (DAO)</button>
+        <button class="tab-btn active" id="tab-colective" onclick="switchTab('colective')">🏛️ Inversiones Colectivas DAO</button>
         <button class="tab-btn" id="tab-individual" onclick="switchTab('individual')">🏡 Mis Propiedades Privadas</button>
     </div>
 
-    <div class="main-container">
-        <!-- Mapa OpenStreetMap / Leaflet -->
-        <div id="map"></div>
+    <div class="container">
+        <div class="user-constructors-box">
+            <span style="color: #ffb703; font-weight: bold; font-size: 0.95rem;">Tus Constructors Disponibles:</span>
+            <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.2rem;">0 🏗️</span>
+        </div>
 
-        <!-- Panel Lateral con Listado y Progreso -->
-        <div class="side-panel" id="side-panel-content">
-            <h2 class="panel-title">🏛️ Listado de Inversiones DAO</h2>
-            <p class="panel-desc">Explora las parcelas comunitarias de Amposta, revisa su progreso e invierte tus Constructors.</p>
+        <div id="main-content-area">
+            <div class="section-title">Parcelas Urbanas de Amposta</div>
+            <div class="section-desc">Invierte tus Constructors en proyectos comunitarios. Una vez completados, la propiedad es 100% compartida entre todos los inversores del DAO sin un dueño único.</div>
             
-            <div class="user-constructors-box">
-                <span style="color: #ffb703; font-weight: bold; font-size: 0.85rem;">Tus Constructors Disponibles:</span>
-                <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.05rem;">0 🏗️</span>
-            </div>
-
             <div id="plots-list-container">
-                <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
-                    Cargando parcelas de Amposta...
-                </div>
+                <div style="text-align: center; color: #a0aec0; padding: 30px;">Cargando inversiones...</div>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
-        let map;
-        let currentMode = 'colective';
         let currentUser = null;
         let userConstructorsBalance = 0;
-        let markersLayer = L.layerGroup();
+        let currentMode = 'colective';
         let plotsData = [];
-        let selectedPlotId = null;
 
         const DEFAULT_AMPOSTA_PLOTS = [
-            { id: 1, name: "Plaça del Ajuntament", description: "Centro neurálgico y administrativo de Amposta.", lat: 40.7078, lng: 0.5825, icon: "🏛️", cost_constructors: 10, current_constructors: 0, status: "active" },
-            { id: 2, name: "Pont Colgant d'Amposta", description: "Icónico puente colgante sobre el río Ebro.", lat: 40.7102, lng: 0.5840, icon: "🌉", cost_constructors: 15, current_constructors: 0, status: "active" },
-            { id: 3, name: "Passeig del Canal", description: "Zona verde y recreativa junto al canal de riego.", lat: 40.7050, lng: 0.5790, icon: "🌳", cost_constructors: 8, current_constructors: 0, status: "active" },
-            { id: 4, name: "Zona Comercial del Centre", description: "Eje de comercios locales y tiendas de proximidad.", lat: 40.7085, lng: 0.5805, icon: "🏬", cost_constructors: 12, current_constructors: 0, status: "active" },
-            { id: 5, name: "Torre de la Carrova", description: "Torre medieval defensiva a orillas del Ebro.", lat: 40.7250, lng: 0.5920, icon: "🏰", cost_constructors: 20, current_constructors: 0, status: "active" }
+            { id: 1, name: "Plaça del Ajuntament", description: "Centro neurálgico y administrativo de Amposta.", icon: "🏛️", cost_constructors: 10, current_constructors: 0, status: "active" },
+            { id: 2, name: "Pont Colgant d'Amposta", description: "Icónico puente colgante sobre el río Ebro.", icon: "🌉", cost_constructors: 15, current_constructors: 0, status: "active" },
+            { id: 3, name: "Passeig del Canal", description: "Zona verde y recreativa junto al canal de riego.", icon: "🌳", cost_constructors: 8, current_constructors: 0, status: "active" },
+            { id: 4, name: "Zona Comercial del Centre", description: "Eje de comercios locales y tiendas de proximidad.", icon: "🏬", cost_constructors: 12, current_constructors: 0, status: "active" },
+            { id: 5, name: "Torre de la Carrova", description: "Torre medieval defensiva a orillas del Ebro.", icon: "🏰", cost_constructors: 20, current_constructors: 0, status: "active" }
         ];
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -305,32 +266,8 @@
                 fetchUserProfile(currentUser.id);
             }
 
-            initMap();
             loadPlots();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetPlotId = urlParams.get('plot');
-            const targetTab = urlParams.get('tab');
-
-            if (targetTab === 'individual') {
-                switchTab('individual');
-            } else if (targetPlotId) {
-                setTimeout(() => {
-                    selectPlotById(parseInt(targetPlotId));
-                }, 800);
-            }
         });
-
-        function initMap() {
-            map = L.map('map').setView([40.7088, 0.5822], 15);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            markersLayer.addTo(map);
-        }
 
         async function fetchUserProfile(userId) {
             try {
@@ -351,7 +288,6 @@
         }
 
         async function loadPlots() {
-            markersLayer.clearLayers();
             try {
                 const { data, error } = await supabaseClient
                     .from('board_plots')
@@ -362,36 +298,11 @@
                 } else {
                     plotsData = data;
                 }
-                renderMarkers();
                 renderPlotsList();
             } catch (err) {
                 plotsData = DEFAULT_AMPOSTA_PLOTS;
-                renderMarkers();
                 renderPlotsList();
             }
-        }
-
-        function renderMarkers() {
-            markersLayer.clearLayers();
-
-            plotsData.forEach(plot => {
-                const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
-                const markerColor = isCompleted ? '#00ff88' : '#00f0ff';
-
-                const customIcon = L.divIcon({
-                    className: 'custom-div-icon',
-                    html: `<div style="background-color: #0b0f19; border: 2px solid ${markerColor}; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 0 10px ${markerColor};">${plot.icon || '🏗️'}</div>`,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                });
-
-                const marker = L.marker([plot.lat, plot.lng], { icon: customIcon });
-                marker.on('click', () => {
-                    selectPlotById(plot.id);
-                });
-
-                markersLayer.addLayer(marker);
-            });
         }
 
         function renderPlotsList() {
@@ -402,47 +313,38 @@
             plotsData.forEach(plot => {
                 const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
                 const percentage = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
-                const isSelected = selectedPlotId === plot.id;
 
-                const item = document.createElement('div');
-                item.className = 'plot-list-item' + (isSelected ? ' selected' : '');
-                item.onclick = () => selectPlotById(plot.id);
-
-                item.innerHTML = `
+                const card = document.createElement('div');
+                card.className = 'plot-card';
+                card.innerHTML = `
                     <div class="plot-header">
-                        <span class="plot-title-text">${plot.icon || '🏗️'} ${plot.name}</span>
+                        <div class="plot-title">
+                            <span style="font-size: 1.3rem;">${plot.icon || '🏗️'}</span>
+                            <span>${plot.name}</span>
+                        </div>
                         <span class="plot-badge ${isCompleted ? 'badge-completed' : 'badge-active'}">
-                            ${isCompleted ? '✨ Completado' : '⚡ Activo'}
+                            ${isCompleted ? '✨ Propiedad Compartida (DAO)' : '⚡ En Financiación Colectiva'}
                         </span>
                     </div>
-                    <div style="font-size: 0.75rem; color: #a0aec0; margin-bottom: 6px;">${plot.description || ''}</div>
+                    <div style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 10px;">${plot.description || ''}</div>
                     
-                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0aec0;">
-                        <span>Progreso: ${plot.current_constructors} / ${plot.cost_constructors} 🏗️</span>
-                        <span style="color: #ffffff; font-weight: bold;">${percentage}%</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #a0aec0;">
+                        <span>Progreso de financiación</span>
+                        <span style="color: #ffffff; font-weight: bold;">${plot.current_constructors} / ${plot.cost_constructors} 🏗️ (${percentage}%)</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
                     </div>
 
                     <div class="plot-footer">
-                        <span>Coste total: ${plot.cost_constructors} 🏗️</span>
-                        <button class="btn-action-small" onclick="event.stopPropagation(); contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
-                            ${isCompleted ? 'Financiado' : '+1 🏗️ Aportar'}
+                        <span>Coste objetivo: <b>${plot.cost_constructors} 🏗️</b></span>
+                        <button class="btn-action" onclick="contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
+                            ${isCompleted ? 'Proyecto Completado' : 'Aportar 1 Constructor (🏗️)'}
                         </button>
                     </div>
                 `;
-                container.appendChild(item);
+                container.appendChild(card);
             });
-        }
-
-        function selectPlotById(id) {
-            selectedPlotId = id;
-            const plot = plotsData.find(p => p.id === id);
-            if (plot) {
-                map.setView([plot.lat, plot.lng], 17);
-                renderPlotsList();
-            }
         }
 
         async function contributeToPlot(plotId) {
@@ -465,13 +367,14 @@
             const newStatus = isCompleted ? 'completed' : 'active';
 
             try {
+                // Registrar contribución DAO compartida
                 await supabaseClient.from('plot_contributions').insert({
                     user_id: currentUser.id,
                     plot_id: plotId,
                     amount: 1
                 });
 
-                // Actualiza parcela sin asignar owner_id individual (DAO 100% compartido)
+                // Actualizar estado sin asignar owner_id individual
                 await supabaseClient
                     .from('board_plots')
                     .update({
@@ -480,6 +383,7 @@
                     })
                     .eq('id', plotId);
 
+                // Descontar constructor del usuario
                 const newBalance = userConstructorsBalance - 1;
                 await supabaseClient
                     .from('profiles')
@@ -491,7 +395,7 @@
 
                 alert(isCompleted ? "🎉 ¡Felicidades! Habéis completado este proyecto DAO colectivo." : "✅ ¡Aportación realizada con éxito!");
                 
-                await loadPlots();
+                loadPlots();
 
             } catch (err) {
                 console.error("Error en aportación:", err);
@@ -499,40 +403,32 @@
             }
         }
 
-        function switchTab(mode) {
+        async function switchTab(mode) {
             currentMode = mode;
             document.getElementById('tab-colective').classList.toggle('active', mode === 'colective');
             document.getElementById('tab-individual').classList.toggle('active', mode === 'individual');
 
-            const panel = document.getElementById('side-panel-content');
+            const container = document.getElementById('main-content-area');
             if (mode === 'individual') {
-                panel.innerHTML = `
-                    <h2 class="panel-title">🏡 Mis Propiedades Privadas</h2>
-                    <p class="panel-desc">Tus viviendas y locales personales en el ecosistema Phygital de Amposta.</p>
-                    <div id="private-list-container" style="color: #a0aec0; font-size: 0.85rem; text-align: center; padding: 20px;">
-                        Cargando tus propiedades...
-                    </div>
+                container.innerHTML = `
+                    <div class="section-title">🏡 Mis Propiedades Privadas</div>
+                    <div class="section-desc">Gestiona tus viviendas, locales y talleres personales en Amposta.</div>
+                    <div id="private-list-container" style="color: #a0aec0; padding: 20px; text-align: center;">Cargando tus propiedades...</div>
                 `;
-                loadUserPrivatePropertiesList();
+                loadUserPrivateProperties();
             } else {
-                panel.innerHTML = `
-                    <h2 class="panel-title">🏛️ Listado de Inversiones DAO</h2>
-                    <p class="panel-desc">Explora las parcelas comunitarias de Amposta, revisa su progreso e invierte tus Constructors.</p>
-                    <div class="user-constructors-box">
-                        <span style="color: #ffb703; font-weight: bold; font-size: 0.85rem;">Tus Constructors Disponibles:</span>
-                        <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.05rem;">${userConstructorsBalance} 🏗️</span>
-                    </div>
+                container.innerHTML = `
+                    <div class="section-title">Parcelas Urbanas de Amposta</div>
+                    <div class="section-desc">Invierte tus Constructors en proyectos comunitarios. Una vez completados, la propiedad es 100% compartida entre todos los inversores del DAO sin un dueño único.</div>
                     <div id="plots-list-container">
-                        <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
-                            Cargando parcelas de Amposta...
-                        </div>
+                        <div style="text-align: center; color: #a0aec0; padding: 30px;">Cargando inversiones...</div>
                     </div>
                 `;
                 loadPlots();
             }
         }
 
-        async function loadUserPrivatePropertiesList() {
+        async function loadUserPrivateProperties() {
             if (!currentUser) return;
             const container = document.getElementById('private-list-container');
             try {
@@ -544,26 +440,22 @@
                 if (!error && data && data.length > 0) {
                     container.innerHTML = '';
                     data.forEach(prop => {
-                        const div = document.createElement('div');
-                        div.style.background = 'rgba(0, 255, 136, 0.05)';
-                        div.style.border = '1px solid rgba(0, 255, 136, 0.3)';
-                        div.style.padding = '12px';
-                        div.style.borderRadius = '10px';
-                        div.style.marginBottom = '10px';
-                        div.innerHTML = `
-                            <div style="font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                        const card = document.createElement('div');
+                        card.className = 'plot-card';
+                        card.innerHTML = `
+                            <div class="plot-title" style="margin-bottom: 8px;">
                                 <span>${prop.icon || '🏠'}</span>
                                 <span>${prop.name}</span>
                             </div>
-                            <div style="color: #00ff88; font-size: 0.8rem; margin-top: 6px;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️ invertidos)</div>
+                            <div style="color: #00ff88; font-size: 0.85rem;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️ invertidos en propiedad individual)</div>
                         `;
-                        container.appendChild(div);
+                        container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No tienes propiedades privadas registradas todavía.</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">No tienes propiedades privadas registradas todavía.</div>`;
                 }
             } catch (err) {
-                console.error("Error cargando propiedades privadas:", err);
+                container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">Error al cargar las propiedades privadas.</div>`;
             }
         }
     </script>
