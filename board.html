@@ -3,1101 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero & Mapa de Ciudad - Bit-Towns</title>
+    <title>Tablero de Amposta - Bit-Towns</title>
     <link rel="icon" type="image/png" href="favicon.png?v=1">
-    
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         body {
             background-color: #0b0f19;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        .container {
-            max-width: 950px;
-            width: 100%;
-            box-sizing: border-box;
+            height: 100vh;
+            overflow: hidden;
         }
         .header {
+            background: rgba(11, 15, 25, 0.95);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            z-index: 1000;
         }
-        .back-btn {
-            color: #00f0ff;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: rgba(0, 240, 255, 0.05);
-            font-weight: bold;
-        }
-        .back-btn:hover {
-            background: rgba(0, 240, 255, 0.2);
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         h1 {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;
         }
-        .user-balance-bar {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 12px;
-            padding: 12px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
-        }
-        .balance-info {
-            font-size: 0.95rem;
-            font-weight: bold;
-        }
-
-        /* --- NAVEGACIÓN POR PESTAÑAS --- */
-        .tab-selector {
+        .nav-links {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+        }
+        .btn-nav {
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-nav:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+        .btn-profile {
+            color: #ffb703;
+            border-color: rgba(255, 183, 3, 0.4);
+            background: rgba(255, 183, 3, 0.08);
+        }
+        .btn-profile:hover {
+            background: rgba(255, 183, 3, 0.25);
+        }
+
+        /* Pestañas de navegación interna */
+        .tabs-bar {
+            display: flex;
             background: rgba(0, 0, 0, 0.4);
-            padding: 6px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 8px 20px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 999;
         }
         .tab-btn {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: 20px;
-            border: none;
             background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #a0aec0;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 0.85rem;
             font-weight: bold;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: all 0.2s;
         }
         .tab-btn.active {
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-        }
-
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* --- MAPA LEAFLET EN VIVO --- */
-        .map-section {
-            background: #060911;
-            border: 2px solid #00f0ff;
-            border-radius: 16px;
-            padding: 10px;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
-            margin-bottom: 25px;
-            position: relative;
-        }
-        .map-header-title {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
             color: #00f0ff;
-            font-size: 0.9rem;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+            background: #0b0f19;
+        }
+
+        /* Panel lateral de información y acciones */
+        .side-panel {
+            width: 360px;
+            background: rgba(11, 15, 25, 0.96);
+            border-left: 1px solid rgba(0, 240, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .panel-title {
+            color: #00f0ff;
+            font-size: 1.1rem;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: 0;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding-left: 5px;
         }
-        #map {
-            height: 380px;
-            width: 100%;
-            border-radius: 12px;
-            z-index: 1;
-            background: #0b0f19;
-        }
-        #map .leaflet-tile-pane {
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
-
-        .custom-map-marker {
-            background: rgba(11, 15, 25, 0.9);
-            border: 2px solid #00f0ff;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .custom-map-marker:hover {
-            transform: scale(1.2);
-            border-color: #ffffff;
-        }
-        .custom-map-marker.completed {
-            border-color: #00ff88;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
-        }
-
-        .leaflet-popup-content-wrapper {
-            background: #0b0f19 !important;
-            border: 1px solid #00f0ff !important;
-            color: #ffffff !important;
-            border-radius: 12px !important;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4) !important;
-        }
-        .leaflet-popup-tip {
-            background: #0b0f19 !important;
-            border: 1px solid #00f0ff !important;
-        }
-        .popup-content {
-            text-align: center;
-            padding: 5px;
-        }
-        .popup-title {
-            font-weight: bold;
-            color: #00f0ff;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-        }
-        .popup-status {
-            font-size: 0.8rem;
+        .panel-desc {
             color: #a0aec0;
-            margin-bottom: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 20px;
         }
-        .btn-map-invest {
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            color: #ffffff;
-            border: none;
-            padding: 6px 14px;
+        
+        .plot-detail-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 12px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
-        }
-
-        /* --- CUADRÍCULA DE PARCELAS COLECTIVAS --- */
-        .board-frame {
-            background: #060911;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-        .street-legend {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px dashed rgba(0, 240, 255, 0.2);
-            border-radius: 8px;
-            padding: 6px;
+            padding: 16px;
             margin-bottom: 15px;
-            font-size: 0.72rem;
-            color: #00f0ff;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: bold;
-            flex-wrap: wrap;
-            gap: 6px;
         }
-        .board-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            position: relative;
-            padding: 4px;
-        }
-        .plot-card {
-            background: #0d1322;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 125px;
-            box-sizing: border-box;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-        .plot-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            border-color: #00f0ff;
-            box-shadow: 0 0 18px rgba(0, 240, 255, 0.5);
-            background: #111a30;
-            z-index: 5;
-        }
-        .plot-card.completed {
-            border-color: #00ff88;
-            background: rgba(0, 255, 136, 0.08);
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
-        }
-        .plot-number {
-            position: absolute;
-            top: 5px;
-            left: 8px;
-            font-size: 0.65rem;
-            color: rgba(0, 240, 255, 0.5);
-            font-weight: bold;
-        }
-        .plot-icon {
-            font-size: 2rem;
-            margin: 4px 0;
-        }
-        .plot-title {
-            font-size: 0.8rem;
+        .plot-name {
+            font-size: 1.1rem;
             font-weight: bold;
             color: #ffffff;
-            line-height: 1.15;
             margin-bottom: 6px;
         }
         .plot-status {
-            font-size: 0.7rem;
-            color: #a0aec0;
-            margin-bottom: 6px;
-        }
-        .progress-bar-bg {
-            background: rgba(255, 255, 255, 0.1);
+            display: inline-block;
+            padding: 3px 10px;
             border-radius: 10px;
-            height: 6px;
-            width: 100%;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .status-active { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); }
+        .status-completed { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.4); }
+
+        .progress-bar-bg {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            height: 10px;
             overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .progress-bar-fill {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             height: 100%;
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.4s ease;
         }
-        .owner-badge {
-            font-size: 0.72rem;
-            color: #00ff88;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-top: 4px;
-        }
-
-        /* --- ESTILOS DE COMPRAS INDIVIDUALES --- */
-        .individual-section-title {
-            color: #00f0ff;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .catalog-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .catalog-icon {
-            font-size: 2.8rem;
-            margin-bottom: 8px;
-        }
-        .catalog-name {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #ffffff;
-            margin-bottom: 6px;
-        }
-        .catalog-desc {
-            font-size: 0.78rem;
-            color: #a0aec0;
-            margin-bottom: 12px;
-            line-height: 1.3;
-        }
-        .catalog-price {
-            color: #ffb703;
-            font-weight: bold;
-            font-size: 0.95rem;
-            margin-bottom: 12px;
-        }
-        .btn-buy-individual {
+        
+        .btn-action {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             color: #ffffff;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
             transition: transform 0.2s;
         }
-        .btn-buy-individual:hover {
-            transform: scale(1.04);
+        .btn-action:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 0 18px rgba(0, 240, 255, 0.6);
         }
-
-        .my-properties-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .my-property-card {
-            background: rgba(13, 19, 34, 0.8);
-            border: 1px solid #00ff88;
-            border-radius: 12px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
-        }
-        .my-property-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .my-property-icon {
-            font-size: 2.2rem;
-        }
-        .my-property-title {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #ffffff;
-        }
-        .my-property-level {
-            font-size: 0.8rem;
-            color: #00ff88;
-            font-weight: bold;
-            margin-top: 2px;
-        }
-        .btn-upgrade {
-            background: rgba(255, 183, 3, 0.15);
-            border: 1px solid #ffb703;
-            color: #ffb703;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-upgrade:hover {
-            background: rgba(255, 183, 3, 0.3);
-            box-shadow: 0 0 12px rgba(255, 183, 3, 0.5);
-            transform: scale(1.04);
-        }
-
-        /* Modal Aportar Constructors */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        .modal-card {
-            background: #0b0f19;
-            border: 1px solid #00f0ff;
-            border-radius: 16px;
-            padding: 22px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .modal-title {
-            color: #00f0ff;
-            font-size: 1.2rem;
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-        .modal-desc {
-            color: #a0aec0;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-        }
-        .amount-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            outline: none;
-        }
-        .amount-input:focus {
-            border-color: #00f0ff;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-modal {
-            flex: 1;
-            padding: 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: none;
-        }
-        .btn-cancel {
+        .btn-action:disabled {
             background: rgba(255, 255, 255, 0.1);
-            color: #a0aec0;
-        }
-        .btn-save {
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
-        }
-
-        .legal-notice {
             color: #718096;
-            font-size: 0.75rem;
-            line-height: 1.4;
-            text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 15px;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
-        @media (max-width: 650px) {
-            .board-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            .catalog-grid {
-                grid-template-columns: 1fr;
-            }
-            #map {
-                height: 280px;
-            }
+        .user-constructors-box {
+            background: rgba(255, 183, 3, 0.08);
+            border: 1px solid rgba(255, 183, 3, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="javascript:history.back()" class="back-btn">← Volver</a>
-            <h1>Tablero & Ciudad</h1>
+    <div class="header">
+        <div class="header-title">
+            <span style="font-size: 1.5rem;">🎲</span>
+            <h1>Tablero Phygital — Amposta</h1>
         </div>
-
-        <div class="user-balance-bar">
-            <span>🏛️ Amposta Digital - Sector Piloto</span>
-            <div class="balance-info">
-                Mis Constructors: <span id="my-constructors" style="color: #ffb703;">...</span> 🏗️
-            </div>
-        </div>
-
-        <!-- SELECTOR DE PESTAÑAS -->
-        <div class="tab-selector">
-            <button class="tab-btn active" id="tab-colective-btn" onclick="switchTab('colective')">
-                🏛️ Compras Colectivas
-            </button>
-            <button class="tab-btn" id="tab-individual-btn" onclick="switchTab('individual')">
-                🏡 Propiedades Individuales
-            </button>
-        </div>
-
-        <!-- PESTAÑA 1: COMPRAS COLECTIVAS (MAPA + TABLERO 4x4) -->
-        <div class="tab-content active" id="tab-colective">
-            <div class="map-section">
-                <div class="map-header-title">🗺️ Mapa Phygital de Elementos en Amposta</div>
-                <div id="map"></div>
-            </div>
-
-            <div class="board-frame">
-                <div class="street-legend">
-                    <span>🛣️ C. Major</span>
-                    <span>🛣️ Av. de la Ràpita</span>
-                    <span>🛣️ C. Sant Sebastià</span>
-                </div>
-                <div class="board-grid" id="board-grid"></div>
-            </div>
-        </div>
-
-        <!-- PESTAÑA 2: COMPRAS INDIVIDUALES (CATÁLOGO + MIS PROPIEDADES) -->
-        <div class="tab-content" id="tab-individual">
-            
-            <div class="individual-section-title">🛒 Catálogo de Viviendas & Espacios Privados</div>
-            <div class="catalog-grid">
-                <!-- Parcela 1: Casa Digital (Fácil para empezar) -->
-                <div class="catalog-card">
-                    <div>
-                        <div class="catalog-icon">🏠</div>
-                        <div class="catalog-name">Casa Particular Digital</div>
-                        <div class="catalog-desc">Tu residencia privada en Amposta. Perfecta para dar tus primeros pasos como ciudadano.</div>
-                    </div>
-                    <div>
-                        <div class="catalog-price">Coste: 1 Constructor 🏗️</div>
-                        <button class="btn-buy-individual" onclick="buyIndividualProperty('casa_base', 'Casa Particular Digital', '🏠', 1)">
-                            Adquirir Vivienda (1 🏗️)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Parcela 2: Taller Cyberpunk -->
-                <div class="catalog-card">
-                    <div>
-                        <div class="catalog-icon">🛠️</div>
-                        <div class="catalog-name">Taller Cyberpunk</div>
-                        <div class="catalog-desc">Espacio de creación e investigación técnica para proyectos phygitales.</div>
-                    </div>
-                    <div>
-                        <div class="catalog-price">Coste: 3 Constructors 🏗️</div>
-                        <button class="btn-buy-individual" onclick="buyIndividualProperty('taller', 'Taller Cyberpunk', '🛠️', 3)">
-                            Adquirir Taller (3 🏗️)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Parcela 3: Apartamento Neón -->
-                <div class="catalog-card">
-                    <div>
-                        <div class="catalog-icon">🏢</div>
-                        <div class="catalog-name">Apartamento Neón</div>
-                        <div class="catalog-desc">Piso de alto nivel ubicado en la avenida principal con vistas al Pont Penjat.</div>
-                    </div>
-                    <div>
-                        <div class="catalog-price">Coste: 5 Constructors 🏗️</div>
-                        <button class="btn-buy-individual" onclick="buyIndividualProperty('apartamento', 'Apartamento Neón', '🏢', 5)">
-                            Adquirir Apartamento (5 🏗️)
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="individual-section-title">🗝️ Mis Propiedades Privadas</div>
-            <div class="my-properties-list" id="my-properties-container">
-                <div style="text-align: center; color: #a0aec0; padding: 20px;">Cargando tus propiedades privadas...</div>
-            </div>
-
-        </div>
-
-        <div class="legal-notice">
-            <p>Bit-Towns — Plano urbano interactivo de Amposta. Participa en las grandes obras comunitarias o edifica y sube de nivel tu vivienda privada.</p>
+        <div class="nav-links">
+            <a href="profile.html" class="btn-profile">👤 Mi Perfil</a>
+            <a href="index.html" class="btn-nav">🏠 Inicio</a>
         </div>
     </div>
 
-    <!-- Modal Invertir Constructors (Colectivo) -->
-    <div class="modal-overlay" id="invest-modal">
-        <div class="modal-card">
-            <div id="modal-icon" style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</div>
-            <h3 class="modal-title" id="modal-plot-name">Nombre Parcela</h3>
-            <p class="modal-desc" id="modal-plot-desc">Aporta Constructors para completar esta edificación.</p>
-            
-            <input type="number" id="invest-amount" class="amount-input" min="1" value="1">
+    <!-- Pestañas de modo -->
+    <div class="tabs-bar">
+        <button class="tab-btn active" id="tab-colective" onclick="switchTab('colective')">🏛️ Mapa Colectivo (DAO)</button>
+        <button class="tab-btn" id="tab-individual" onclick="switchTab('individual')">🏡 Mis Propiedades Privadas</button>
+    </div>
 
-            <div class="modal-actions">
-                <button class="btn-modal btn-cancel" onclick="closeInvestModal()">Cancelar</button>
-                <button class="btn-modal btn-save" id="btn-confirm-invest" onclick="confirmInvestment()">Invertir 🏗️</button>
+    <div class="main-container">
+        <!-- Mapa OpenStreetMap / Leaflet -->
+        <div id="map"></div>
+
+        <!-- Panel Lateral Dinámico -->
+        <div class="side-panel" id="side-panel-content">
+            <h2 class="panel-title">🏛️ Parcelas de Amposta</h2>
+            <p class="panel-desc">Haz clic en cualquier parcela del mapa para ver su estado de financiación colectiva y aportar tus Constructors (🏗️).</p>
+            
+            <div class="user-constructors-box">
+                <span style="color: #ffb703; font-weight: bold; font-size: 0.9rem;">Tus Constructors:</span>
+                <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.1rem;">0 🏗️</span>
+            </div>
+
+            <div id="selected-plot-details">
+                <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
+                    Ninguna parcela seleccionada en el mapa.
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
-        const PLOT_COORDINATES = {
-            1:  { lat: 40.7138, lng: 0.5786 },
-            2:  { lat: 40.7135, lng: 0.5765 },
-            3:  { lat: 40.7118, lng: 0.5772 },
-            4:  { lat: 40.7065, lng: 0.5720 },
-            5:  { lat: 40.7125, lng: 0.5780 },
-            6:  { lat: 40.7095, lng: 0.5750 },
-            7:  { lat: 40.7080, lng: 0.5715 },
-            8:  { lat: 40.7050, lng: 0.5755 },
-            9:  { lat: 40.7108, lng: 0.5745 },
-            10: { lat: 40.7145, lng: 0.5810 },
-            11: { lat: 40.7142, lng: 0.5825 },
-            12: { lat: 40.7122, lng: 0.5760 },
-            13: { lat: 40.7100, lng: 0.5790 },
-            14: { lat: 40.7085, lng: 0.5780 },
-            15: { lat: 40.7070, lng: 0.5760 },
-            16: { lat: 40.7112, lng: 0.5768 }
-        };
-
-        let map;
-        let mapMarkers = {};
         let supabaseClient;
+        let map;
+        let currentMode = 'colective'; // 'colective' o 'individual'
         let currentUser = null;
-        let userConstructors = 0;
-        let selectedPlot = null;
+        let userConstructorsBalance = 0;
+        let markersLayer = L.layerGroup();
         let plotsData = [];
+        let selectedPlotId = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Obtener usuario autenticado
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                fetchUserProfile(currentUser.id);
+            }
+
             initMap();
+            loadPlots();
 
-            if (typeof supabase !== 'undefined') {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                try {
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    currentUser = session?.user || null;
+            // Comprobar parámetros en URL por si viene desde el perfil
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetPlotId = urlParams.get('plot');
+            const targetTab = urlParams.get('tab');
 
-                    if (currentUser) {
-                        const { data: profile } = await supabaseClient
-                            .from('profiles')
-                            .select('constructors')
-                            .eq('id', currentUser.id)
-                            .single();
-                        
-                        if (profile && profile.constructors !== undefined) {
-                            userConstructors = profile.constructors;
-                        }
-                    }
-                    document.getElementById('my-constructors').textContent = userConstructors;
-
-                    await loadBoardFromSupabase();
-                    await loadMyProperties();
-                    subscribeToBoardChanges();
-                } catch (err) {
-                    console.error("Error inicial:", err);
-                }
+            if (targetTab === 'individual') {
+                switchTab('individual');
+            } else if (targetPlotId) {
+                setTimeout(() => {
+                    selectPlotById(parseInt(targetPlotId));
+                }, 800);
             }
         });
 
-        /* Cambio de Pestañas */
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            if (tab === 'colective') {
-                document.getElementById('tab-colective-btn').classList.add('active');
-                document.getElementById('tab-colective').classList.add('active');
-                setTimeout(() => { if (map) map.invalidateSize(); }, 200);
-            } else {
-                document.getElementById('tab-individual-btn').classList.add('active');
-                document.getElementById('tab-individual').classList.add('active');
-            }
-        }
-
-        /* Inicializar el Mapa */
         function initMap() {
-            map = L.map('map', { zoomControl: true }).setView([40.7112, 0.5768], 15);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color: #00f0ff;" target="_blank">OpenStreetMap</a>',
-                maxZoom: 19
+            // Centro aproximado en Amposta
+            map = L.map('map').setView([40.7088, 0.5822], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
+
+            markersLayer.addTo(map);
         }
 
-        async function loadBoardFromSupabase() {
-            const { data: plots, error } = await supabaseClient
-                .from('board_plots')
-                .select(`
-                    id, name, category, cost_constructors, current_constructors, status, icon, owner_id,
-                    profiles:owner_id (nickname, avatar)
-                `)
-                .order('id', { ascending: true });
-
-            if (!error && plots && plots.length > 0) {
-                plotsData = plots;
-                renderBoard(plotsData);
-                updateMapMarkers(plotsData);
-            }
-        }
-
-        function renderBoard(plots) {
-            const grid = document.getElementById('board-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            plots.forEach((plot, index) => {
-                const current = plot.current_constructors || 0;
-                const cost = plot.cost_constructors || 10;
-                const isCompleted = current >= cost || plot.status === 'completado';
-                const percent = Math.min(100, Math.round((current / cost) * 100));
-
-                const card = document.createElement('div');
-                card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
-                card.onclick = () => {
-                    focusPlotOnMap(plot.id);
-                    openInvestModal(plot);
-                };
-
-                let ownerHtml = `<div class="plot-status">${current} / ${cost} 🏗️</div>`;
-                if (isCompleted) {
-                    const ownerNick = plot.profiles?.nickname || 'Comunidad';
-                    ownerHtml = `<div class="owner-badge">👑 ${ownerNick}</div>`;
-                }
-
-                card.innerHTML = `
-                    <span class="plot-number">#${plot.id || index + 1}</span>
-                    <div class="plot-icon">${plot.icon || '🏗️'}</div>
-                    <div class="plot-title">${plot.name}</div>
-                    ${ownerHtml}
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${percent}%;"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function updateMapMarkers(plots) {
-            plots.forEach(plot => {
-                const coords = PLOT_COORDINATES[plot.id] || { lat: 40.7112, lng: 0.5768 };
-                const isCompleted = (plot.current_constructors || 0) >= plot.cost_constructors || plot.status === 'completado';
-                const iconSymbol = plot.icon || '🏗️';
-
-                const customIcon = L.divIcon({
-                    className: 'custom-map-marker-container',
-                    html: `<div class="custom-map-marker ${isCompleted ? 'completed' : ''}">${iconSymbol}</div>`,
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 18]
-                });
-
-                let statusText = `${plot.current_constructors || 0} / ${plot.cost_constructors} 🏗️`;
-                if (isCompleted) {
-                    const ownerNick = plot.profiles?.nickname || 'Comunidad';
-                    statusText = `👑 Propietario: ${ownerNick}`;
-                }
-
-                const popupHtml = `
-                    <div class="popup-content">
-                        <div class="popup-title">${iconSymbol} ${plot.name}</div>
-                        <div class="popup-status">${statusText}</div>
-                        ${!isCompleted ? `<button class="btn-map-invest" onclick="triggerInvestFromMap(${plot.id})">Invertir 🏗️</button>` : ''}
-                    </div>
-                `;
-
-                if (mapMarkers[plot.id]) {
-                    mapMarkers[plot.id].setIcon(customIcon);
-                    mapMarkers[plot.id].getPopup().setContent(popupHtml);
-                } else {
-                    const marker = L.marker([coords.lat, coords.lng], { icon: customIcon })
-                        .addTo(map)
-                        .bindPopup(popupHtml);
-                    mapMarkers[plot.id] = marker;
-                }
-            });
-        }
-
-        function focusPlotOnMap(plotId) {
-            const coords = PLOT_COORDINATES[plotId];
-            if (coords && map) {
-                map.flyTo([coords.lat, coords.lng], 16, { duration: 1 });
-                if (mapMarkers[plotId]) mapMarkers[plotId].openPopup();
-            }
-        }
-
-        window.triggerInvestFromMap = function(plotId) {
-            const plot = plotsData.find(p => p.id === plotId);
-            if (plot) openInvestModal(plot);
-        };
-
-        function subscribeToBoardChanges() {
-            if (!supabaseClient) return;
-            supabaseClient
-                .channel('public:board_plots')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'board_plots' }, () => {
-                    loadBoardFromSupabase();
-                })
-                .subscribe();
-        }
-
-        /* --- LÓGICA DE COMPRAS INDIVIDUALES --- */
-        async function loadMyProperties() {
-            const container = document.getElementById('my-properties-container');
-            if (!container) return;
-
-            if (!currentUser) {
-                container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">Inicia sesión para gestionar tus viviendas.</div>`;
-                return;
-            }
-
+        async function fetchUserProfile(userId) {
             try {
-                const { data: props, error } = await supabaseClient
-                    .from('user_properties')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('constructors')
+                    .eq('id', userId)
+                    .single();
+                
+                if (!error && data) {
+                    userConstructorsBalance = data.constructors || 0;
+                    const el = document.getElementById('panel-user-constructors');
+                    if (el) el.textContent = userConstructorsBalance + ' 🏗️';
+                }
+            } catch (err) {
+                console.error("Error al cargar perfil:", err);
+            }
+        }
+
+        async function loadPlots() {
+            markersLayer.clearLayers();
+            try {
+                const { data, error } = await supabaseClient
+                    .from('board_plots')
+                    .select('*');
 
                 if (error) {
-                    console.error("Error al cargar propiedades:", error);
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No se pudieron obtener tus propiedades.</div>`;
+                    console.error("Error al cargar parcelas:", error);
                     return;
                 }
 
-                if (!props || props.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 18px; color: #a0aec0; font-size: 0.85rem; background: rgba(0,0,0,0.2); border-radius: 10px;">
-                            Aún no posees propiedades privadas.<br>
-                            ¡Adquiere tu primera <b>Casa Particular</b> arriba por solo 1 Constructor! 🏠
-                        </div>
-                    `;
-                    return;
-                }
+                plotsData = data || [];
+                renderMarkers();
+            } catch (err) {
+                console.error("Excepción al cargar parcelas:", err);
+            }
+        }
 
-                container.innerHTML = '';
-                props.forEach(prop => {
-                    const upgradeCost = prop.level + 1; // Fórmula de coste de subida de nivel
-                    const card = document.createElement('div');
-                    card.className = 'my-property-card';
+        function renderMarkers() {
+            markersLayer.clearLayers();
 
-                    card.innerHTML = `
-                        <div class="my-property-info">
-                            <div class="my-property-icon">${prop.icon}</div>
-                            <div>
-                                <div class="my-property-title">${prop.name}</div>
-                                <div class="my-property-level">Nivel ${prop.level} • ${prop.total_constructors || prop.level} 🏗️ invertidos</div>
-                            </div>
-                        </div>
-                        <button class="btn-upgrade" onclick="upgradeProperty('${prop.id}', ${prop.level}, ${upgradeCost})">
-                            🔼 Subir a Nivel ${prop.level + 1} (${upgradeCost} 🏗️)
-                        </button>
-                    `;
-                    container.appendChild(card);
+            plotsData.forEach(plot => {
+                const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
+                const markerColor = isCompleted ? '#00ff88' : '#00f0ff';
+
+                // Icono personalizado con marcador Leaflet
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: #0b0f19; border: 2px solid ${markerColor}; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 0 10px ${markerColor};">${plot.icon || '🏗️'}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
                 });
-            } catch (err) {
-                console.error("Excepción propiedades:", err);
+
+                const marker = L.marker([plot.lat, plot.lng], { icon: customIcon });
+                marker.on('click', () => {
+                    selectPlot(plot);
+                });
+
+                markersLayer.addLayer(marker);
+            });
+        }
+
+        function selectPlot(plot) {
+            selectedPlotId = plot.id;
+            const container = document.getElementById('selected-plot-details');
+            
+            const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
+            const percentage = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
+
+            container.innerHTML = `
+                <div class="plot-detail-card">
+                    <div class="plot-name">${plot.icon || '🏗️'} ${plot.name}</div>
+                    <span class="plot-status ${isCompleted ? 'status-completed' : 'status-active'}">
+                        ${isCompleted ? '✨ Parcela Financiada (DAO)' : '⚡ En Financiación Colectiva'}
+                    </span>
+                    <p style="color: #a0aec0; font-size: 0.8rem; margin: 6px 0 12px 0;">${plot.description || 'Proyecto de mejora urbana comunitaria en Amposta.'}</p>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #a0aec0;">
+                        <span>Progreso DAO</span>
+                        <span style="color: #ffffff; font-weight: bold;">${plot.current_constructors} / ${plot.cost_constructors} 🏗️ (${percentage}%)</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+                    </div>
+
+                    <button class="btn-action" id="btn-contribute" onclick="contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
+                        ${isCompleted ? 'Parcialmente Financiada (Comunidad)' : 'Aportar 1 Constructor (🏗️)'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function selectPlotId(id) {
+            const plot = plotsData.find(p => p.id === id);
+            if (plot) {
+                selectPlot(plot);
+                map.setView([plot.lat, plot.lng], 17);
             }
         }
 
-        async function buyIndividualProperty(type, name, icon, cost) {
+        // LÓGICA CLAVE DE APORTACIÓN DAO COMPARTIDA
+        async function contributeToPlot(plotId) {
             if (!currentUser) {
-                alert("Debes iniciar sesión para comprar una propiedad.");
+                alert("Debes iniciar sesión para aportar Constructors.");
                 window.location.href = 'login.html';
                 return;
             }
 
-            if (userConstructors < cost) {
-                alert(`Necesitas ${cost} Constructor(es) para adquirir esta propiedad. Tu saldo es de ${userConstructors}.`);
+            if (userConstructorsBalance < 1) {
+                alert("No te quedan Constructors disponibles. Puedes reclamar tu recompensa diaria en tu perfil.");
                 return;
             }
 
-            if (!confirm(`¿Deseas adquirir "${name}" por ${cost} Constructor(es)?`)) return;
+            const plot = plotsData.find(p => p.id === plotId);
+            if (!plot) return;
+
+            const newTotal = (plot.current_constructors || 0) + 1;
+            const isCompleted = newTotal >= plot.cost_constructors;
+            const newStatus = isCompleted ? 'completed' : 'active';
 
             try {
-                // 1. Descontar Constructors
-                const newBalance = userConstructors - cost;
-                const { error: profileErr } = await supabaseClient
-                    .from('profiles')
-                    .update({ constructors: newBalance })
-                    .eq('id', currentUser.id);
-
-                if (profileErr) throw profileErr;
-
-                // 2. Insertar propiedad en user_properties
-                const { error: propErr } = await supabaseClient
-                    .from('user_properties')
-                    .insert({
-                        user_id: currentUser.id,
-                        property_type: type,
-                        name: name,
-                        icon: icon,
-                        level: 1,
-                        total_constructors: cost
-                    });
-
-                if (propErr) throw propErr;
-
-                userConstructors = newBalance;
-                document.getElementById('my-constructors').textContent = userConstructors;
-
-                alert(`🎉 ¡Enhorabuena! Has adquirido "${name}". Ahora es de tu propiedad privada.`);
-                await loadMyProperties();
-            } catch (err) {
-                console.error("Error en compra individual:", err);
-                alert("Error al completar la compra: " + err.message);
-            }
-        }
-
-        async function upgradeProperty(propId, currentLevel, upgradeCost) {
-            if (!currentUser) return;
-
-            if (userConstructors < upgradeCost) {
-                alert(`Necesitas ${upgradeCost} Constructors para subir a Nivel ${currentLevel + 1}. Tu saldo actual es ${userConstructors}.`);
-                return;
-            }
-
-            if (!confirm(`¿Subir esta propiedad a Nivel ${currentLevel + 1} por ${upgradeCost} Constructors?`)) return;
-
-            try {
-                // 1. Descontar Constructors
-                const newBalance = userConstructors - upgradeCost;
-                const { error: profileErr } = await supabaseClient
-                    .from('profiles')
-                    .update({ constructors: newBalance })
-                    .eq('id', currentUser.id);
-
-                if (profileErr) throw profileErr;
-
-                // 2. Actualizar nivel de la propiedad
-                const { error: propErr } = await supabaseClient
-                    .from('user_properties')
-                    .update({
-                        level: currentLevel + 1,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', propId);
-
-                if (propErr) throw propErr;
-
-                userConstructors = newBalance;
-                document.getElementById('my-constructors').textContent = userConstructors;
-
-                alert(`✨ ¡Propiedad mejorada a Nivel ${currentLevel + 1}!`);
-                await loadMyProperties();
-            } catch (err) {
-                console.error("Error al mejorar propiedad:", err);
-                alert("Error al subir de nivel: " + err.message);
-            }
-        }
-
-        /* Modal Inversión Colectiva */
-        function openInvestModal(plot) {
-            if (!currentUser) {
-                alert("Debes iniciar sesión para edificar.");
-                window.location.href = 'login.html';
-                return;
-            }
-
-            if ((plot.current_constructors || 0) >= plot.cost_constructors) {
-                alert("🏛️ ¡Esta parcela ya ha sido completada por la comunidad!");
-                return;
-            }
-
-            selectedPlot = plot;
-            document.getElementById('modal-icon').textContent = plot.icon || '🏗️';
-            document.getElementById('modal-plot-name').textContent = plot.name;
-            document.getElementById('modal-plot-desc').textContent = `Progreso actual: ${plot.current_constructors || 0} / ${plot.cost_constructors} Constructors.`;
-            document.getElementById('invest-amount').value = 1;
-            document.getElementById('invest-amount').max = userConstructors;
-            document.getElementById('invest-modal').style.display = 'flex';
-        }
-
-        function closeInvestModal() {
-            document.getElementById('invest-modal').style.display = 'none';
-            selectedPlot = null;
-        }
-
-        async function confirmInvestment() {
-            const amountInput = document.getElementById('invest-amount');
-            const amount = parseInt(amountInput.value);
-
-            if (isNaN(amount) || amount <= 0) {
-                alert("Introduce una cantidad válida.");
-                return;
-            }
-
-            if (amount > userConstructors) {
-                alert(`No tienes suficientes Constructors. Tu saldo actual es de ${userConstructors}.`);
-                return;
-            }
-
-            const confirmBtn = document.getElementById('btn-confirm-invest');
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = "⏳ Guardando...";
-
-            const currentAmount = selectedPlot.current_constructors || 0;
-            const newPlotConstructors = currentAmount + amount;
-            const isNowCompleted = newPlotConstructors >= selectedPlot.cost_constructors;
-            const newStatus = isNowCompleted ? 'completado' : 'en_construccion';
-
-            try {
-                const newBalance = userConstructors - amount;
-                const { error: profileErr } = await supabaseClient
-                    .from('profiles')
-                    .update({ constructors: newBalance })
-                    .eq('id', currentUser.id);
-
-                if (profileErr) throw profileErr;
-
-                const updatePayload = {
-                    current_constructors: newPlotConstructors,
-                    status: newStatus
-                };
-                if (isNowCompleted) {
-                    updatePayload.owner_id = currentUser.id;
-                }
-
-                const { error: plotErr } = await supabaseClient
-                    .from('board_plots')
-                    .update(updatePayload)
-                    .eq('id', selectedPlot.id);
-
-                if (plotErr) throw plotErr;
-
-                await supabaseClient
+                // 1. Registrar la aportación individual en la tabla de contribuciones DAO
+                const { error: contribError } = await supabaseClient
                     .from('plot_contributions')
                     .insert({
-                        plot_id: selectedPlot.id,
                         user_id: currentUser.id,
-                        amount: amount
+                        plot_id: plotId,
+                        amount: 1
                     });
 
-                userConstructors = newBalance;
-                document.getElementById('my-constructors').textContent = userConstructors;
+                if (contribError) {
+                    // Si ya existía aportación previa, actualizamos la cantidad sumando 1
+                    // Opcional según diseño, pero manejamos el error mostrando mensaje
+                    console.warn("Nota de contribución:", contribError);
+                }
 
-                closeInvestModal();
-                await loadBoardFromSupabase();
+                // 2. Actualizar el total de constructors de la parcela en board_plots
+                // IMPORTANTE: NO asignamos ningun 'owner_id' para que la parcela sea 100% comunitaria/compartida.
+                const { error: plotError } = await supabaseClient
+                    .from('board_plots')
+                    .update({
+                        current_constructors: newTotal,
+                        status: newStatus
+                    })
+                    .eq('id', plotId);
 
-                if (isNowCompleted) {
-                    alert(`🎉 ¡Felicidades! Has completado "${selectedPlot.name}" y te has convertido en su propietario digital.`);
+                if (plotError) {
+                    alert("Error al actualizar la parcela en Supabase.");
+                    return;
+                }
+
+                // 3. Descontar 1 constructor del balance del usuario
+                const newBalance = userConstructorsBalance - 1;
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                if (profileError) {
+                    alert("Error al actualizar tus Constructors.");
+                    return;
+                }
+
+                userConstructorsBalance = newBalance;
+                document.getElementById('panel-user-constructors').textContent = userConstructorsBalance + ' 🏗️';
+
+                alert(isCompleted ? "🎉 ¡Felicidades! Con tu aportación habéis completado este proyecto DAO colectivo en Amposta." : "✅ ¡Aportación realizada con éxito!");
+                
+                // Recargar datos del mapa
+                await loadPlots();
+                selectPlot(plotsData.find(p => p.id === plotId));
+
+            } catch (err) {
+                console.error("Error en la transacción de aportación:", err);
+                alert("Hubo un error al procesar tu aportación.");
+            }
+        }
+
+        function switchTab(mode) {
+            currentMode = mode;
+            document.getElementById('tab-colective').classList.toggle('active', mode === 'colective');
+            document.getElementById('tab-individual').classList.toggle('active', mode === 'individual');
+
+            const panel = document.getElementById('side-panel-content');
+            if (mode === 'individual') {
+                panel.innerHTML = `
+                    <h2 class="panel-title">🏡 Mis Propiedades Privadas</h2>
+                    <p class="panel-desc">Tus viviendas y locales personales en el ecosistema Phygital de Amposta.</p>
+                    <div id="private-list-container" style="color: #a0aec0; font-size: 0.85rem; text-align: center; padding: 20px;">
+                        Cargando tus propiedades...
+                    </div>
+                `;
+                loadUserPrivatePropertiesList();
+            } else {
+                panel.innerHTML = `
+                    <h2 class="panel-title">🏛️ Parcelas de Amposta</h2>
+                    <p class="panel-desc">Haz clic en cualquier parcela del mapa para ver su estado de financiación colectiva y aportar tus Constructors (🏗️).</p>
+                    <div class="user-constructors-box">
+                        <span style="color: #ffb703; font-weight: bold; font-size: 0.9rem;">Tus Constructors:</span>
+                        <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.1rem;">${userConstructorsBalance} 🏗️</span>
+                    </div>
+                    <div id="selected-plot-details">
+                        <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
+                            Ninguna parcela seleccionada en el mapa.
+                        </div>
+                    </div>
+                `;
+                loadPlots();
+            }
+        }
+
+        async function loadUserPrivatePropertiesList() {
+            if (!currentUser) return;
+            const container = document.getElementById('private-list-container');
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_properties')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+
+                if (!error && data && data.length > 0) {
+                    container.innerHTML = '';
+                    data.forEach(prop => {
+                        const div = document.createElement('div');
+                        div.style.background = 'rgba(0, 255, 136, 0.05)';
+                        div.style.border = '1px solid rgba(0, 255, 136, 0.3)';
+                        div.style.padding = '12px';
+                        div.style.borderRadius = '10px';
+                        div.style.marginBottom = '10px';
+                        div.innerHTML = `
+                            <div style="font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                                <span>${prop.icon || '🏠'}</span>
+                                <span>${prop.name}</span>
+                            </div>
+                            <div style="color: #00ff88; font-size: 0.8rem; margin-top: 6px;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️ invertidos)</div>
+                        `;
+                        container.appendChild(div);
+                    });
                 } else {
-                    alert(`🏗️ Has aportado ${amount} Constructor(es) a "${selectedPlot.name}".`);
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No tienes propiedades privadas registradas todavía.</div>`;
                 }
             } catch (err) {
-                console.error("Error al invertir:", err);
-                alert("Error al guardar la inversión: " + err.message);
-            } finally {
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = "Invertir 🏗️";
+                console.error("Error cargando propiedades privadas:", err);
             }
         }
     </script>
