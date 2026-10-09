@@ -167,7 +167,7 @@
             box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
         }
 
-        /* Estilo de la Fila / Tarjeta de Tema en el Listado General */
+        /* Estilo de la Fila de Tema en el Listado General */
         .thread-item-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -224,9 +224,18 @@
             gap: 16px;
             font-size: 0.78rem;
             color: var(--text-dim);
+            flex-wrap: wrap;
         }
         .thread-meta-row b {
             color: var(--text-muted);
+        }
+        .badge-replies {
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 600;
         }
         .thread-action-col {
             display: flex;
@@ -412,6 +421,7 @@
         let currentUser = null;
         const ADMIN_EMAIL = 'edgartp89@gmail.com'; 
         let userMessageCounts = {};
+        let threadReplyCounts = {};
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -424,7 +434,7 @@
             }
 
             currentUser = session.user;
-            await loadUserStats();
+            await loadForumStats();
 
             const urlParams = new URLSearchParams(window.location.search);
             const threadId = urlParams.get('id');
@@ -436,12 +446,15 @@
             }
         });
 
-        async function loadUserStats() {
+        async function loadForumStats() {
             try {
+                // Cargar recuento de mensajes por usuario y recuento de respuestas por hilo
                 const { data: threads } = await supabaseClient.from('forum_threads').select('user_id');
-                const { data: replies } = await supabaseClient.from('forum_replies').select('user_id');
+                const { data: replies } = await supabaseClient.from('forum_replies').select('user_id, thread_id');
 
                 userMessageCounts = {};
+                threadReplyCounts = {};
+
                 if (threads) {
                     threads.forEach(t => {
                         if (t.user_id) userMessageCounts[t.user_id] = (userMessageCounts[t.user_id] || 0) + 1;
@@ -450,14 +463,17 @@
                 if (replies) {
                     replies.forEach(r => {
                         if (r.user_id) userMessageCounts[r.user_id] = (userMessageCounts[r.user_id] || 0) + 1;
+                        if (r.thread_id) {
+                            threadReplyCounts[r.thread_id] = (threadReplyCounts[r.thread_id] || 0) + 1;
+                        }
                     });
                 }
             } catch (err) {
-                console.error("Error cargando métricas:", err);
+                console.error("Error cargando estadísticas:", err);
             }
         }
 
-        // VISTA 1: LISTADO GENERAL DE TEMAS (Diseño tipo Foro Profesional / Listado de Hilos)
+        // VISTA 1: LISTADO GENERAL DE TEMAS CON CONTEO DE RESPUESTAS
         async function loadThreadsList() {
             const container = document.getElementById('main-container');
             container.innerHTML = `
@@ -491,6 +507,7 @@
                     data.forEach(thread => {
                         const dateFormatted = new Date(thread.created_at).toLocaleString();
                         const author = thread.author_name || 'Ciudadano';
+                        const numReplies = threadReplyCounts[thread.id] || 0;
 
                         const itemCard = document.createElement('div');
                         itemCard.className = 'thread-item-card';
@@ -507,6 +524,7 @@
                                 <div class="thread-meta-row">
                                     <span>Autor: <b>${escapeHtml(author)}</b></span>
                                     <span>Fecha: <b>${dateFormatted}</b></span>
+                                    <span>Respuestas: <span class="badge-replies">💬 ${numReplies}</span></span>
                                 </div>
                             </div>
                             <div class="thread-action-col">
@@ -524,7 +542,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO Y RESPUESTAS (Con tarjeta de usuario completa)
+        // VISTA 2: DETALLE DEL HILO Y RESPUESTAS
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('main-container');
             container.innerHTML = `
@@ -678,7 +696,7 @@
                 });
 
                 if (error) { alert("Error al registrar el tema."); return; }
-                await loadUserStats();
+                await loadForumStats();
                 loadThreadsList();
             } catch (err) {
                 console.error("Error:", err);
@@ -705,7 +723,7 @@
 
                 if (error) { alert("Error al enviar la respuesta."); return; }
                 document.getElementById('reply-content').value = '';
-                await loadUserStats();
+                await loadForumStats();
                 loadReplies(threadId);
             } catch (err) {
                 console.error("Error:", err);
@@ -720,7 +738,7 @@
                 if (error) { alert("Error al eliminar el tema."); return; }
 
                 alert("Tema eliminado correctamente.");
-                await loadUserStats();
+                await loadForumStats();
                 if (redirectToList) {
                     window.location.href = 'forum.html';
                 } else {
@@ -737,7 +755,7 @@
             try {
                 const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
                 if (error) { alert("Error al eliminar la respuesta."); return; }
-                await loadUserStats();
+                await loadForumStats();
                 loadReplies(threadId);
             } catch (err) {
                 console.error("Error:", err);
