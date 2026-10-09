@@ -217,12 +217,45 @@
             border-radius: 10px;
             color: #ffffff;
             font-size: 0.9rem;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             box-sizing: border-box;
             outline: none;
         }
         .form-input:focus {
             border-color: #00ff88;
+        }
+
+        /* Botones de selección de tipo de propiedad */
+        .type-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .type-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .type-btn:hover {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.08);
+        }
+        .type-btn.selected {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+            color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
         }
     </style>
 </head>
@@ -251,7 +284,7 @@
         </div>
 
         <div id="main-content-area">
-            <!-- Contenido dinámico según la pestaña -->
+            <!-- Contenido dinámico -->
         </div>
     </div>
 
@@ -265,6 +298,8 @@
         let userConstructorsBalance = 0;
         let currentMode = 'colective';
         let plotsData = [];
+        let selectedPropertyIcon = '🏠';
+        let selectedPropertyNameDefault = 'Casa Residencial';
 
         const DEFAULT_AMPOSTA_PLOTS = [
             { id: 1, name: "Plaça del Ajuntament", description: "Centro neurálgico y administrativo de Amposta.", icon: "🏛️", cost_constructors: 10, current_constructors: 0, status: "active" },
@@ -425,15 +460,17 @@
             if (mode === 'individual') {
                 container.innerHTML = `
                     <div class="buy-property-card">
-                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 8px; font-size: 1.05rem;">➕ Comprar Nueva Propiedad Privada</div>
-                        <div style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 15px;">Adquiere una vivienda, local o taller personal por 2 Constructors (🏗️).</div>
-                        <input type="text" id="new-prop-name" class="form-input" placeholder="Nombre de la propiedad (ej. Loft en Carrer de Sants)..." />
-                        <select id="new-prop-icon" class="form-input">
-                            <option value="🏠">🏠 Casa / Vivienda</option>
-                            <option value="🏢">🏢 Edificio / Oficina</option>
-                            <option value="🏬">🏬 Local Comercial</option>
-                            <option value="🏭">🏭 Taller / Fábrica</option>
-                        </select>
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 6px; font-size: 1.05rem;">➕ Comprar Nueva Propiedad Privada</div>
+                        <div style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 15px;">Selecciona el tipo de inmueble y adquiérelo por 2 Constructors (🏗️).</div>
+                        
+                        <div class="type-buttons-grid">
+                            <button class="type-btn selected" id="btn-type-house" onclick="selectPropertyType('🏠', 'Casa Residencial', 'btn-type-house')">🏠 Casa</button>
+                            <button class="type-btn" id="btn-type-office" onclick="selectPropertyType('🏢', 'Edificio de Oficinas', 'btn-type-office')">🏢 Edificio</button>
+                            <button class="type-btn" id="btn-type-shop" onclick="selectPropertyType('🏬', 'Local Comercial', 'btn-type-shop')">🏬 Local</button>
+                            <button class="type-btn" id="btn-type-factory" onclick="selectPropertyType('🏭', 'Taller / Fábrica', 'btn-type-factory')">🏭 Taller</button>
+                        </div>
+
+                        <input type="text" id="new-prop-name" class="form-input" placeholder="Nombre personalizado (opcional)..." />
                         <button class="btn-action" onclick="buyPrivateProperty()" style="background: linear-gradient(90deg, #00ff88, #00f0ff); color: #0b0f19; width: 100%; padding: 10px;">Comprar Propiedad (2 🏗️)</button>
                     </div>
 
@@ -454,6 +491,15 @@
                 `;
                 loadPlots();
             }
+        }
+
+        function selectPropertyType(icon, defaultName, buttonId) {
+            selectedPropertyIcon = icon;
+            selectedPropertyNameDefault = defaultName;
+            
+            // Quitar clase selected a todos y ponérsela al pulsado
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById(buttonId).classList.add('selected');
         }
 
         async function loadUserPrivateProperties() {
@@ -486,7 +532,7 @@
                         container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">No tienes propiedades privadas registradas todavía. ¡Utiliza el formulario superior para adquirir una!</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">No tienes propiedades privadas registradas todavía. ¡Utiliza los botones superiores para adquirir una!</div>`;
                 }
             } catch (err) {
                 container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">Error al cargar las propiedades privadas.</div>`;
@@ -506,8 +552,7 @@
             }
 
             const nameInput = document.getElementById('new-prop-name').value.trim();
-            const iconVal = document.getElementById('new-prop-icon').value;
-            const propName = nameInput || "Vivienda Privada Amposta";
+            const propName = nameInput || selectedPropertyNameDefault;
 
             try {
                 const { error: insertErr } = await supabaseClient
@@ -515,7 +560,7 @@
                     .insert({
                         user_id: currentUser.id,
                         name: propName,
-                        icon: iconVal,
+                        icon: selectedPropertyIcon,
                         level: 1,
                         total_constructors: 2
                     });
