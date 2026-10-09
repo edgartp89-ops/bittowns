@@ -464,6 +464,16 @@
             </div>
         </div>
 
+        <!-- MÓDULO NUEVO: INVERSIONES EN LA CIUDAD -->
+        <div class="section-card">
+            <h2>🏗️ Inversiones en la Ciudad</h2>
+            <div id="user-investments-list">
+                <div style="text-align: center; color: #a0aec0; font-size: 0.85rem; padding: 10px;">
+                    Cargando proyectos invertidos...
+                </div>
+            </div>
+        </div>
+
         <div class="section-card">
             <h2>🎒 Inventario & Activos Phygital</h2>
             <div class="inventory-item">
@@ -657,6 +667,92 @@
             }
         }
 
+        /* FUNCIÓN PARA CARGAR LAS INVERSIONES DEL USUARIO */
+        async function loadUserInvestments(userId) {
+            const container = document.getElementById('user-investments-list');
+            if (!container) return;
+
+            try {
+                const { data: contributions, error } = await supabaseClient
+                    .from('plot_contributions')
+                    .select(`
+                        amount,
+                        plot_id,
+                        board_plots (id, name, icon, cost_constructors, current_constructors, status, owner_id)
+                    `)
+                    .eq('user_id', userId);
+
+                if (error) {
+                    console.error("Error al obtener inversiones:", error);
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; font-size: 0.85rem;">Sin inversiones activas.</div>`;
+                    return;
+                }
+
+                if (!contributions || contributions.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 12px; color: #a0aec0; font-size: 0.85rem;">
+                            Aún no has invertido Constructors en la ciudad.<br>
+                            <a href="board.html" style="color: #00f0ff; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px;">
+                                🎲 Explorar Tablero de Amposta →
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Agrupar aportaciones por parcela
+                const plotMap = {};
+                contributions.forEach(item => {
+                    const plot = item.board_plots;
+                    if (!plot) return;
+                    const pId = item.plot_id || plot.id;
+                    if (!plotMap[pId]) {
+                        plotMap[pId] = {
+                            id: plot.id,
+                            name: plot.name,
+                            icon: plot.icon || '🏗️',
+                            cost: plot.cost_constructors || 10,
+                            current: plot.current_constructors || 0,
+                            status: plot.status,
+                            isOwner: plot.owner_id === userId,
+                            userTotal: 0
+                        };
+                    }
+                    plotMap[pId].userTotal += (item.amount || 0);
+                });
+
+                const aggregatedList = Object.values(plotMap);
+
+                container.innerHTML = '';
+                aggregatedList.forEach(inv => {
+                    const isCompleted = inv.current >= inv.cost || inv.status === 'completado';
+                    const card = document.createElement('div');
+                    card.className = 'inventory-item';
+                    card.style.borderLeftColor = inv.isOwner ? '#00ff88' : '#00f0ff';
+
+                    let badgeText = `<span style="color: #ffb703; font-weight: bold;">${inv.userTotal} 🏗️ invertidos</span>`;
+                    if (inv.isOwner) {
+                        badgeText = `<span style="color: #00ff88; font-weight: bold;">👑 Propietario (${inv.userTotal} 🏗️)</span>`;
+                    }
+
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.3rem;">${inv.icon}</span>
+                            <div>
+                                <div style="font-weight: bold; color: #ffffff;">${inv.name}</div>
+                                <div style="font-size: 0.75rem; color: #a0aec0;">Progreso global: ${inv.current} / ${inv.cost} 🏗️</div>
+                            </div>
+                        </div>
+                        <div>${badgeText}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error("Excepción inversiones:", err);
+                container.innerHTML = `<div style="text-align: center; color: #a0aec0; font-size: 0.85rem;">Error al cargar datos.</div>`;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 populateModalPresets();
@@ -729,6 +825,9 @@
                     if (isOwnProfile) {
                         updateClaimButtonState();
                     }
+
+                    // Cargar lista de inversiones en el perfil
+                    await loadUserInvestments(activeTargetId);
                 }
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
@@ -776,7 +875,7 @@
                     document.getElementById('user-nickname').textContent = newNick;
                     closeNicknameModal();
                 } catch (err) {
-                    alert("Error de conexión: Verifica que 'www.bittowns.net' esté añadido a URL Configuration en Supabase.");
+                    alert("Error de conexión al actualizar apodo.");
                 }
             }
         }
