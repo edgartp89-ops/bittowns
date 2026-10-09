@@ -73,12 +73,7 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 3px;
-        }
-        .citizen-email {
-            color: #a0aec0;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .citizen-district {
             color: #a0aec0;
@@ -186,7 +181,6 @@
         <div class="profile-card">
             <div class="avatar-placeholder">🏙️</div>
             <div class="citizen-name" id="user-nickname">Cargando...</div>
-            <div class="citizen-email" id="user-email">...</div>
             <div class="citizen-district">
                 Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
             </div>
@@ -255,27 +249,25 @@
                         return;
                     }
 
-                    // Si es su propio perfil, mostramos el botón de cerrar sesión
+                    // Mostrar botón de cerrar sesión únicamente si el usuario está viendo su propio perfil
                     if (loggedInUser && loggedInUser.id === targetId) {
                         document.getElementById('btn-logout').style.display = 'block';
                     }
 
-                    // Consultar los datos del perfil objetivo en 'profiles'
+                    // Consultar los datos públicos del perfil
                     let { data: profile } = await supabaseClient
                         .from('profiles')
-                        .select('*')
+                        .select('id, nickname, community, role, xp, town_balance')
                         .eq('id', targetId)
                         .single();
 
                     const nickname = profile?.nickname || 'Ciudadano';
-                    const email = (loggedInUser?.id === targetId) ? (profile?.email || loggedInUser?.email) : '••••@••••.com';
                     const community = profile?.community || 'Amposta';
                     const role = profile?.role || 'Miembro Fundador';
                     const xp = profile?.xp !== undefined ? profile.xp : 50;
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
 
                     document.getElementById('user-nickname').textContent = nickname;
-                    document.getElementById('user-email').textContent = email;
                     
                     const communityLink = document.getElementById('user-community-link');
                     communityLink.textContent = community;
