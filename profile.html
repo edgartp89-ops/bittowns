@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Ciudadano - Bit-Towns</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
         body {
             background-color: #0b0f19;
@@ -182,12 +183,12 @@
                     <div class="stat-value" id="user-role">Miembro Fundador</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">DISTRITO ASIGNADO</div>
-                    <div class="stat-value" id="user-district">Nodo Piloto 01</div>
+                    <div class="stat-label">EXPERIENCIA (XP)</div>
+                    <div class="stat-value" id="user-xp" style="color: #00f0ff;">50 XP</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">BALANCE $TOWN</div>
-                    <div class="stat-value">100 BT</div>
+                    <div class="stat-value" id="user-balance">100 BT</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">REPUTACIÓN (SBT)</div>
@@ -215,7 +216,6 @@
         </div>
     </div>
 
-    <!-- Carga de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
@@ -236,16 +236,26 @@
                     }
 
                     const user = session.user;
-                    const nickname = user.user_metadata?.nickname || 'Ciudadano';
-                    const community = user.user_metadata?.community || 'Amposta';
-                    const district = user.user_metadata?.district || 'Nodo Piloto 01';
-                    const role = user.user_metadata?.role || 'Miembro Fundador';
+
+                    // Consultar los datos del usuario en la tabla 'profiles'
+                    let { data: profile } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+
+                    const nickname = profile?.nickname || user.user_metadata?.nickname || 'Ciudadano';
+                    const community = profile?.community || user.user_metadata?.community || 'Amposta';
+                    const role = profile?.role || 'Miembro Fundador';
+                    const xp = profile?.xp !== undefined ? profile.xp : 50;
+                    const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
 
                     document.getElementById('user-nickname').textContent = nickname;
                     document.getElementById('user-email').textContent = user.email;
                     document.getElementById('user-community').textContent = 'Comunidad: ' + community;
-                    document.getElementById('user-district').textContent = district;
                     document.getElementById('user-role').textContent = role;
+                    document.getElementById('user-xp').textContent = xp + ' XP';
+                    document.getElementById('user-balance').textContent = balance + ' BT';
                 }
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
