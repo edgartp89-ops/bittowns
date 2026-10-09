@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Ciudad - Bit-Towns</title>
+    <title>Tablero & Mapa de Ciudad - Bit-Towns</title>
     <link rel="icon" type="image/png" href="favicon.png?v=1">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         body {
             background-color: #0b0f19;
@@ -19,7 +23,7 @@
             box-sizing: border-box;
         }
         .container {
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -65,15 +69,108 @@
             font-weight: bold;
         }
 
-        .board-frame {
+        /* --- MAPA LEAFLET EN VIVO --- */
+        .map-section {
             background: #060911;
             border: 2px solid #00f0ff;
             border-radius: 16px;
-            padding: 15px;
+            padding: 10px;
             box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+            margin-bottom: 25px;
             position: relative;
         }
+        .map-header-title {
+            color: #00f0ff;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 5px;
+        }
+        #map {
+            height: 380px;
+            width: 100%;
+            border-radius: 12px;
+            z-index: 1;
+            background: #0b0f19;
+        }
 
+        /* Marcadores personalizados en el mapa */
+        .custom-map-marker {
+            background: rgba(11, 15, 25, 0.9);
+            border: 2px solid #00f0ff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .custom-map-marker:hover {
+            transform: scale(1.2);
+            border-color: #ffffff;
+        }
+        .custom-map-marker.completed {
+            border-color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
+        }
+
+        /* Popups de Leaflet personalizados */
+        .leaflet-popup-content-wrapper {
+            background: #0b0f19 !important;
+            border: 1px solid #00f0ff !important;
+            color: #ffffff !important;
+            border-radius: 12px !important;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4) !important;
+        }
+        .leaflet-popup-tip {
+            background: #0b0f19 !important;
+            border: 1px solid #00f0ff !important;
+        }
+        .popup-content {
+            text-align: center;
+            padding: 5px;
+        }
+        .popup-title {
+            font-weight: bold;
+            color: #00f0ff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .popup-status {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-bottom: 8px;
+        }
+        .btn-map-invest {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        /* --- CUADRÍCULA DEL TABLERO --- */
+        .board-frame {
+            background: #060911;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
         .street-legend {
             display: flex;
             justify-content: space-around;
@@ -90,19 +187,13 @@
             flex-wrap: wrap;
             gap: 6px;
         }
-
         .board-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             position: relative;
-            background-image: 
-                linear-gradient(to right, rgba(0, 240, 255, 0.15) 2px, transparent 2px),
-                linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 2px, transparent 2px);
-            background-size: calc(25% + 4px) calc(25% + 4px);
             padding: 4px;
         }
-
         .plot-card {
             background: #0d1322;
             border: 1px solid rgba(0, 240, 255, 0.3);
@@ -119,7 +210,6 @@
             position: relative;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
-
         .plot-card:hover {
             transform: translateY(-4px) scale(1.02);
             border-color: #00f0ff;
@@ -127,13 +217,11 @@
             background: #111a30;
             z-index: 5;
         }
-
         .plot-card.completed {
             border-color: #00ff88;
             background: rgba(0, 255, 136, 0.08);
             box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
         }
-
         .plot-number {
             position: absolute;
             top: 5px;
@@ -142,12 +230,10 @@
             color: rgba(0, 240, 255, 0.5);
             font-weight: bold;
         }
-
         .plot-icon {
             font-size: 2rem;
             margin: 4px 0;
         }
-
         .plot-title {
             font-size: 0.8rem;
             font-weight: bold;
@@ -155,13 +241,11 @@
             line-height: 1.15;
             margin-bottom: 6px;
         }
-
         .plot-status {
             font-size: 0.7rem;
             color: #a0aec0;
             margin-bottom: 6px;
         }
-
         .progress-bar-bg {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
@@ -169,14 +253,12 @@
             width: 100%;
             overflow: hidden;
         }
-
         .progress-bar-fill {
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             height: 100%;
             width: 0%;
             transition: width 0.3s;
         }
-
         .owner-badge {
             font-size: 0.72rem;
             color: #00ff88;
@@ -188,6 +270,7 @@
             margin-top: 4px;
         }
 
+        /* Modal Aportar Constructors */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -275,6 +358,9 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
+            #map {
+                height: 280px;
+            }
         }
     </style>
 </head>
@@ -282,7 +368,7 @@
     <div class="container">
         <div class="header">
             <a href="javascript:history.back()" class="back-btn">← Volver</a>
-            <h1>Tablero de Amposta</h1>
+            <h1>Tablero & Mapa de Amposta</h1>
         </div>
 
         <div class="user-balance-bar">
@@ -292,6 +378,13 @@
             </div>
         </div>
 
+        <!-- VISTA DE MAPA REAL EN VIVO -->
+        <div class="map-section">
+            <div class="map-header-title">🗺️ Mapa Phygital de Elementos en Amposta</div>
+            <div id="map"></div>
+        </div>
+
+        <!-- CUADRÍCULA DE PARCELAS -->
         <div class="board-frame">
             <div class="street-legend">
                 <span>🛣️ C. Major</span>
@@ -303,7 +396,7 @@
         </div>
 
         <div class="legal-notice">
-            <p>Bit-Towns — Plano reticular interactivo de Amposta. Edifica parcelas junto a tus vecinos utilizando tus $CONSTRUCTOR diarios.</p>
+            <p>Bit-Towns — Plano urbano interactivo de Amposta. Haz clic en las parcelas del mapa o la cuadrícula para edificar con tus $CONSTRUCTOR diarios.</p>
         </div>
     </div>
 
@@ -323,11 +416,36 @@
         </div>
     </div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
+        // Coordenadas geográficas reales de los 16 puntos emblemáticos de Amposta
+        const PLOT_COORDINATES = {
+            1:  { lat: 40.7138, lng: 0.5786 }, // Pont Penjat Digital
+            2:  { lat: 40.7135, lng: 0.5765 }, // Castell d'Amposta
+            3:  { lat: 40.7118, lng: 0.5772 }, // Mercat Municipal
+            4:  { lat: 40.7065, lng: 0.5720 }, // Parc dels Xiribecs
+            5:  { lat: 40.7125, lng: 0.5780 }, // Hub Bit-Towns
+            6:  { lat: 40.7095, lng: 0.5750 }, // Zona Comercial Ràpita
+            7:  { lat: 40.7080, lng: 0.5715 }, // Estació Autobusos
+            8:  { lat: 40.7050, lng: 0.5755 }, // Centro Deportivo
+            9:  { lat: 40.7108, lng: 0.5745 }, // Biblioteca Comunitària
+            10: { lat: 40.7145, lng: 0.5810 }, // Hub Innovación Ebre
+            11: { lat: 40.7142, lng: 0.5825 }, // Cafetería del Puerto
+            12: { lat: 40.7122, lng: 0.5760 }, // Teatre La Unió
+            13: { lat: 40.7100, lng: 0.5790 }, // Solar Residencial 1
+            14: { lat: 40.7085, lng: 0.5780 }, // Solar Residencial 2
+            15: { lat: 40.7070, lng: 0.5760 }, // Solar Comercial 3
+            16: { lat: 40.7112, lng: 0.5768 }  // Plaza Central Neón
+        };
+
+        let map;
+        let mapMarkers = {};
         let supabaseClient;
         let currentUser = null;
         let userConstructors = 0;
@@ -335,6 +453,8 @@
         let plotsData = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
+            initMap();
+
             if (typeof supabase !== 'undefined') {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
@@ -363,6 +483,18 @@
             }
         });
 
+        /* Inicializar el Mapa Leaflet */
+        function initMap() {
+            // Centrado en el corazón de Amposta
+            map = L.map('map', { zoomControl: true }).setView([40.7112, 0.5768], 15);
+
+            // Capa de mapa estilo Cyberpunk / Dark
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
         async function loadBoardFromSupabase() {
             const { data: plots, error } = await supabaseClient
                 .from('board_plots')
@@ -380,9 +512,11 @@
             if (plots && plots.length > 0) {
                 plotsData = plots;
                 renderBoard(plotsData);
+                updateMapMarkers(plotsData);
             }
         }
 
+        /* Renderizar Cuadrícula */
         function renderBoard(plots) {
             const grid = document.getElementById('board-grid');
             if (!grid) return;
@@ -397,7 +531,12 @@
 
                 const card = document.createElement('div');
                 card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
-                card.onclick = () => openInvestModal(plot);
+                
+                // Al hacer clic en la tarjeta, se abre la inversión y centra el mapa
+                card.onclick = () => {
+                    focusPlotOnMap(plot.id);
+                    openInvestModal(plot);
+                };
 
                 let ownerHtml = `<div class="plot-status">${current} / ${cost} 🏗️</div>`;
                 
@@ -419,6 +558,63 @@
                 grid.appendChild(card);
             });
         }
+
+        /* Actualizar Marcadores en el Mapa Leaflet */
+        function updateMapMarkers(plots) {
+            plots.forEach(plot => {
+                const coords = PLOT_COORDINATES[plot.id] || { lat: 40.7112, lng: 0.5768 };
+                const isCompleted = (plot.current_constructors || 0) >= plot.cost_constructors || plot.status === 'completado';
+                const iconSymbol = plot.icon || '🏗️';
+
+                // Crear icono DivIcon personalizado
+                const customIcon = L.divIcon({
+                    className: 'custom-map-marker-container',
+                    html: `<div class="custom-map-marker ${isCompleted ? 'completed' : ''}">${iconSymbol}</div>`,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                });
+
+                let statusText = `${plot.current_constructors || 0} / ${plot.cost_constructors} 🏗️`;
+                if (isCompleted) {
+                    const ownerNick = plot.profiles?.nickname || 'Comunidad';
+                    statusText = `👑 Propietario: ${ownerNick}`;
+                }
+
+                const popupHtml = `
+                    <div class="popup-content">
+                        <div class="popup-title">${iconSymbol} ${plot.name}</div>
+                        <div class="popup-status">${statusText}</div>
+                        ${!isCompleted ? `<button class="btn-map-invest" onclick="triggerInvestFromMap(${plot.id})">Invertir 🏗️</button>` : ''}
+                    </div>
+                `;
+
+                if (mapMarkers[plot.id]) {
+                    mapMarkers[plot.id].setIcon(customIcon);
+                    mapMarkers[plot.id].getPopup().setContent(popupHtml);
+                } else {
+                    const marker = L.marker([coords.lat, coords.lng], { icon: customIcon })
+                        .addTo(map)
+                        .bindPopup(popupHtml);
+                    
+                    mapMarkers[plot.id] = marker;
+                }
+            });
+        }
+
+        function focusPlotOnMap(plotId) {
+            const coords = PLOT_COORDINATES[plotId];
+            if (coords && map) {
+                map.flyTo([coords.lat, coords.lng], 16, { duration: 1 });
+                if (mapMarkers[plotId]) {
+                    mapMarkers[plotId].openPopup();
+                }
+            }
+        }
+
+        window.triggerInvestFromMap = function(plotId) {
+            const plot = plotsData.find(p => p.id === plotId);
+            if (plot) openInvestModal(plot);
+        };
 
         function subscribeToBoardChanges() {
             if (!supabaseClient) return;
@@ -480,7 +676,7 @@
             const newStatus = isNowCompleted ? 'completado' : 'en_construccion';
 
             try {
-                // 1. Restar Constructors al perfil del usuario
+                // 1. Restar Constructors al usuario
                 const newBalance = userConstructors - amount;
                 const { error: profileErr } = await supabaseClient
                     .from('profiles')
