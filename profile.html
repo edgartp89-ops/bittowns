@@ -171,7 +171,6 @@
             text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
         }
 
-        /* Rejilla de Estadísticas */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -199,7 +198,6 @@
             font-weight: bold;
         }
 
-        /* Tarjeta de Reclamo Diario */
         .daily-claim-card {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(112, 0, 255, 0.12));
             border: 1px solid rgba(0, 240, 255, 0.4);
@@ -262,6 +260,14 @@
             align-items: center;
             gap: 8px;
         }
+        .sub-section-title {
+            color: #ffb703;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 12px 0 8px 0;
+        }
         .inventory-item {
             display: flex;
             justify-content: space-between;
@@ -272,6 +278,10 @@
             margin-bottom: 8px;
             font-size: 0.85rem;
             border-left: 3px solid #7000ff;
+        }
+        .inventory-item.private {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.04);
         }
         .btn-logout {
             background: rgba(255, 74, 74, 0.1);
@@ -289,7 +299,6 @@
             background: rgba(255, 74, 74, 0.25);
         }
 
-        /* Modales */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -464,13 +473,18 @@
             </div>
         </div>
 
-        <!-- MÓDULO NUEVO: INVERSIONES EN LA CIUDAD -->
+        <!-- MÓDULO ACTUALIZADO: INVERSIONES Y PROPIEDADES -->
         <div class="section-card">
-            <h2>🏗️ Inversiones en la Ciudad</h2>
+            <h2>🏗️ Inversiones & Propiedades</h2>
+            
+            <div class="sub-section-title">🏡 Propiedades Privadas & Viviendas</div>
+            <div id="user-private-properties-list">
+                <div style="text-align: center; color: #a0aec0; font-size: 0.8rem; padding: 6px;">Cargando viviendas...</div>
+            </div>
+
+            <div class="sub-section-title" style="margin-top: 18px;">🏛️ Aportaciones en la Ciudad (DAO)</div>
             <div id="user-investments-list">
-                <div style="text-align: center; color: #a0aec0; font-size: 0.85rem; padding: 10px;">
-                    Cargando proyectos invertidos...
-                </div>
+                <div style="text-align: center; color: #a0aec0; font-size: 0.8rem; padding: 6px;">Cargando proyectos colectivos...</div>
             </div>
         </div>
 
@@ -491,16 +505,13 @@
         </div>
     </div>
 
-    <!-- Modal para Seleccionar Avatar Cyberpunk -->
+    <!-- Modal para Seleccionar Avatar -->
     <div class="modal-overlay" id="avatar-modal">
         <div class="modal-card">
             <h3 class="modal-title">👾 Elige tu Avatar Cyberpunk</h3>
             <p style="color: #a0aec0; font-size: 0.8rem; margin-bottom: 15px;">Selecciona una identidad visual de la red o pega una URL de imagen:</p>
-            
             <div class="avatar-grid" id="avatar-presets-grid"></div>
-
             <input type="url" id="custom-avatar-url" class="custom-avatar-input" placeholder="O pega URL de imagen personalizada (https://...)" oninput="clearPresetSelection()">
-
             <div class="modal-actions">
                 <button class="btn-modal btn-cancel" onclick="closeAvatarModal()">Cancelar</button>
                 <button class="btn-modal btn-save" onclick="saveAvatar()">Guardar Avatar</button>
@@ -513,9 +524,7 @@
         <div class="modal-card">
             <h3 class="modal-title">✏️ Cambiar Nombre / Nickname</h3>
             <p style="color: #a0aec0; font-size: 0.8rem; margin-bottom: 15px;">Escribe tu nuevo apodo de ciudadano en Bit-Towns:</p>
-            
             <input type="text" id="custom-nickname-input" class="custom-avatar-input" placeholder="Tu nuevo nick..." maxlength="25">
-
             <div class="modal-actions">
                 <button class="btn-modal btn-cancel" onclick="closeNicknameModal()">Cancelar</button>
                 <button class="btn-modal btn-save" onclick="saveNickname()">Guardar Nick</button>
@@ -563,7 +572,6 @@
         function renderAvatarInElement(elementId, avatarVal) {
             const el = document.getElementById(elementId);
             if (!el) return;
-
             if (avatarVal && (avatarVal.startsWith('http://') || avatarVal.startsWith('https://') || avatarVal.startsWith('data:'))) {
                 el.innerHTML = `<img src="${avatarVal}" alt="Avatar">`;
             } else {
@@ -575,7 +583,6 @@
             const container = document.getElementById('avatar-presets-grid');
             if (!container) return;
             container.innerHTML = '';
-
             PRESET_AVATARS.forEach((url, idx) => {
                 const item = document.createElement('div');
                 item.className = 'avatar-option' + (selectedAvatarVal === url ? ' selected' : '');
@@ -607,11 +614,9 @@
                 btn.textContent = '🎁 Reclamar 1 Constructor';
             } else {
                 btn.disabled = true;
-                
                 const updateCountdown = () => {
                     const currentNow = new Date().getTime();
                     const remainingMs = cooldownMs - (currentNow - lastClaimTime);
-
                     if (remainingMs <= 0) {
                         btn.disabled = false;
                         btn.textContent = '🎁 Reclamar 1 Constructor';
@@ -623,7 +628,6 @@
                         btn.textContent = `⏳ Reclamado (Disponible en ${hrs}h ${mins}m ${secs}s)`;
                     }
                 };
-
                 updateCountdown();
                 claimInterval = setInterval(updateCountdown, 1000);
             }
@@ -650,15 +654,13 @@
                     .select();
 
                 if (error || !data || data.length === 0) {
-                    alert("Error al guardar en Supabase: " + (error ? error.message : "Comprueba los permisos RLS."));
+                    alert("Error al guardar en Supabase.");
                     updateClaimButtonState();
                 } else {
                     userConstructors = newCount;
                     lastDailyClaim = nowIso;
-
                     document.getElementById('user-constructors').textContent = userConstructors;
                     updateClaimButtonState();
-
                     alert("🎉 ¡Has recibido 1 Constructor! Úsalo para edificar Amposta.");
                 }
             } catch (err) {
@@ -667,13 +669,46 @@
             }
         }
 
-        /* FUNCIÓN PARA CARGAR LAS INVERSIONES DEL USUARIO */
-        async function loadUserInvestments(userId) {
-            const container = document.getElementById('user-investments-list');
-            if (!container) return;
+        /* CARGAR PROPIEDADES PRIVADAS E INVERSIONES COLECTIVAS */
+        async function loadUserAllProperties(userId) {
+            const privateContainer = document.getElementById('user-private-properties-list');
+            const collectiveContainer = document.getElementById('user-investments-list');
 
+            // 1. Cargar Propiedades Privadas (user_properties)
             try {
-                const { data: contributions, error } = await supabaseClient
+                const { data: privateProps, error: pErr } = await supabaseClient
+                    .from('user_properties')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+
+                if (!pErr && privateProps && privateProps.length > 0) {
+                    privateContainer.innerHTML = '';
+                    privateProps.forEach(prop => {
+                        const card = document.createElement('div');
+                        card.className = 'inventory-item private';
+                        card.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">${prop.icon || '🏠'}</span>
+                                <span style="font-weight: bold; color: #ffffff;">${prop.name}</span>
+                            </div>
+                            <div>
+                                <span style="color: #00ff88; font-weight: bold;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️)</span>
+                            </div>
+                        `;
+                        privateContainer.appendChild(card);
+                    });
+                } else {
+                    privateContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin viviendas privadas registradas.</div>`;
+                }
+            } catch (err) {
+                console.error("Error al cargar propiedades privadas:", err);
+                privateContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center;">Error de conexión.</div>`;
+            }
+
+            // 2. Cargar Aportaciones Colectivas (plot_contributions)
+            try {
+                const { data: contributions, error: cErr } = await supabaseClient
                     .from('plot_contributions')
                     .select(`
                         amount,
@@ -682,74 +717,52 @@
                     `)
                     .eq('user_id', userId);
 
-                if (error) {
-                    console.error("Error al obtener inversiones:", error);
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; font-size: 0.85rem;">Sin inversiones activas.</div>`;
-                    return;
-                }
+                if (!cErr && contributions && contributions.length > 0) {
+                    const plotMap = {};
+                    contributions.forEach(item => {
+                        const plot = item.board_plots;
+                        if (!plot) return;
+                        const pId = item.plot_id || plot.id;
+                        if (!plotMap[pId]) {
+                            plotMap[pId] = {
+                                id: plot.id,
+                                name: plot.name,
+                                icon: plot.icon || '🏗️',
+                                cost: plot.cost_constructors || 10,
+                                current: plot.current_constructors || 0,
+                                isOwner: plot.owner_id === userId,
+                                userTotal: 0
+                            };
+                        }
+                        plotMap[pId].userTotal += (item.amount || 0);
+                    });
 
-                if (!contributions || contributions.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 12px; color: #a0aec0; font-size: 0.85rem;">
-                            Aún no has invertido Constructors en la ciudad.<br>
-                            <a href="board.html" style="color: #00f0ff; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px;">
-                                🎲 Explorar Tablero de Amposta →
-                            </a>
-                        </div>
-                    `;
-                    return;
-                }
+                    collectiveContainer.innerHTML = '';
+                    Object.values(plotMap).forEach(inv => {
+                        const card = document.createElement('div');
+                        card.className = 'inventory-item';
+                        card.style.borderLeftColor = inv.isOwner ? '#00ff88' : '#00f0ff';
 
-                // Agrupar aportaciones por parcela
-                const plotMap = {};
-                contributions.forEach(item => {
-                    const plot = item.board_plots;
-                    if (!plot) return;
-                    const pId = item.plot_id || plot.id;
-                    if (!plotMap[pId]) {
-                        plotMap[pId] = {
-                            id: plot.id,
-                            name: plot.name,
-                            icon: plot.icon || '🏗️',
-                            cost: plot.cost_constructors || 10,
-                            current: plot.current_constructors || 0,
-                            status: plot.status,
-                            isOwner: plot.owner_id === userId,
-                            userTotal: 0
-                        };
-                    }
-                    plotMap[pId].userTotal += (item.amount || 0);
-                });
+                        let badgeText = `<span style="color: #ffb703; font-weight: bold;">${inv.userTotal} 🏗️ invertidos</span>`;
+                        if (inv.isOwner) {
+                            badgeText = `<span style="color: #00ff88; font-weight: bold;">👑 Propietario (${inv.userTotal} 🏗️)</span>`;
+                        }
 
-                const aggregatedList = Object.values(plotMap);
-
-                container.innerHTML = '';
-                aggregatedList.forEach(inv => {
-                    const isCompleted = inv.current >= inv.cost || inv.status === 'completado';
-                    const card = document.createElement('div');
-                    card.className = 'inventory-item';
-                    card.style.borderLeftColor = inv.isOwner ? '#00ff88' : '#00f0ff';
-
-                    let badgeText = `<span style="color: #ffb703; font-weight: bold;">${inv.userTotal} 🏗️ invertidos</span>`;
-                    if (inv.isOwner) {
-                        badgeText = `<span style="color: #00ff88; font-weight: bold;">👑 Propietario (${inv.userTotal} 🏗️)</span>`;
-                    }
-
-                    card.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.3rem;">${inv.icon}</span>
-                            <div>
-                                <div style="font-weight: bold; color: #ffffff;">${inv.name}</div>
-                                <div style="font-size: 0.75rem; color: #a0aec0;">Progreso global: ${inv.current} / ${inv.cost} 🏗️</div>
+                        card.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">${inv.icon}</span>
+                                <span style="font-weight: bold; color: #ffffff;">${inv.name}</span>
                             </div>
-                        </div>
-                        <div>${badgeText}</div>
-                    `;
-                    container.appendChild(card);
-                });
+                            <div>${badgeText}</div>
+                        `;
+                        collectiveContainer.appendChild(card);
+                    });
+                } else {
+                    collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin aportaciones colectivas en la ciudad.</div>`;
+                }
             } catch (err) {
-                console.error("Excepción inversiones:", err);
-                container.innerHTML = `<div style="text-align: center; color: #a0aec0; font-size: 0.85rem;">Error al cargar datos.</div>`;
+                console.error("Error al cargar inversiones colectivas:", err);
+                collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center;">Error de conexión.</div>`;
             }
         }
 
@@ -826,15 +839,15 @@
                         updateClaimButtonState();
                     }
 
-                    // Cargar lista de inversiones en el perfil
-                    await loadUserInvestments(activeTargetId);
+                    // Cargar propiedades privadas y aportaciones colectivas en el perfil
+                    await loadUserAllProperties(activeTargetId);
                 }
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
             }
         });
 
-        /* Lógica Nickname Blindada */
+        /* Lógica Nickname */
         function openNicknameModal() {
             const currentNick = document.getElementById('user-nickname').textContent;
             document.getElementById('custom-nickname-input').value = currentNick !== 'Cargando...' ? currentNick : '';
@@ -864,14 +877,6 @@
                         return;
                     }
 
-                    try {
-                        await supabaseClient.auth.updateUser({
-                            data: { nickname: newNick }
-                        });
-                    } catch (mErr) {
-                        console.warn("Metadata sync omitida:", mErr);
-                    }
-
                     document.getElementById('user-nickname').textContent = newNick;
                     closeNicknameModal();
                 } catch (err) {
@@ -892,7 +897,6 @@
         function selectPreset(url, element) {
             selectedAvatarVal = url;
             document.getElementById('custom-avatar-url').value = '';
-            
             document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
             if (element) element.classList.add('selected');
         }
