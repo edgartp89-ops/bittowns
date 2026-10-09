@@ -80,8 +80,13 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 15px;
+            margin-bottom: 6px;
             font-weight: bold;
+        }
+        .citizen-date {
+            color: #a0aec0;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
         }
         .community-link {
             color: #00f0ff;
@@ -184,6 +189,9 @@
             <div class="citizen-district">
                 Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
             </div>
+            <div class="citizen-date">
+                🗓️ Registro: <span id="user-created-at" style="color: #00f0ff; font-weight: bold;">--/--/----</span>
+            </div>
 
             <div class="stats-grid">
                 <div class="stat-box">
@@ -231,6 +239,16 @@
 
         let supabaseClient;
 
+        function formatearFecha(dateString) {
+            if (!dateString) return 'Desconocida';
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) return 'Desconocida';
+            const dia = String(d.getDate()).padStart(2, '0');
+            const mes = String(d.getMonth() + 1).padStart(2, '0');
+            const anio = d.getFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof supabase !== 'undefined') {
@@ -249,15 +267,13 @@
                         return;
                     }
 
-                    // Mostrar botón de cerrar sesión únicamente si el usuario está viendo su propio perfil
                     if (loggedInUser && loggedInUser.id === targetId) {
                         document.getElementById('btn-logout').style.display = 'block';
                     }
 
-                    // Consultar los datos públicos del perfil
                     let { data: profile } = await supabaseClient
                         .from('profiles')
-                        .select('id, nickname, community, role, xp, town_balance')
+                        .select('id, nickname, community, role, xp, town_balance, created_at')
                         .eq('id', targetId)
                         .single();
 
@@ -266,8 +282,10 @@
                     const role = profile?.role || 'Miembro Fundador';
                     const xp = profile?.xp !== undefined ? profile.xp : 50;
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
+                    const fechaRegistro = formatearFecha(profile?.created_at);
 
                     document.getElementById('user-nickname').textContent = nickname;
+                    document.getElementById('user-created-at').textContent = fechaRegistro;
                     
                     const communityLink = document.getElementById('user-community-link');
                     communityLink.textContent = community;
