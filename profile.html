@@ -190,7 +190,7 @@
                 Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
             </div>
             <div class="citizen-date">
-                🗓️ Registro: <span id="user-created-at" style="color: #00f0ff; font-weight: bold;">--/--/----</span>
+                🗓️ Registro: <span id="user-created-at" style="color: #00f0ff; font-weight: bold;">Cargando...</span>
             </div>
 
             <div class="stats-grid">
@@ -240,9 +240,9 @@
         let supabaseClient;
 
         function formatearFecha(dateString) {
-            if (!dateString) return 'Desconocida';
+            if (!dateString) return null;
             const d = new Date(dateString);
-            if (isNaN(d.getTime())) return 'Desconocida';
+            if (isNaN(d.getTime())) return null;
             const dia = String(d.getDate()).padStart(2, '0');
             const mes = String(d.getMonth() + 1).padStart(2, '0');
             const anio = d.getFullYear();
@@ -277,12 +277,15 @@
                         .eq('id', targetId)
                         .single();
 
-                    const nickname = profile?.nickname || 'Ciudadano';
+                    const nickname = profile?.nickname || loggedInUser?.user_metadata?.nickname || 'Ciudadano';
                     const community = profile?.community || 'Amposta';
                     const role = profile?.role || 'Miembro Fundador';
                     const xp = profile?.xp !== undefined ? profile.xp : 50;
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
-                    const fechaRegistro = formatearFecha(profile?.created_at);
+                    
+                    // Respaldo de fecha: si no viene en profiles, usa la fecha de autenticación
+                    const rawDate = profile?.created_at || (loggedInUser?.id === targetId ? loggedInUser?.created_at : null);
+                    const fechaRegistro = formatearFecha(rawDate) || 'Reciente';
 
                     document.getElementById('user-nickname').textContent = nickname;
                     document.getElementById('user-created-at').textContent = fechaRegistro;
