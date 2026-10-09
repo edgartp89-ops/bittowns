@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Ciudadano - Bit-Towns</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
         body {
             background-color: #0b0f19;
@@ -162,7 +163,6 @@
         </div>
     </div>
 
-    <!-- Librería cliente de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
@@ -193,7 +193,7 @@
 
             submitBtn.disabled = true;
             statusMsg.style.color = '#00f0ff';
-            statusMsg.textContent = 'Asignando ciudadano a la Comunidad Amposta...';
+            statusMsg.textContent = 'Creando ciudadano y perfil en Amposta...';
 
             if (!supabaseClient) {
                 statusMsg.style.color = '#ff4a4a';
@@ -202,15 +202,14 @@
                 return;
             }
 
+            // 1. Crear usuario en autenticación de Supabase
             const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
                 options: {
                     data: { 
                         nickname: nickname,
-                        community: 'Amposta',
-                        district: 'Nodo Piloto 01 - Amposta',
-                        role: 'Miembro Fundador'
+                        community: 'Amposta'
                     }
                 }
             });
@@ -219,9 +218,24 @@
                 statusMsg.style.color = '#ff4a4a';
                 statusMsg.textContent = 'Error: ' + error.message;
                 submitBtn.disabled = false;
-            } else {
+            } else if (data.user) {
+                // 2. Insertar fila personalizada en la tabla 'profiles'
+                await supabaseClient
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            email: email,
+                            nickname: nickname,
+                            community: 'Amposta',
+                            role: 'Miembro Fundador',
+                            xp: 50,
+                            town_balance: 100
+                        }
+                    ]);
+
                 statusMsg.style.color = '#00ff88';
-                statusMsg.textContent = '¡Registro completado! Te has unido a la Comunidad Amposta. Revisa tu correo electrónico para confirmar la cuenta.';
+                statusMsg.textContent = '¡Perfil creado con éxito! Te has unido a la Comunidad Amposta. Revisa tu correo electrónico para confirmar la cuenta.';
                 form.reset();
                 submitBtn.disabled = false;
             }
