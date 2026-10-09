@@ -56,18 +56,52 @@
             margin-bottom: 15px;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
             text-align: center;
+            position: relative;
+        }
+        .avatar-wrapper {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px auto;
         }
         .avatar-placeholder {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             background: linear-gradient(135deg, #00f0ff, #7000ff);
-            margin: 0 auto 15px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 2.2rem;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            overflow: hidden;
+            object-fit: cover;
+        }
+        .avatar-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #00f0ff;
+            color: #0b0f19;
+            border: 2px solid #0b0f19;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+            transition: transform 0.2s;
+        }
+        .edit-avatar-btn:hover {
+            transform: scale(1.15);
         }
         .citizen-name {
             font-size: 1.3rem;
@@ -165,6 +199,91 @@
         .btn-logout:hover {
             background: rgba(255, 74, 74, 0.25);
         }
+
+        /* Modal Personalización de Avatar */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #0b0f19;
+            border: 1px solid #00f0ff;
+            border-radius: 16px;
+            padding: 22px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .modal-title {
+            color: #00f0ff;
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .avatar-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .avatar-option:hover {
+            background: rgba(0, 240, 255, 0.2);
+            border-color: #00f0ff;
+            transform: scale(1.1);
+        }
+        .custom-avatar-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-modal {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+        }
+        .btn-save {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
         .legal-notice {
             color: #718096;
             font-size: 0.75rem;
@@ -184,7 +303,11 @@
         </div>
 
         <div class="profile-card">
-            <div class="avatar-placeholder">🏙️</div>
+            <div class="avatar-wrapper">
+                <div class="avatar-placeholder" id="user-avatar">🏙️</div>
+                <button class="edit-avatar-btn" id="edit-avatar-btn" style="display: none;" onclick="openAvatarModal()" title="Editar Avatar">✏️</button>
+            </div>
+
             <div class="citizen-name" id="user-nickname">Cargando...</div>
             <div class="citizen-district">
                 Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
@@ -232,12 +355,44 @@
         </div>
     </div>
 
+    <!-- Modal para Seleccionar Avatar -->
+    <div class="modal-overlay" id="avatar-modal">
+        <div class="modal-card">
+            <h3 class="modal-title">👾 Elegir Avatar Cyberpunk</h3>
+            <p style="color: #a0aec0; font-size: 0.8rem; margin-bottom: 15px;">Selecciona una identidad visual o pega una URL de imagen:</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-option" onclick="selectPreset('🏙️')">🏙️</div>
+                <div class="avatar-option" onclick="selectPreset('🤖')">🤖</div>
+                <div class="avatar-option" onclick="selectPreset('⚡')">⚡</div>
+                <div class="avatar-option" onclick="selectPreset('🧬')">🧬</div>
+                <div class="avatar-option" onclick="selectPreset('👾')">👾</div>
+                <div class="avatar-option" onclick="selectPreset('🕶️')">🕶️</div>
+                <div class="avatar-option" onclick="selectPreset('🛸')">🛸</div>
+                <div class="avatar-option" onclick="selectPreset('🦾')">🦾</div>
+                <div class="avatar-option" onclick="selectPreset('🎮')">🎮</div>
+                <div class="avatar-option" onclick="selectPreset('☣️')">☣️</div>
+                <div class="avatar-option" onclick="selectPreset('🚀')">🚀</div>
+                <div class="avatar-option" onclick="selectPreset('🛰️')">🛰️</div>
+            </div>
+
+            <input type="url" id="custom-avatar-url" class="custom-avatar-input" placeholder="O pega URL de imagen (https://...)" oninput="clearPresetSelection()">
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeAvatarModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="saveAvatar()">Guardar Avatar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
+        let selectedAvatarVal = '🏙️';
+        let activeTargetId = null;
 
         function formatearFecha(dateString) {
             if (!dateString) return null;
@@ -247,6 +402,17 @@
             const mes = String(d.getMonth() + 1).padStart(2, '0');
             const anio = d.getFullYear();
             return `${dia}/${mes}/${anio}`;
+        }
+
+        function renderAvatarInElement(elementId, avatarVal) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            if (avatarVal && (avatarVal.startsWith('http://') || avatarVal.startsWith('https://'))) {
+                el.innerHTML = `<img src="${avatarVal}" alt="Avatar">`;
+            } else {
+                el.textContent = avatarVal || '🏙️';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -260,21 +426,23 @@
                     const { data: { session } } = await supabaseClient.auth.getSession();
                     const loggedInUser = session?.user;
 
-                    let targetId = queryUserId || loggedInUser?.id;
+                    activeTargetId = queryUserId || loggedInUser?.id;
 
-                    if (!targetId) {
+                    if (!activeTargetId) {
                         window.location.href = 'login.html';
                         return;
                     }
 
-                    if (loggedInUser && loggedInUser.id === targetId) {
+                    // Mostrar botones de edición si es tu propio perfil
+                    if (loggedInUser && loggedInUser.id === activeTargetId) {
                         document.getElementById('btn-logout').style.display = 'block';
+                        document.getElementById('edit-avatar-btn').style.display = 'flex';
                     }
 
                     let { data: profile } = await supabaseClient
                         .from('profiles')
-                        .select('id, nickname, community, role, xp, town_balance, created_at')
-                        .eq('id', targetId)
+                        .select('id, nickname, community, role, xp, town_balance, created_at, avatar')
+                        .eq('id', activeTargetId)
                         .single();
 
                     const nickname = profile?.nickname || loggedInUser?.user_metadata?.nickname || 'Ciudadano';
@@ -282,14 +450,17 @@
                     const role = profile?.role || 'Miembro Fundador';
                     const xp = profile?.xp !== undefined ? profile.xp : 50;
                     const balance = profile?.town_balance !== undefined ? profile.town_balance : 100;
+                    const avatarVal = profile?.avatar || '🏙️';
                     
-                    // Respaldo de fecha: si no viene en profiles, usa la fecha de autenticación
-                    const rawDate = profile?.created_at || (loggedInUser?.id === targetId ? loggedInUser?.created_at : null);
+                    const rawDate = profile?.created_at || (loggedInUser?.id === activeTargetId ? loggedInUser?.created_at : null);
                     const fechaRegistro = formatearFecha(rawDate) || 'Reciente';
 
                     document.getElementById('user-nickname').textContent = nickname;
                     document.getElementById('user-created-at').textContent = fechaRegistro;
                     
+                    renderAvatarInElement('user-avatar', avatarVal);
+                    selectedAvatarVal = avatarVal;
+
                     const communityLink = document.getElementById('user-community-link');
                     communityLink.textContent = community;
                     
@@ -308,6 +479,45 @@
                 console.error("Error al cargar perfil:", err);
             }
         });
+
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'flex';
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'none';
+        }
+
+        function selectPreset(emoji) {
+            selectedAvatarVal = emoji;
+            document.getElementById('custom-avatar-url').value = '';
+        }
+
+        function clearPresetSelection() {
+            const urlInput = document.getElementById('custom-avatar-url').value.trim();
+            if (urlInput) {
+                selectedAvatarVal = urlInput;
+            }
+        }
+
+        async function saveAvatar() {
+            const customUrl = document.getElementById('custom-avatar-url').value.trim();
+            const avatarToSave = customUrl || selectedAvatarVal || '🏙️';
+
+            if (supabaseClient && activeTargetId) {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ avatar: avatarToSave })
+                    .eq('id', activeTargetId);
+
+                if (error) {
+                    alert("Error al guardar el avatar: " + error.message);
+                } else {
+                    renderAvatarInElement('user-avatar', avatarToSave);
+                    closeAvatarModal();
+                }
+            }
+        }
 
         async function logout() {
             if (supabaseClient) {
