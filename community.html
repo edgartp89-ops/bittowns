@@ -209,10 +209,28 @@
             flex-grow: 1;
             text-align: left;
         }
+        .user-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+        .user-link:hover {
+            color: #00f0ff;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+        }
         .xp-points {
             color: #7000ff;
             font-weight: bold;
             font-size: 0.85rem;
+        }
+        .role-tag {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
         }
         .legal-notice {
             color: #718096;
@@ -287,10 +305,19 @@
             </div>
         </div>
 
+        <!-- Leaderboard (Top Activos) -->
         <div class="section-title">🏆 Top Ciudadanos Activos</div>
         <div class="leaderboard-list" id="leaderboard-list">
             <div class="leaderboard-item">
-                <span style="color: #a0aec0;">Obteniendo datos de Supabase...</span>
+                <span style="color: #a0aec0;">Cargando ranking de Supabase...</span>
+            </div>
+        </div>
+
+        <!-- Censo Completo de Ciudadanos -->
+        <div class="section-title">👥 Censo de Ciudadanos</div>
+        <div class="leaderboard-list" id="all-citizens-list">
+            <div class="leaderboard-item">
+                <span style="color: #a0aec0;">Cargando lista de ciudadanos...</span>
             </div>
         </div>
 
@@ -317,7 +344,7 @@
             try {
                 const { data: profiles, error } = await supabaseClient
                     .from('profiles')
-                    .select('nickname, xp, town_balance')
+                    .select('id, nickname, xp, town_balance, role')
                     .order('xp', { ascending: false });
 
                 if (error) throw error;
@@ -328,9 +355,9 @@
                     const totalTown = profiles.reduce((sum, p) => sum + (p.town_balance || 0), 0);
                     document.getElementById('stat-treasury').textContent = totalTown.toLocaleString();
 
+                    // 1. Renderizar TOP ACTIVOS
                     const leaderboardContainer = document.getElementById('leaderboard-list');
                     leaderboardContainer.innerHTML = '';
-
                     const medallas = ['🥇', '🥈', '🥉'];
 
                     profiles.forEach((profile, index) => {
@@ -341,19 +368,44 @@
                         const itemHTML = `
                             <div class="leaderboard-item">
                                 <span class="rank">${rankIcon}</span>
-                                <span class="user-info">${nickname}</span>
+                                <span class="user-info">
+                                    <a href="profile.html?id=${profile.id}" class="user-link">👤 ${nickname}</a>
+                                </span>
                                 <span class="xp-points">${xp} XP</span>
                             </div>
                         `;
                         leaderboardContainer.innerHTML += itemHTML;
                     });
+
+                    // 2. Renderizar CENSO COMPLETO DE CIUDADANOS
+                    const allCitizensContainer = document.getElementById('all-citizens-list');
+                    allCitizensContainer.innerHTML = '';
+
+                    profiles.forEach((profile, index) => {
+                        const nickname = profile.nickname || ('Ciudadano ' + (index + 1));
+                        const role = profile.role || 'Miembro';
+                        const balance = profile.town_balance !== undefined ? profile.town_balance : 0;
+
+                        const citizenHTML = `
+                            <div class="leaderboard-item">
+                                <span class="user-info">
+                                    <a href="profile.html?id=${profile.id}" class="user-link">👤 ${nickname}</a>
+                                    <span class="role-tag">${role}</span>
+                                </span>
+                                <span style="color: #00f0ff; font-weight: bold; font-size: 0.85rem;">${balance} $TOWN</span>
+                            </div>
+                        `;
+                        allCitizensContainer.innerHTML += citizenHTML;
+                    });
+
                 } else {
                     document.getElementById('stat-citizens').textContent = '0';
                     document.getElementById('stat-treasury').textContent = '0';
                     document.getElementById('leaderboard-list').innerHTML = `
-                        <div class="leaderboard-item">
-                            <span style="color: #a0aec0;">No hay perfiles registrados todavía en la tabla profiles.</span>
-                        </div>
+                        <div class="leaderboard-item"><span style="color: #a0aec0;">No hay perfiles activos.</span></div>
+                    `;
+                    document.getElementById('all-citizens-list').innerHTML = `
+                        <div class="leaderboard-item"><span style="color: #a0aec0;">No hay ciudadanos registrados.</span></div>
                     `;
                 }
             } catch (err) {
