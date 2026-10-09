@@ -225,7 +225,6 @@
             border-color: #00ff88;
         }
 
-        /* Botones de selección de tipo de propiedad */
         .type-buttons-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -348,10 +347,23 @@
                 if (error || !data || data.length === 0) {
                     plotsData = DEFAULT_AMPOSTA_PLOTS;
                 } else {
-                    plotsData = data;
+                    // Fusionar con los valores por defecto si faltan campos esenciales
+                    plotsData = data.map((plot, idx) => {
+                        const def = DEFAULT_AMPOSTA_PLOTS[idx] || {};
+                        return {
+                            id: plot.id || def.id || (idx + 1),
+                            name: plot.name || def.name || `Parcela ${idx + 1}`,
+                            description: plot.description || def.description || 'Proyecto comunitario de Amposta.',
+                            icon: plot.icon || def.icon || '🏗️',
+                            cost_constructors: plot.cost_constructors || def.cost_constructors || 10,
+                            current_constructors: plot.current_constructors || 0,
+                            status: plot.status || (plot.current_constructors >= (plot.cost_constructors || 10) ? 'completed' : 'active')
+                        };
+                    });
                 }
                 renderPlotsList();
             } catch (err) {
+                console.warn("Usando parcelas por defecto debido a error en Supabase:", err);
                 plotsData = DEFAULT_AMPOSTA_PLOTS;
                 renderPlotsList();
             }
@@ -497,7 +509,6 @@
             selectedPropertyIcon = icon;
             selectedPropertyNameDefault = defaultName;
             
-            // Quitar clase selected a todos y ponérsela al pulsado
             document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById(buttonId).classList.add('selected');
         }
