@@ -87,7 +87,6 @@
             margin: 0;
         }
         
-        /* Dashboard Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -114,7 +113,6 @@
             text-transform: uppercase;
         }
 
-        /* Secciones */
         .section-title {
             width: 100%;
             text-align: left;
@@ -128,7 +126,6 @@
             gap: 8px;
         }
 
-        /* Propuestas de Gobernanza */
         .proposal-card {
             width: 100%;
             background: rgba(255, 255, 255, 0.03);
@@ -156,11 +153,6 @@
             background: rgba(0, 240, 255, 0.15);
             color: #00f0ff;
             border: 1px solid rgba(0, 240, 255, 0.4);
-        }
-        .badge-passed {
-            background: rgba(0, 255, 136, 0.15);
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.4);
         }
         .proposal-title {
             font-size: 1rem;
@@ -195,7 +187,6 @@
             color: #00f0ff;
         }
 
-        /* Leaderboard */
         .leaderboard-list {
             width: 100%;
             display: flex;
@@ -256,13 +247,14 @@
             <p class="hero-subtitle">Piloto N°1 — Gobernanza Phygital Descentralizada</p>
         </div>
 
+        <!-- Dashboard Estadísticas en Tiempo Real -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-value">142</div>
+                <div class="stat-value" id="stat-citizens">...</div>
                 <div class="stat-label">Ciudadanos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">35,000</div>
+                <div class="stat-value" id="stat-treasury">...</div>
                 <div class="stat-label">Tesorería $TOWN</div>
             </div>
             <div class="stat-card">
@@ -271,6 +263,7 @@
             </div>
         </div>
 
+        <!-- Propuestas DAO -->
         <div class="section-title">⚖️ Votaciones de Gobernanza</div>
 
         <div class="proposal-card">
@@ -301,22 +294,11 @@
             </div>
         </div>
 
+        <!-- Leaderboard en Tiempo Real desde Supabase -->
         <div class="section-title">🏆 Top Ciudadanos Activos</div>
-        <div class="leaderboard-list">
+        <div class="leaderboard-list" id="leaderboard-list">
             <div class="leaderboard-item">
-                <span class="rank">🥇</span>
-                <span class="user-info">CyberAmpostí</span>
-                <span class="xp-points">1,450 XP</span>
-            </div>
-            <div class="leaderboard-item">
-                <span class="rank">🥈</span>
-                <span class="user-info">EbreKnight</span>
-                <span class="xp-points">1,210 XP</span>
-            </div>
-            <div class="leaderboard-item">
-                <span class="rank">🥉</span>
-                <span class="user-info">DeltaNode</span>
-                <span class="xp-points">980 XP</span>
+                <span style="color: #a0aec0;">Cargando ranking de Supabase...</span>
             </div>
         </div>
 
@@ -328,6 +310,67 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
     <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            await cargarDatosComunidad();
+        });
+
+        async function cargarDatosComunidad() {
+            try {
+                if (typeof supabase === 'undefined') return;
+
+                const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                // 1. Obtener la lista de perfiles ordenados por XP desc
+                const { data: profiles, error } = await supabaseClient
+                    .from('profiles')
+                    .select('nickname, xp, town_balance')
+                    .order('xp', { ascending: false });
+
+                if (error) throw error;
+
+                if (profiles) {
+                    // Contar total de ciudadanos registrados en Supabase
+                    document.getElementById('stat-citizens').textContent = profiles.length;
+
+                    // Sumar la tesorería comunitaria ($TOWN total acumulado de todos los perfiles)
+                    const totalTown = profiles.reduce((sum, p) => sum + (p.town_balance || 0), 0);
+                    document.getElementById('stat-treasury').textContent = totalTown.toLocaleString();
+
+                    // Renderizar el Leaderboard
+                    const leaderboardContainer = document.getElementById('leaderboard-list');
+                    leaderboardContainer.innerHTML = '';
+
+                    const medallas = ['🥇', '🥈', '🥉'];
+
+                    profiles.forEach((profile, index) => {
+                        const rankIcon = medallas[index] || (index + 1) + '.';
+                        const nickname = profile.nickname || 'Ciudadano ' + (index + 1);
+                        const xp = profile.xp !== undefined ? profile.xp : 0;
+
+                        const itemHTML = `
+                            <div class="leaderboard-item">
+                                <span class="rank">${rankIcon}</span>
+                                <span class="user-info">${nickname}</span>
+                                <span class="xp-points">${xp} XP</span>
+                            </div>
+                        `;
+                        leaderboardContainer.innerHTML += itemHTML;
+                    });
+                }
+            } catch (err) {
+                console.error("Error al cargar datos de Supabase:", err);
+                document.getElementById('stat-citizens').textContent = '1';
+                document.getElementById('stat-treasury').textContent = '100';
+                document.getElementById('leaderboard-list').innerHTML = `
+                    <div class="leaderboard-item">
+                        <span class="rank">🥇</span>
+                        <span class="user-info">Ciudadano Fundador</span>
+                        <span class="xp-points">50 XP</span>
+                    </div>
+                `;
+            }
+        }
+
         async function votar(propuestaId, opcion) {
             const session = await getActiveSession();
             if (!session) {
