@@ -99,6 +99,11 @@
             background: #0b0f19;
         }
 
+        /* Filtro de Estilo Oscuro / Cyberpunk para OpenStreetMap (Sin API Key) */
+        #map .leaflet-tile-pane {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
         /* Marcadores personalizados en el mapa */
         .custom-map-marker {
             background: rgba(11, 15, 25, 0.9);
@@ -483,14 +488,14 @@
             }
         });
 
-        /* Inicializar el Mapa Leaflet */
+        /* Inicializar el Mapa Leaflet con OpenStreetMap sin API Key */
         function initMap() {
             // Centrado en el corazón de Amposta
             map = L.map('map', { zoomControl: true }).setView([40.7112, 0.5768], 15);
 
-            // Capa de mapa estilo Cyberpunk / Dark
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
+            // Capa OpenStreetMap 100% libre sin API key + filtro CSS dark
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color: #00f0ff;" target="_blank">OpenStreetMap</a>',
                 maxZoom: 19
             }).addTo(map);
         }
@@ -532,7 +537,6 @@
                 const card = document.createElement('div');
                 card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
                 
-                // Al hacer clic en la tarjeta, se abre la inversión y centra el mapa
                 card.onclick = () => {
                     focusPlotOnMap(plot.id);
                     openInvestModal(plot);
@@ -566,7 +570,6 @@
                 const isCompleted = (plot.current_constructors || 0) >= plot.cost_constructors || plot.status === 'completado';
                 const iconSymbol = plot.icon || '🏗️';
 
-                // Crear icono DivIcon personalizado
                 const customIcon = L.divIcon({
                     className: 'custom-map-marker-container',
                     html: `<div class="custom-map-marker ${isCompleted ? 'completed' : ''}">${iconSymbol}</div>`,
