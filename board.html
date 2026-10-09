@@ -105,8 +105,9 @@
             background: #0b0f19;
         }
 
+        /* Panel lateral con listado de propiedades y progreso */
         .side-panel {
-            width: 380px;
+            width: 400px;
             background: rgba(11, 15, 25, 0.96);
             border-left: 1px solid rgba(0, 240, 255, 0.2);
             display: flex;
@@ -121,114 +122,113 @@
             font-size: 1.1rem;
             font-weight: bold;
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         .panel-desc {
             color: #a0aec0;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             line-height: 1.4;
-            margin-bottom: 20px;
-        }
-        
-        .plot-detail-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 12px;
-            padding: 16px;
             margin-bottom: 15px;
-        }
-        .plot-name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #ffffff;
-            margin-bottom: 6px;
-        }
-        .plot-status {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-        .status-active { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); }
-        .status-completed { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.4); }
-
-        .progress-bar-bg {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            height: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .progress-bar-fill {
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-        
-        .btn-action {
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            color: #ffffff;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-            transition: transform 0.2s;
-        }
-        .btn-action:hover:not(:disabled) {
-            transform: scale(1.02);
-            box-shadow: 0 0 18px rgba(0, 240, 255, 0.6);
-        }
-        .btn-action:disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: #718096;
-            cursor: not-allowed;
-            box-shadow: none;
         }
 
         .user-constructors-box {
             background: rgba(255, 183, 3, 0.08);
             border: 1px solid rgba(255, 183, 3, 0.3);
-            padding: 12px;
+            padding: 10px 14px;
             border-radius: 10px;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .buy-property-card {
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(0, 255, 136, 0.4);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 0.85rem;
+
+        /* Tarjeta de cada propiedad en el listado lateral */
+        .plot-list-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px;
             margin-bottom: 12px;
-            box-sizing: border-box;
-            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .form-input:focus {
-            border-color: #00ff88;
+        .plot-list-item:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: #00f0ff;
+            transform: translateX(2px);
+        }
+        .plot-list-item.selected {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        .plot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .plot-title-text {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .plot-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .badge-active { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); }
+        .badge-completed { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+
+        .progress-bar-bg {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .plot-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 6px;
+        }
+
+        .btn-action-small {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-action-small:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        .btn-action-small:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #718096;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -254,19 +254,19 @@
         <!-- Mapa OpenStreetMap / Leaflet -->
         <div id="map"></div>
 
-        <!-- Panel Lateral Dinámico -->
+        <!-- Panel Lateral con Listado y Progreso -->
         <div class="side-panel" id="side-panel-content">
-            <h2 class="panel-title">🏛️ Parcelas de Amposta</h2>
-            <p class="panel-desc">Haz clic en cualquier parcela del mapa para ver su estado de financiación colectiva y aportar tus Constructors (🏗️).</p>
+            <h2 class="panel-title">🏛️ Listado de Inversiones DAO</h2>
+            <p class="panel-desc">Explora las parcelas comunitarias de Amposta, revisa su progreso e invierte tus Constructors.</p>
             
             <div class="user-constructors-box">
-                <span style="color: #ffb703; font-weight: bold; font-size: 0.9rem;">Tus Constructors:</span>
-                <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.1rem;">0 🏗️</span>
+                <span style="color: #ffb703; font-weight: bold; font-size: 0.85rem;">Tus Constructors Disponibles:</span>
+                <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.05rem;">0 🏗️</span>
             </div>
 
-            <div id="selected-plot-details">
+            <div id="plots-list-container">
                 <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
-                    Haz clic en un marcador del mapa para interactuar con la parcela.
+                    Cargando parcelas de Amposta...
                 </div>
             </div>
         </div>
@@ -286,11 +286,11 @@
         let userConstructorsBalance = 0;
         let markersLayer = L.layerGroup();
         let plotsData = [];
+        let selectedPlotId = null;
 
-        // Parcelas base por defecto en Amposta si la tabla estuviera vacía
         const DEFAULT_AMPOSTA_PLOTS = [
             { id: 1, name: "Plaça del Ajuntament", description: "Centro neurálgico y administrativo de Amposta.", lat: 40.7078, lng: 0.5825, icon: "🏛️", cost_constructors: 10, current_constructors: 0, status: "active" },
-            { id: 2, name: "Pont Colgant d'Amposta", description: "Icónico puente sobre el río Ebro.", lat: 40.7102, lng: 0.5840, icon: "🌉", cost_constructors: 15, current_constructors: 0, status: "active" },
+            { id: 2, name: "Pont Colgant d'Amposta", description: "Icónico puente colgante sobre el río Ebro.", lat: 40.7102, lng: 0.5840, icon: "🌉", cost_constructors: 15, current_constructors: 0, status: "active" },
             { id: 3, name: "Passeig del Canal", description: "Zona verde y recreativa junto al canal de riego.", lat: 40.7050, lng: 0.5790, icon: "🌳", cost_constructors: 8, current_constructors: 0, status: "active" },
             { id: 4, name: "Zona Comercial del Centre", description: "Eje de comercios locales y tiendas de proximidad.", lat: 40.7085, lng: 0.5805, icon: "🏬", cost_constructors: 12, current_constructors: 0, status: "active" },
             { id: 5, name: "Torre de la Carrova", description: "Torre medieval defensiva a orillas del Ebro.", lat: 40.7250, lng: 0.5920, icon: "🏰", cost_constructors: 20, current_constructors: 0, status: "active" }
@@ -358,15 +358,16 @@
                     .select('*');
 
                 if (error || !data || data.length === 0) {
-                    // Si la tabla está vacía, usamos las parcelas por defecto
                     plotsData = DEFAULT_AMPOSTA_PLOTS;
                 } else {
                     plotsData = data;
                 }
                 renderMarkers();
+                renderPlotsList();
             } catch (err) {
                 plotsData = DEFAULT_AMPOSTA_PLOTS;
                 renderMarkers();
+                renderPlotsList();
             }
         }
 
@@ -386,46 +387,61 @@
 
                 const marker = L.marker([plot.lat, plot.lng], { icon: customIcon });
                 marker.on('click', () => {
-                    selectPlot(plot);
+                    selectPlotById(plot.id);
                 });
 
                 markersLayer.addLayer(marker);
             });
         }
 
-        function selectPlot(plot) {
-            const container = document.getElementById('selected-plot-details');
-            const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
-            const percentage = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
+        function renderPlotsList() {
+            const container = document.getElementById('plots-list-container');
+            if (!container) return;
 
-            container.innerHTML = `
-                <div class="plot-detail-card">
-                    <div class="plot-name">${plot.icon || '🏗️'} ${plot.name}</div>
-                    <span class="plot-status ${isCompleted ? 'status-completed' : 'status-active'}">
-                        ${isCompleted ? '✨ Parcela Financiada (DAO)' : '⚡ En Financiación Colectiva'}
-                    </span>
-                    <p style="color: #a0aec0; font-size: 0.8rem; margin: 6px 0 12px 0;">${plot.description || 'Proyecto de mejora urbana comunitaria en Amposta.'}</p>
+            container.innerHTML = '';
+            plotsData.forEach(plot => {
+                const isCompleted = plot.status === 'completed' || plot.current_constructors >= plot.cost_constructors;
+                const percentage = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
+                const isSelected = selectedPlotId === plot.id;
+
+                const item = document.createElement('div');
+                item.className = 'plot-list-item' + (isSelected ? ' selected' : '');
+                item.onclick = () => selectPlotById(plot.id);
+
+                item.innerHTML = `
+                    <div class="plot-header">
+                        <span class="plot-title-text">${plot.icon || '🏗️'} ${plot.name}</span>
+                        <span class="plot-badge ${isCompleted ? 'badge-completed' : 'badge-active'}">
+                            ${isCompleted ? '✨ Completado' : '⚡ Activo'}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #a0aec0; margin-bottom: 6px;">${plot.description || ''}</div>
                     
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #a0aec0;">
-                        <span>Progreso DAO</span>
-                        <span style="color: #ffffff; font-weight: bold;">${plot.current_constructors} / ${plot.cost_constructors} 🏗️ (${percentage}%)</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0aec0;">
+                        <span>Progreso: ${plot.current_constructors} / ${plot.cost_constructors} 🏗️</span>
+                        <span style="color: #ffffff; font-weight: bold;">${percentage}%</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
                     </div>
 
-                    <button class="btn-action" onclick="contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
-                        ${isCompleted ? 'Proyecto DAO Completado' : 'Aportar 1 Constructor (🏗️)'}
-                    </button>
-                </div>
-            `;
+                    <div class="plot-footer">
+                        <span>Coste total: ${plot.cost_constructors} 🏗️</span>
+                        <button class="btn-action-small" onclick="event.stopPropagation(); contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
+                            ${isCompleted ? 'Financiado' : '+1 🏗️ Aportar'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function selectPlotById(id) {
+            selectedPlotId = id;
             const plot = plotsData.find(p => p.id === id);
             if (plot) {
-                selectPlot(plot);
                 map.setView([plot.lat, plot.lng], 17);
+                renderPlotsList();
             }
         }
 
@@ -449,26 +465,20 @@
             const newStatus = isCompleted ? 'completed' : 'active';
 
             try {
-                // Registrar aportación en tabla plot_contributions (si existe en base de datos)
                 await supabaseClient.from('plot_contributions').insert({
                     user_id: currentUser.id,
                     plot_id: plotId,
                     amount: 1
                 });
 
-                // Actualizar progreso en la parcela sin asignar owner_id (DAO compartido)
-                const { error: plotError } = await supabaseClient
+                // Actualiza parcela sin asignar owner_id individual (DAO 100% compartido)
+                await supabaseClient
                     .from('board_plots')
                     .update({
                         current_constructors: newTotal,
                         status: newStatus
                     })
                     .eq('id', plotId);
-
-                if (plotError) {
-                    // Si la tabla board_plots no estuviera creada aún, simulamos localmente
-                    console.warn("Actualizando de forma local por restricciones de tabla:", plotError);
-                }
 
                 const newBalance = userConstructorsBalance - 1;
                 await supabaseClient
@@ -481,10 +491,7 @@
 
                 alert(isCompleted ? "🎉 ¡Felicidades! Habéis completado este proyecto DAO colectivo." : "✅ ¡Aportación realizada con éxito!");
                 
-                plot.current_constructors = newTotal;
-                plot.status = newStatus;
-                renderMarkers();
-                selectPlot(plot);
+                await loadPlots();
 
             } catch (err) {
                 console.error("Error en aportación:", err);
@@ -501,36 +508,23 @@
             if (mode === 'individual') {
                 panel.innerHTML = `
                     <h2 class="panel-title">🏡 Mis Propiedades Privadas</h2>
-                    <p class="panel-desc">Adquiere y edifica tus viviendas o locales privados en el ecosistema Phygital.</p>
-                    
-                    <div class="buy-property-card">
-                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 8px;">➕ Comprar Nueva Propiedad</div>
-                        <input type="text" id="new-prop-name" class="form-input" placeholder="Nombre (ej. Loft Digital Sants)..." />
-                        <select id="new-prop-icon" class="form-input">
-                            <option value="🏠">🏠 Casa / Vivienda</option>
-                            <option value="🏢">🏢 Edificio / Oficina</option>
-                            <option value="🏬">🏬 Local Comercial</option>
-                            <option value="🏭">🏭 Taller / Fábrica</option>
-                        </select>
-                        <button class="btn-action" onclick="buyPrivateProperty()" style="background: linear-gradient(90deg, #00ff88, #00f0ff); color: #0b0f19;">Comprar por 2 Constructors (🏗️)</button>
-                    </div>
-
-                    <div id="private-list-container" style="color: #a0aec0; font-size: 0.85rem; text-align: center; padding: 10px;">
+                    <p class="panel-desc">Tus viviendas y locales personales en el ecosistema Phygital de Amposta.</p>
+                    <div id="private-list-container" style="color: #a0aec0; font-size: 0.85rem; text-align: center; padding: 20px;">
                         Cargando tus propiedades...
                     </div>
                 `;
                 loadUserPrivatePropertiesList();
             } else {
                 panel.innerHTML = `
-                    <h2 class="panel-title">🏛️ Parcelas de Amposta</h2>
-                    <p class="panel-desc">Haz clic en cualquier parcela del mapa para ver su estado de financiación colectiva y aportar tus Constructors (🏗️).</p>
+                    <h2 class="panel-title">🏛️ Listado de Inversiones DAO</h2>
+                    <p class="panel-desc">Explora las parcelas comunitarias de Amposta, revisa su progreso e invierte tus Constructors.</p>
                     <div class="user-constructors-box">
-                        <span style="color: #ffb703; font-weight: bold; font-size: 0.9rem;">Tus Constructors:</span>
-                        <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.1rem;">${userConstructorsBalance} 🏗️</span>
+                        <span style="color: #ffb703; font-weight: bold; font-size: 0.85rem;">Tus Constructors Disponibles:</span>
+                        <span id="panel-user-constructors" style="color: #ffb703; font-weight: bold; font-size: 1.05rem;">${userConstructorsBalance} 🏗️</span>
                     </div>
-                    <div id="selected-plot-details">
+                    <div id="plots-list-container">
                         <div style="text-align: center; color: #a0aec0; padding: 20px; font-size: 0.85rem;">
-                            Haz clic en un marcador del mapa para interactuar con la parcela.
+                            Cargando parcelas de Amposta...
                         </div>
                     </div>
                 `;
@@ -548,76 +542,28 @@
                     .eq('user_id', currentUser.id);
 
                 if (!error && data && data.length > 0) {
-                    container.innerHTML = '<div style="color: #ffffff; font-weight: bold; margin-bottom: 8px;">Tus inmuebles registrados:</div>';
+                    container.innerHTML = '';
                     data.forEach(prop => {
                         const div = document.createElement('div');
                         div.style.background = 'rgba(0, 255, 136, 0.05)';
                         div.style.border = '1px solid rgba(0, 255, 136, 0.3)';
-                        div.style.padding = '10px';
-                        div.style.borderRadius = '8px';
-                        div.style.marginBottom = '8px';
+                        div.style.padding = '12px';
+                        div.style.borderRadius = '10px';
+                        div.style.marginBottom = '10px';
                         div.innerHTML = `
                             <div style="font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 8px;">
                                 <span>${prop.icon || '🏠'}</span>
                                 <span>${prop.name}</span>
                             </div>
-                            <div style="color: #00ff88; font-size: 0.75rem; margin-top: 4px;">Nivel ${prop.level} (${prop.total_constructors || 2} 🏗️ invertidos)</div>
+                            <div style="color: #00ff88; font-size: 0.8rem; margin-top: 6px;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️ invertidos)</div>
                         `;
                         container.appendChild(div);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No tienes propiedades privadas todavía. ¡Usa el formulario superior para adquirir una!</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No tienes propiedades privadas registradas todavía.</div>`;
                 }
             } catch (err) {
-                container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">Sin propiedades registradas.</div>`;
-            }
-        }
-
-        async function buyPrivateProperty() {
-            if (!currentUser) {
-                alert("Debes iniciar sesión.");
-                window.location.href = 'login.html';
-                return;
-            }
-
-            if (userConstructorsBalance < 2) {
-                alert("Necesitas al menos 2 Constructors (🏗️) para comprar una propiedad privada.");
-                return;
-            }
-
-            const nameInput = document.getElementById('new-prop-name').value.trim();
-            const iconVal = document.getElementById('new-prop-icon').value;
-            const propName = nameInput || "Vivienda Privada Amposta";
-
-            try {
-                const { error: insertErr } = await supabaseClient
-                    .from('user_properties')
-                    .insert({
-                        user_id: currentUser.id,
-                        name: propName,
-                        icon: iconVal,
-                        level: 1,
-                        total_constructors: 2
-                    });
-
-                if (insertErr) {
-                    alert("Error al registrar la propiedad en Supabase.");
-                    return;
-                }
-
-                const newBalance = userConstructorsBalance - 2;
-                await supabaseClient
-                    .from('profiles')
-                    .update({ constructors: newBalance })
-                    .eq('id', currentUser.id);
-
-                userConstructorsBalance = newBalance;
-                alert("🎉 ¡Propiedad privada adquirida con éxito!");
-                loadUserPrivatePropertiesList();
-
-            } catch (err) {
-                console.error("Error comprando propiedad:", err);
-                alert("Error al procesar la compra.");
+                console.error("Error cargando propiedades privadas:", err);
             }
         }
     </script>
