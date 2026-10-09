@@ -65,7 +65,6 @@
             font-weight: bold;
         }
 
-        /* --- DISEÑO GRÁFICO DEL TABLERO Y CALLES --- */
         .board-frame {
             background: #060911;
             border: 2px solid #00f0ff;
@@ -75,7 +74,6 @@
             position: relative;
         }
 
-        /* Indicador de Leyenda de Calles */
         .street-legend {
             display: flex;
             justify-content: space-around;
@@ -93,7 +91,6 @@
             gap: 6px;
         }
 
-        /* Rejilla 4x4 separada por asfaltos y líneas de calles (3 cruces) */
         .board-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -106,7 +103,6 @@
             padding: 4px;
         }
 
-        /* Parcela de Terreno */
         .plot-card {
             background: #0d1322;
             border: 1px solid rgba(0, 240, 255, 0.3);
@@ -192,7 +188,6 @@
             margin-top: 4px;
         }
 
-        /* Modal Aportar Constructors */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -293,22 +288,18 @@
         <div class="user-balance-bar">
             <span>🏛️ Amposta Digital - Sector Piloto</span>
             <div class="balance-info">
-                Mis Constructors: <span id="my-constructors" style="color: #ffb703;">1</span> 🏗️
+                Mis Constructors: <span id="my-constructors" style="color: #ffb703;">...</span> 🏗️
             </div>
         </div>
 
-        <!-- MARCO GRÁFICO DEL MAPA DE CALLES -->
         <div class="board-frame">
-            <!-- Nombres de las Avenidas/Calles cruzadas -->
             <div class="street-legend">
                 <span>🛣️ C. Major</span>
                 <span>🛣️ Av. de la Ràpita</span>
                 <span>🛣️ C. Sant Sebastià</span>
             </div>
 
-            <div class="board-grid" id="board-grid">
-                <!-- Se cargará aquí con las 16 parcelas -->
-            </div>
+            <div class="board-grid" id="board-grid"></div>
         </div>
 
         <div class="legal-notice">
@@ -327,7 +318,7 @@
 
             <div class="modal-actions">
                 <button class="btn-modal btn-cancel" onclick="closeInvestModal()">Cancelar</button>
-                <button class="btn-modal btn-save" onclick="confirmInvestment()">Invertir 🏗️</button>
+                <button class="btn-modal btn-save" id="btn-confirm-invest" onclick="confirmInvestment()">Invertir 🏗️</button>
             </div>
         </div>
     </div>
@@ -337,36 +328,13 @@
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
-        // 16 Parcelas por defecto de Amposta (por si falla la red o la tabla está vacía)
-        const DEFAULT_PLOTS = [
-            { id: 1, name: 'Pont Penjat Digital', cost_constructors: 50, current_constructors: 0, status: 'disponible', icon: '🌉' },
-            { id: 2, name: 'Castell d\'Amposta', cost_constructors: 100, current_constructors: 0, status: 'disponible', icon: '🏰' },
-            { id: 3, name: 'Mercat Municipal', cost_constructors: 30, current_constructors: 0, status: 'disponible', icon: '🛒' },
-            { id: 4, name: 'Parc dels Xiribecs', cost_constructors: 20, current_constructors: 0, status: 'disponible', icon: '🌳' },
-            { id: 5, name: 'Hub Bit-Towns', cost_constructors: 40, current_constructors: 0, status: 'disponible', icon: '💻' },
-            { id: 6, name: 'Zona Comercial Ràpita', cost_constructors: 15, current_constructors: 0, status: 'disponible', icon: '🏪' },
-            { id: 7, name: 'Estació Autobusos', cost_constructors: 25, current_constructors: 0, status: 'disponible', icon: '🚌' },
-            { id: 8, name: 'Centro Deportivo', cost_constructors: 20, current_constructors: 0, status: 'disponible', icon: '⚽' },
-            { id: 9, name: 'Biblioteca Comunitària', cost_constructors: 15, current_constructors: 0, status: 'disponible', icon: '📚' },
-            { id: 10, name: 'Hub Innovación Ebre', cost_constructors: 35, current_constructors: 0, status: 'disponible', icon: '⚡' },
-            { id: 11, name: 'Cafetería del Puerto', cost_constructors: 10, current_constructors: 0, status: 'disponible', icon: '☕' },
-            { id: 12, name: 'Teatre La Unió', cost_constructors: 25, current_constructors: 0, status: 'disponible', icon: '🎭' },
-            { id: 13, name: 'Solar Residencial 1', cost_constructors: 10, current_constructors: 0, status: 'disponible', icon: '🏠' },
-            { id: 14, name: 'Solar Residencial 2', cost_constructors: 10, current_constructors: 0, status: 'disponible', icon: '🏠' },
-            { id: 15, name: 'Solar Comercial 3', cost_constructors: 15, current_constructors: 0, status: 'disponible', icon: '🏬' },
-            { id: 16, name: 'Plaza Central Neón', cost_constructors: 30, current_constructors: 0, status: 'disponible', icon: '🏛️' }
-        ];
-
         let supabaseClient;
         let currentUser = null;
-        let userConstructors = 1;
+        let userConstructors = 0;
         let selectedPlot = null;
-        let plotsData = [...DEFAULT_PLOTS];
+        let plotsData = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Pintar inmediatamente con datos locales para evitar pantalla vacía
-            renderBoard(plotsData);
-
             if (typeof supabase !== 'undefined') {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
@@ -390,7 +358,7 @@
                     await loadBoardFromSupabase();
                     subscribeToBoardChanges();
                 } catch (err) {
-                    console.log("Modo offline / desarrollo activo");
+                    console.error("Error inicial:", err);
                 }
             }
         });
@@ -404,7 +372,12 @@
                 `)
                 .order('id', { ascending: true });
 
-            if (!error && plots && plots.length > 0) {
+            if (error) {
+                console.error("Error al cargar tablero:", error);
+                return;
+            }
+
+            if (plots && plots.length > 0) {
                 plotsData = plots;
                 renderBoard(plotsData);
             }
@@ -417,14 +390,16 @@
             grid.innerHTML = '';
 
             plots.forEach((plot, index) => {
-                const isCompleted = plot.current_constructors >= plot.cost_constructors || plot.status === 'completado';
-                const percent = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
+                const current = plot.current_constructors || 0;
+                const cost = plot.cost_constructors || 10;
+                const isCompleted = current >= cost || plot.status === 'completado';
+                const percent = Math.min(100, Math.round((current / cost) * 100));
 
                 const card = document.createElement('div');
                 card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
                 card.onclick = () => openInvestModal(plot);
 
-                let ownerHtml = `<div class="plot-status">${plot.current_constructors} / ${plot.cost_constructors} 🏗️</div>`;
+                let ownerHtml = `<div class="plot-status">${current} / ${cost} 🏗️</div>`;
                 
                 if (isCompleted) {
                     const ownerNick = plot.profiles?.nickname || 'Comunidad';
@@ -462,7 +437,7 @@
                 return;
             }
 
-            if (plot.current_constructors >= plot.cost_constructors) {
+            if ((plot.current_constructors || 0) >= plot.cost_constructors) {
                 alert("🏛️ ¡Esta parcela ya ha sido completada por la comunidad!");
                 return;
             }
@@ -470,7 +445,7 @@
             selectedPlot = plot;
             document.getElementById('modal-icon').textContent = plot.icon || '🏗️';
             document.getElementById('modal-plot-name').textContent = plot.name;
-            document.getElementById('modal-plot-desc').textContent = `Progreso actual: ${plot.current_constructors} / ${plot.cost_constructors} Constructors.`;
+            document.getElementById('modal-plot-desc').textContent = `Progreso actual: ${plot.current_constructors || 0} / ${plot.cost_constructors} Constructors.`;
             document.getElementById('invest-amount').value = 1;
             document.getElementById('invest-amount').max = userConstructors;
             document.getElementById('invest-modal').style.display = 'flex';
@@ -495,28 +470,26 @@
                 return;
             }
 
-            const newPlotConstructors = (selectedPlot.current_constructors || 0) + amount;
+            const confirmBtn = document.getElementById('btn-confirm-invest');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "⏳ Guardando...";
+
+            const currentAmount = selectedPlot.current_constructors || 0;
+            const newPlotConstructors = currentAmount + amount;
             const isNowCompleted = newPlotConstructors >= selectedPlot.cost_constructors;
             const newStatus = isNowCompleted ? 'completado' : 'en_construccion';
 
             try {
-                // Restar Constructors al usuario
+                // 1. Restar Constructors al perfil del usuario
                 const newBalance = userConstructors - amount;
-                await supabaseClient
+                const { error: profileErr } = await supabaseClient
                     .from('profiles')
                     .update({ constructors: newBalance })
                     .eq('id', currentUser.id);
 
-                // Registrar la contribución
-                await supabaseClient
-                    .from('plot_contributions')
-                    .insert({
-                        plot_id: selectedPlot.id,
-                        user_id: currentUser.id,
-                        amount: amount
-                    });
+                if (profileErr) throw profileErr;
 
-                // Actualizar la parcela
+                // 2. Actualizar parcela en Supabase
                 const updatePayload = {
                     current_constructors: newPlotConstructors,
                     status: newStatus
@@ -525,10 +498,21 @@
                     updatePayload.owner_id = currentUser.id;
                 }
 
-                await supabaseClient
+                const { error: plotErr } = await supabaseClient
                     .from('board_plots')
                     .update(updatePayload)
                     .eq('id', selectedPlot.id);
+
+                if (plotErr) throw plotErr;
+
+                // 3. Registrar contribución
+                await supabaseClient
+                    .from('plot_contributions')
+                    .insert({
+                        plot_id: selectedPlot.id,
+                        user_id: currentUser.id,
+                        amount: amount
+                    });
 
                 userConstructors = newBalance;
                 document.getElementById('my-constructors').textContent = userConstructors;
@@ -543,8 +527,10 @@
                 }
             } catch (err) {
                 console.error("Error al invertir:", err);
-                alert("Se actualizó la parcela localmente.");
-                closeInvestModal();
+                alert("Error al guardar la inversión: " + err.message);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Invertir 🏗️";
             }
         }
     </script>
