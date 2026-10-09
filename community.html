@@ -199,8 +199,6 @@
             padding: 10px 15px;
             border-radius: 8px;
             font-size: 0.9rem;
-            flex-wrap: wrap;
-            gap: 6px;
         }
         .rank {
             font-weight: bold;
@@ -210,10 +208,6 @@
         .user-info {
             flex-grow: 1;
             text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
         }
         .user-link {
             color: #ffffff;
@@ -231,19 +225,12 @@
             font-size: 0.85rem;
         }
         .role-tag {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             color: #a0aec0;
             background: rgba(255, 255, 255, 0.05);
             padding: 2px 6px;
             border-radius: 4px;
-        }
-        .date-tag {
-            font-size: 0.72rem;
-            color: rgba(0, 240, 255, 0.7);
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px solid rgba(0, 240, 255, 0.15);
-            padding: 2px 6px;
-            border-radius: 4px;
+            margin-left: 8px;
         }
         .legal-notice {
             color: #718096;
@@ -326,7 +313,7 @@
             </div>
         </div>
 
-        <!-- Censo Completo de Ciudadanos con Fecha de Registro -->
+        <!-- Censo Completo de Ciudadanos -->
         <div class="section-title">👥 Censo de Ciudadanos</div>
         <div class="leaderboard-list" id="all-citizens-list">
             <div class="leaderboard-item">
@@ -353,21 +340,11 @@
             }
         });
 
-        function formatearFecha(dateString) {
-            if (!dateString) return null;
-            const d = new Date(dateString);
-            if (isNaN(d.getTime())) return null;
-            const dia = String(d.getDate()).padStart(2, '0');
-            const mes = String(d.getMonth() + 1).padStart(2, '0');
-            const anio = d.getFullYear();
-            return `${dia}/${mes}/${anio}`;
-        }
-
         async function cargarDatosComunidad() {
             try {
                 const { data: profiles, error } = await supabaseClient
                     .from('profiles')
-                    .select('id, nickname, xp, town_balance, role, created_at')
+                    .select('id, nickname, xp, town_balance, role')
                     .order('xp', { ascending: false });
 
                 if (error) throw error;
@@ -400,24 +377,20 @@
                         leaderboardContainer.innerHTML += itemHTML;
                     });
 
-                    // 2. Renderizar CENSO COMPLETO con Fecha
+                    // 2. Renderizar CENSO COMPLETO DE CIUDADANOS
                     const allCitizensContainer = document.getElementById('all-citizens-list');
                     allCitizensContainer.innerHTML = '';
 
-                    profiles.forEach((profile) => {
-                        const nickname = profile.nickname || 'Ciudadano';
+                    profiles.forEach((profile, index) => {
+                        const nickname = profile.nickname || ('Ciudadano ' + (index + 1));
                         const role = profile.role || 'Miembro';
                         const balance = profile.town_balance !== undefined ? profile.town_balance : 0;
-                        const fechaFormateada = formatearFecha(profile.created_at);
-
-                        const dateBadge = fechaFormateada ? `<span class="date-tag">🗓️ ${fechaFormateada}</span>` : '';
 
                         const citizenHTML = `
                             <div class="leaderboard-item">
                                 <span class="user-info">
                                     <a href="profile.html?id=${profile.id}" class="user-link">👤 ${nickname}</a>
                                     <span class="role-tag">${role}</span>
-                                    ${dateBadge}
                                 </span>
                                 <span style="color: #00f0ff; font-weight: bold; font-size: 0.85rem;">${balance} $TOWN</span>
                             </div>
