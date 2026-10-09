@@ -268,6 +268,8 @@
             letter-spacing: 0.5px;
             margin: 12px 0 8px 0;
         }
+        
+        /* Enlaces interactivos en el inventario */
         .inventory-item {
             display: flex;
             justify-content: space-between;
@@ -278,11 +280,24 @@
             margin-bottom: 8px;
             font-size: 0.85rem;
             border-left: 3px solid #7000ff;
+            text-decoration: none;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .inventory-item:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: #00f0ff;
+            transform: translateX(3px);
         }
         .inventory-item.private {
             border-left-color: #00ff88;
             background: rgba(0, 255, 136, 0.04);
         }
+        .inventory-item.private:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: #00ff88;
+        }
+
         .btn-logout {
             background: rgba(255, 74, 74, 0.1);
             border: 1px solid rgba(255, 74, 74, 0.4);
@@ -473,7 +488,7 @@
             </div>
         </div>
 
-        <!-- MÓDULO ACTUALIZADO: INVERSIONES Y PROPIEDADES -->
+        <!-- MÓDULO CON ENLACES A PROPIEDADES -->
         <div class="section-card">
             <h2>🏗️ Inversiones & Propiedades</h2>
             
@@ -669,12 +684,12 @@
             }
         }
 
-        /* CARGAR PROPIEDADES PRIVADAS E INVERSIONES COLECTIVAS */
+        /* CARGAR PROPIEDADES PRIVADAS E INVERSIONES COLECTIVAS CON ENLACES */
         async function loadUserAllProperties(userId) {
             const privateContainer = document.getElementById('user-private-properties-list');
             const collectiveContainer = document.getElementById('user-investments-list');
 
-            // 1. Cargar Propiedades Privadas (user_properties)
+            // 1. Cargar Propiedades Privadas (Enlace directo a la pestaña individual del tablero)
             try {
                 const { data: privateProps, error: pErr } = await supabaseClient
                     .from('user_properties')
@@ -685,18 +700,22 @@
                 if (!pErr && privateProps && privateProps.length > 0) {
                     privateContainer.innerHTML = '';
                     privateProps.forEach(prop => {
-                        const card = document.createElement('div');
-                        card.className = 'inventory-item private';
-                        card.innerHTML = `
+                        const linkCard = document.createElement('a');
+                        linkCard.className = 'inventory-item private';
+                        linkCard.href = 'board.html?tab=individual';
+                        linkCard.title = 'Ver en el Tablero de Propiedades';
+
+                        linkCard.innerHTML = `
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="font-size: 1.2rem;">${prop.icon || '🏠'}</span>
                                 <span style="font-weight: bold; color: #ffffff;">${prop.name}</span>
                             </div>
-                            <div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
                                 <span style="color: #00ff88; font-weight: bold;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️)</span>
+                                <span style="color: #00f0ff; font-size: 0.8rem;">→</span>
                             </div>
                         `;
-                        privateContainer.appendChild(card);
+                        privateContainer.appendChild(linkCard);
                     });
                 } else {
                     privateContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin viviendas privadas registradas.</div>`;
@@ -706,7 +725,7 @@
                 privateContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center;">Error de conexión.</div>`;
             }
 
-            // 2. Cargar Aportaciones Colectivas (plot_contributions)
+            // 2. Cargar Aportaciones Colectivas (Enlace directo a la parcela concreta en board.html)
             try {
                 const { data: contributions, error: cErr } = await supabaseClient
                     .from('plot_contributions')
@@ -739,23 +758,28 @@
 
                     collectiveContainer.innerHTML = '';
                     Object.values(plotMap).forEach(inv => {
-                        const card = document.createElement('div');
-                        card.className = 'inventory-item';
-                        card.style.borderLeftColor = inv.isOwner ? '#00ff88' : '#00f0ff';
+                        const linkCard = document.createElement('a');
+                        linkCard.className = 'inventory-item';
+                        linkCard.href = `board.html?plot=${inv.id}`;
+                        linkCard.title = 'Ver parcela en el mapa';
+                        linkCard.style.borderLeftColor = inv.isOwner ? '#00ff88' : '#00f0ff';
 
-                        let badgeText = `<span style="color: #ffb703; font-weight: bold;">${inv.userTotal} 🏗️ invertidos</span>`;
+                        let badgeText = `<span style="color: #ffb703; font-weight: bold;">${inv.userTotal} 🏗️</span>`;
                         if (inv.isOwner) {
                             badgeText = `<span style="color: #00ff88; font-weight: bold;">👑 Propietario (${inv.userTotal} 🏗️)</span>`;
                         }
 
-                        card.innerHTML = `
+                        linkCard.innerHTML = `
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="font-size: 1.2rem;">${inv.icon}</span>
                                 <span style="font-weight: bold; color: #ffffff;">${inv.name}</span>
                             </div>
-                            <div>${badgeText}</div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                ${badgeText}
+                                <span style="color: #00f0ff; font-size: 0.8rem;">→</span>
+                            </div>
                         `;
-                        collectiveContainer.appendChild(card);
+                        collectiveContainer.appendChild(linkCard);
                     });
                 } else {
                     collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin aportaciones colectivas en la ciudad.</div>`;
@@ -839,7 +863,6 @@
                         updateClaimButtonState();
                     }
 
-                    // Cargar propiedades privadas y aportaciones colectivas en el perfil
                     await loadUserAllProperties(activeTargetId);
                 }
             } catch (err) {
