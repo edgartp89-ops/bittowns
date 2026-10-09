@@ -81,12 +81,24 @@
             margin-bottom: 8px;
         }
         .citizen-district {
-            color: #00f0ff;
+            color: #a0aec0;
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
             font-weight: bold;
+        }
+        .community-link {
+            color: #00f0ff;
+            text-decoration: none;
+            border-bottom: 1px dashed #00f0ff;
+            padding-bottom: 2px;
+            transition: all 0.2s ease;
+        }
+        .community-link:hover {
+            color: #ffffff;
+            border-bottom-style: solid;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
         }
         .stats-grid {
             display: grid;
@@ -175,7 +187,9 @@
             <div class="avatar-placeholder">🏙️</div>
             <div class="citizen-name" id="user-nickname">Cargando...</div>
             <div class="citizen-email" id="user-email">...</div>
-            <div class="citizen-district" id="user-community">Comunidad: Amposta</div>
+            <div class="citizen-district">
+                Comunidad: <a href="community.html" id="user-community-link" class="community-link">Amposta</a>
+            </div>
 
             <div class="stats-grid">
                 <div class="stat-box">
@@ -252,7 +266,18 @@
 
                     document.getElementById('user-nickname').textContent = nickname;
                     document.getElementById('user-email').textContent = user.email;
-                    document.getElementById('user-community').textContent = 'Comunidad: ' + community;
+                    
+                    // Configurar el enlace dinámico a la comunidad
+                    const communityLink = document.getElementById('user-community-link');
+                    communityLink.textContent = community;
+                    
+                    const slug = community.toLowerCase().trim().replace(/\s+/g, '-');
+                    if (slug === 'amposta') {
+                        communityLink.href = 'community.html';
+                    } else {
+                        communityLink.href = `community.html?town=${encodeURIComponent(slug)}`;
+                    }
+
                     document.getElementById('user-role').textContent = role;
                     document.getElementById('user-xp').textContent = xp + ' XP';
                     document.getElementById('user-balance').textContent = balance + ' BT';
