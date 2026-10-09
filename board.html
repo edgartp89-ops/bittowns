@@ -132,6 +132,18 @@
             border-color: #00f0ff;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
         }
+
+        /* Estilo especial para proyectos completados (arriba y color verde claro) */
+        .plot-card.completed-plot {
+            background: rgba(0, 255, 136, 0.06);
+            border: 1px solid rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
+        }
+        .plot-card.completed-plot:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
         .plot-header {
             display: flex;
             justify-content: space-between;
@@ -153,7 +165,7 @@
             font-weight: bold;
         }
         .badge-active { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); }
-        .badge-completed { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+        .badge-completed { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.5); }
 
         .progress-bar-bg {
             background: rgba(0, 0, 0, 0.5);
@@ -168,6 +180,9 @@
             height: 100%;
             width: 0%;
             transition: width 0.3s ease;
+        }
+        .completed-plot .progress-bar-fill {
+            background: linear-gradient(90deg, #00ff88, #00f0ff);
         }
 
         .plot-footer {
@@ -196,8 +211,9 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
         }
         .btn-action:disabled {
-            background: rgba(255, 255, 255, 0.08);
-            color: #718096;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -347,20 +363,30 @@
                 if (error || !data || data.length === 0) {
                     plotsData = DEFAULT_AMPOSTA_PLOTS;
                 } else {
-                    // Fusionar con los valores por defecto si faltan campos esenciales
                     plotsData = data.map((plot, idx) => {
                         const def = DEFAULT_AMPOSTA_PLOTS[idx] || {};
+                        const cost = plot.cost_constructors || def.cost_constructors || 10;
+                        const current = plot.current_constructors || 0;
+                        const isCompleted = plot.status === 'completed' || current >= cost;
                         return {
                             id: plot.id || def.id || (idx + 1),
                             name: plot.name || def.name || `Parcela ${idx + 1}`,
                             description: plot.description || def.description || 'Proyecto comunitario de Amposta.',
                             icon: plot.icon || def.icon || '🏗️',
-                            cost_constructors: plot.cost_constructors || def.cost_constructors || 10,
-                            current_constructors: plot.current_constructors || 0,
-                            status: plot.status || (plot.current_constructors >= (plot.cost_constructors || 10) ? 'completed' : 'active')
+                            cost_constructors: cost,
+                            current_constructors: current,
+                            status: isCompleted ? 'completed' : 'active'
                         };
                     });
                 }
+
+                // ORDENAR: Los completados van arriba del todo
+                plotsData.sort((a, b) => {
+                    const aCompleted = a.status === 'completed' || a.current_constructors >= a.cost_constructors ? 1 : 0;
+                    const bCompleted = b.status === 'completed' || b.current_constructors >= b.cost_constructors ? 1 : 0;
+                    return bCompleted - aCompleted; // Los completados (1) primero
+                });
+
                 renderPlotsList();
             } catch (err) {
                 console.warn("Usando parcelas por defecto debido a error en Supabase:", err);
@@ -379,7 +405,7 @@
                 const percentage = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
 
                 const card = document.createElement('div');
-                card.className = 'plot-card';
+                card.className = 'plot-card' + (isCompleted ? ' completed-plot' : '');
                 card.innerHTML = `
                     <div class="plot-header">
                         <div class="plot-title">
@@ -387,7 +413,7 @@
                             <span>${plot.name}</span>
                         </div>
                         <span class="plot-badge ${isCompleted ? 'badge-completed' : 'badge-active'}">
-                            ${isCompleted ? '✨ Propiedad Compartida (DAO)' : '⚡ En Financiación Colectiva'}
+                            ${isCompleted ? '✨ ¡Completado / Compartido!' : '⚡ En Financiación Colectiva'}
                         </span>
                     </div>
                     <div style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 10px;">${plot.description || ''}</div>
@@ -403,7 +429,7 @@
                     <div class="plot-footer">
                         <span>Coste objetivo: <b>${plot.cost_constructors} 🏗️</b></span>
                         <button class="btn-action" onclick="contributeToPlot(${plot.id})" ${isCompleted ? 'disabled' : ''}>
-                            ${isCompleted ? 'Proyecto Completado' : 'Aportar 1 Constructor (🏗️)'}
+                            ${isCompleted ? '✨ Proyecto Finalizado' : 'Aportar 1 Constructor (🏗️)'}
                         </button>
                     </div>
                 `;
