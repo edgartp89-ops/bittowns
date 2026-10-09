@@ -73,7 +73,7 @@
         }
 
         .container {
-            max-width: 920px;
+            max-width: 960px;
             width: 100%;
             margin: 35px auto;
             padding: 0 24px;
@@ -140,67 +140,147 @@
             box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
         }
 
-        .thread-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(0, 240, 255, 0.15);
+        /* Estilo de Mensaje / Hilo en formato Foro Pro */
+        .post-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: border-color 0.2s;
         }
-        .thread-card:hover {
-            border-color: rgba(0, 240, 255, 0.4);
+        @media (max-width: 768px) {
+            .post-box {
+                grid-template-columns: 1fr;
+            }
         }
-        .thread-title {
+        .post-box:hover {
+            border-color: rgba(0, 240, 255, 0.45);
+        }
+
+        /* Columna de Usuario (Perfil Izquierda) */
+        .user-panel {
+            background: rgba(11, 15, 25, 0.9);
+            border-right: 1px solid rgba(0, 240, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .user-panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 15px;
+                text-align: left;
+                padding: 14px 20px;
+            }
+        }
+        .user-avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #00f0ff, #7000ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        @media (max-width: 768px) {
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+        }
+        .user-name {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            word-break: break-all;
+            margin-bottom: 4px;
+        }
+        .user-badge {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .user-stats {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            line-height: 1.3;
+        }
+
+        /* Columna de Contenido (Derecha) */
+        .content-panel {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .post-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #64748b;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .thread-main-title {
             color: #ffffff;
             font-size: 1.15rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             text-decoration: none;
             display: block;
         }
-        .thread-title:hover {
+        .thread-main-title:hover {
             color: #00f0ff;
         }
-        .thread-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 8px;
-        }
-        .thread-content {
+        .post-text {
             color: #cbd5e1;
             font-size: 0.92rem;
             line-height: 1.5;
             white-space: pre-wrap;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 10px;
         }
         .btn-delete {
             background: rgba(255, 75, 75, 0.12);
             color: #ff4b4b;
             border: 1px solid rgba(255, 75, 75, 0.3);
-            padding: 6px 14px;
-            border-radius: 14px;
-            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
         .btn-delete:hover {
             background: rgba(255, 75, 75, 0.25);
-        }
-        .reply-card {
-            background: rgba(11, 15, 25, 0.6);
-            border-left: 3px solid #00ff88;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 16px;
-            border-radius: 0 12px 12px 0;
-            margin-bottom: 12px;
         }
         .back-link {
             display: inline-block;
@@ -229,7 +309,6 @@
     </div>
 
     <div class="container" id="main-container">
-        <!-- El contenido se cargará dinámicamente según si estamos viendo la lista o un hilo específico -->
         <div style="text-align: center; color: #94a3b8; padding: 40px;">Cargando foro...</div>
     </div>
 
@@ -241,6 +320,7 @@
         let supabaseClient;
         let currentUser = null;
         const ADMIN_EMAIL = 'edgartp89@gmail.com'; 
+        let userMessageCounts = {};
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -253,8 +333,8 @@
             }
 
             currentUser = session.user;
+            await loadUserStats();
 
-            // Comprobar si la URL tiene un parámetro ?id=X para ver un hilo o la lista general
             const urlParams = new URLSearchParams(window.location.search);
             const threadId = urlParams.get('id');
 
@@ -265,7 +345,29 @@
             }
         });
 
-        // VISTA 1: Lista de hilos y formulario para crear nuevo tema
+        // Calcular cuántos mensajes/hilos lleva cada usuario para mostrarlos en su tarjeta
+        async function loadUserStats() {
+            try {
+                const { data: threads } = await supabaseClient.from('forum_threads').select('user_id');
+                const { data: replies } = await supabaseClient.from('forum_replies').select('user_id');
+
+                userMessageCounts = {};
+                if (threads) {
+                    threads.forEach(t => {
+                        if (t.user_id) userMessageCounts[t.user_id] = (userMessageCounts[t.user_id] || 0) + 1;
+                    });
+                }
+                if (replies) {
+                    replies.forEach(r => {
+                        if (r.user_id) userMessageCounts[r.user_id] = (userMessageCounts[r.user_id] || 0) + 1;
+                    });
+                }
+            } catch (err) {
+                console.error("Error calculando estadísticas de usuario:", err);
+            }
+        }
+
+        // VISTA 1: Lista de Temas
         async function loadThreadsList() {
             const container = document.getElementById('main-container');
             container.innerHTML = `
@@ -279,7 +381,7 @@
                 </div>
 
                 <div class="section-title">Temas Activos</div>
-                <div class="section-desc">Debates organizados por los ciudadanos de Amposta. Pincha en un título para ver las respuestas.</div>
+                <div class="section-desc">Debates organizados por los ciudadanos de Amposta. Pincha en un título para entrar a leer y responder.</div>
                 <div id="threads-container">
                     <div style="text-align: center; color: #94a3b8; padding: 40px;">Cargando debates...</div>
                 </div>
@@ -298,27 +400,43 @@
 
                     data.forEach(thread => {
                         const dateFormatted = new Date(thread.created_at).toLocaleString();
-                        const card = document.createElement('div');
-                        card.className = 'thread-card';
-                        
-                        let modButtonHtml = '';
+                        const msgCount = userMessageCounts[thread.user_id] || 1;
+                        const author = thread.author_name || 'Ciudadano';
+                        const isAdminAuthor = author.includes('edgartp89') || thread.user_id === currentUser?.id && currentUser?.email === ADMIN_EMAIL; // o similar
+
+                        const postBox = document.createElement('div');
+                        postBox.className = 'post-box';
+
+                        let modBtn = '';
                         if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
-                            modButtonHtml = `<button class="btn-delete" onclick="deleteThread(${thread.id})">🗑️ Borrar Tema</button>`;
+                            modBtn = `<button class="btn-delete" onclick="deleteThread(${thread.id})">🗑️ Borrar Tema</button>`;
                         }
 
-                        card.innerHTML = `
-                            <a href="forum.html?id=${thread.id}" class="thread-title">📌 ${escapeHtml(thread.title)}</a>
-                            <div class="thread-meta">
-                                <span>👤 ${thread.author_name || 'Ciudadano'}</span>
-                                <span>${dateFormatted}</span>
+                        postBox.innerHTML = `
+                            <div class="user-panel">
+                                <div class="user-avatar">🏙️</div>
+                                <div>
+                                    <div class="user-name">${escapeHtml(author)}</div>
+                                    <div class="user-badge">${thread.user_id === ADMIN_EMAIL || author === 'edgartp89' ? '🛡️ Admin' : '💬 Ciudadano'}</div>
+                                    <div class="user-stats">📊 Mensajes: <b>${msgCount}</b></div>
+                                </div>
                             </div>
-                            <div class="thread-content">${escapeHtml(thread.content)}</div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                                <a href="forum.html?id=${thread.id}" style="color: #00f0ff; text-decoration: none; font-size: 0.88rem; font-weight: 600;">💬 Ver y responder al debate &rarr;</a>
-                                ${modButtonHtml}
+                            <div class="content-panel">
+                                <div>
+                                    <div class="post-header-info">
+                                        <span>📅 ${dateFormatted}</span>
+                                        <span>#HiloPrincipal</span>
+                                    </div>
+                                    <a href="forum.html?id=${thread.id}" class="thread-main-title">📌 ${escapeHtml(thread.title)}</a>
+                                    <div class="post-text">${escapeHtml(thread.content)}</div>
+                                </div>
+                                <div class="post-footer">
+                                    <a href="forum.html?id=${thread.id}" style="color: #00f0ff; text-decoration: none; font-size: 0.88rem; font-weight: 600;">💬 Ver respuestas y debatir &rarr;</a>
+                                    ${modBtn}
+                                </div>
                             </div>
                         `;
-                        threadsContainer.appendChild(card);
+                        threadsContainer.appendChild(postBox);
                     });
                 } else {
                     threadsContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 40px; background: rgba(15, 23, 42, 0.4); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);">Aún no hay temas de debate creados. ¡Sé el primero en abrir uno!</div>`;
@@ -328,7 +446,7 @@
             }
         }
 
-        // VISTA 2: Detalle del hilo y respuestas
+        // VISTA 2: Detalle del hilo y respuestas con tarjetas de usuario
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('main-container');
             container.innerHTML = `
@@ -336,19 +454,18 @@
                 <div id="single-thread-container"></div>
                 
                 <div class="forum-post-card" style="margin-top: 30px;">
-                    <div style="color: #00ff88; font-weight: 700; margin-bottom: 6px; font-size: 1.05rem;">💬 Escribe una respuesta</div>
-                    <textarea id="reply-content" class="form-textarea" placeholder="Escribe tu opinión o aportación al debate..."></textarea>
+                    <div style="color: #00ff88; font-weight: 700; margin-bottom: 6px; font-size: 1.05rem;">💬 Escribe una respuesta al debate</div>
+                    <textarea id="reply-content" class="form-textarea" placeholder="Escribe tu opinión o aportación..."></textarea>
                     <button class="btn-action" onclick="createReply(${threadId})">Enviar Respuesta</button>
                 </div>
 
-                <div class="section-title" style="margin-top: 30px;">Respuestas de la Comunidad</div>
+                <div class="section-title" style="margin-top: 35px;">Respuestas de la Comunidad</div>
                 <div id="replies-container">
                     <div style="text-align: center; color: #94a3b8; padding: 30px;">Cargando respuestas...</div>
                 </div>
             `;
 
             try {
-                // Cargar datos del hilo principal
                 const { data: thread, error: threadError } = await supabaseClient
                     .from('forum_threads')
                     .select('*')
@@ -362,26 +479,42 @@
 
                 const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
                 const threadContainer = document.getElementById('single-thread-container');
-                let modButtonHtml = '';
+                const author = thread.author_name || 'Ciudadano';
+                const msgCount = userMessageCounts[thread.user_id] || 1;
+
+                let modBtn = '';
                 if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
-                    modButtonHtml = `<button class="btn-delete" onclick="deleteThread(${thread.id}, true)">🗑️ Borrar Tema Principal</button>`;
+                    modBtn = `<button class="btn-delete" onclick="deleteThread(${thread.id}, true)">🗑️ Borrar Tema Completo</button>`;
                 }
 
                 threadContainer.innerHTML = `
-                    <div class="thread-card" style="border-color: #00ff88;">
-                        <div class="thread-title" style="font-size: 1.3rem;">📌 ${escapeHtml(thread.title)}</div>
-                        <div class="thread-meta">
-                            <span>👤 ${thread.author_name || 'Ciudadano'}</span>
-                            <span>${new Date(thread.created_at).toLocaleString()}</span>
+                    <div class="post-box" style="border-color: #00ff88;">
+                        <div class="user-panel">
+                            <div class="user-avatar" style="background: linear-gradient(135deg, #00ff88, #00f0ff);">🏛️</div>
+                            <div>
+                                <div class="user-name">${escapeHtml(author)}</div>
+                                <div class="user-badge">📌 Autor del Hilo</div>
+                                <div class="user-stats">📊 Mensajes: <b>${msgCount}</b></div>
+                            </div>
                         </div>
-                        <div class="thread-content" style="font-size: 1rem;">${escapeHtml(thread.content)}</div>
-                        ${modButtonHtml}
+                        <div class="content-panel">
+                            <div>
+                                <div class="post-header-info">
+                                    <span>📅 ${new Date(thread.created_at).toLocaleString()}</span>
+                                    <span>#TemaPrincipal</span>
+                                </div>
+                                <div class="thread-main-title" style="font-size: 1.25rem;">📌 ${escapeHtml(thread.title)}</div>
+                                <div class="post-text">${escapeHtml(thread.content)}</div>
+                            </div>
+                            <div class="post-footer">
+                                <span></span>
+                                ${modBtn}
+                            </div>
+                        </div>
                     </div>
                 `;
 
-                // Cargar respuestas del hilo
                 loadReplies(threadId);
-
             } catch (err) {
                 console.error("Error cargando detalle:", err);
             }
@@ -401,33 +534,50 @@
                     const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                     replies.forEach(reply => {
-                        const card = document.createElement('div');
-                        card.className = 'reply-card';
+                        const author = reply.author_name || 'Ciudadano';
+                        const msgCount = userMessageCounts[reply.user_id] || 1;
+                        const postBox = document.createElement('div');
+                        postBox.className = 'post-box';
 
                         let deleteReplyBtn = '';
                         if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
-                            deleteReplyBtn = `<button class="btn-delete" style="padding: 4px 10px; font-size: 0.75rem; margin-top: 8px;" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Borrar Respuesta</button>`;
+                            deleteReplyBtn = `<button class="btn-delete" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Borrar Respuesta</button>`;
                         }
 
-                        card.innerHTML = `
-                            <div class="thread-meta" style="margin-bottom: 8px;">
-                                <span style="color: #00ff88; font-weight: 600;">👤 ${reply.author_name || 'Ciudadano'}</span>
-                                <span>${new Date(reply.created_at).toLocaleString()}</span>
+                        postBox.innerHTML = `
+                            <div class="user-panel">
+                                <div class="user-avatar" style="background: linear-gradient(135deg, #7000ff, #9d4edd);">💬</div>
+                                <div>
+                                    <div class="user-name">${escapeHtml(author)}</div>
+                                    <div class="user-badge" style="background: rgba(112, 0, 255, 0.15); color: #b197fc; border-color: rgba(112, 0, 255, 0.3);">👤 Participante</div>
+                                    <div class="user-stats">📊 Mensajes: <b>${msgCount}</b></div>
+                                </div>
                             </div>
-                            <div style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(reply.content)}</div>
-                            ${deleteReplyBtn}
+                            <div class="content-panel">
+                                <div>
+                                    <div class="post-header-info">
+                                        <span>📅 ${new Date(reply.created_at).toLocaleString()}</span>
+                                        <span>#Respuesta</span>
+                                    </div>
+                                    <div class="post-text">${escapeHtml(reply.content)}</div>
+                                </div>
+                                <div class="post-footer">
+                                    <span></span>
+                                    ${deleteReplyBtn}
+                                </div>
+                            </div>
                         `;
-                        repliesContainer.appendChild(card);
+                        repliesContainer.appendChild(postBox);
                     });
                 } else {
-                    repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 25px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.08);">Aún no hay respuestas en este debate. ¡Sé el primero en contestar!</div>`;
+                    repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 30px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.08);">Aún no hay respuestas en este debate. ¡Sé el primero en contestar!</div>`;
                 }
             } catch (err) {
                 repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Error al cargar las respuestas.</div>`;
             }
         }
 
-        // Acciones de creación y borrado
+        // Acciones
         async function createThread() {
             if (!currentUser) return;
             const title = document.getElementById('thread-title').value.trim();
@@ -448,6 +598,7 @@
                 });
 
                 if (error) { alert("Error al publicar el tema."); return; }
+                await loadUserStats();
                 loadThreadsList();
             } catch (err) {
                 console.error("Error:", err);
@@ -474,6 +625,7 @@
 
                 if (error) { alert("Error al enviar la respuesta."); return; }
                 document.getElementById('reply-content').value = '';
+                await loadUserStats();
                 loadReplies(threadId);
             } catch (err) {
                 console.error("Error:", err);
@@ -488,6 +640,7 @@
                 if (error) { alert("Error al eliminar el tema."); return; }
 
                 alert("Tema eliminado.");
+                await loadUserStats();
                 if (redirectToList) {
                     window.location.href = 'forum.html';
                 } else {
@@ -504,6 +657,7 @@
             try {
                 const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
                 if (error) { alert("Error al eliminar la respuesta."); return; }
+                await loadUserStats();
                 loadReplies(threadId);
             } catch (err) {
                 console.error("Error:", err);
