@@ -120,7 +120,6 @@
             margin-bottom: 20px;
         }
 
-        /* Tarjetas de propiedades / parcelas */
         .plot-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -202,13 +201,36 @@
             cursor: not-allowed;
             box-shadow: none;
         }
+
+        .buy-property-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #00ff88;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-title">
             <span style="font-size: 1.6rem;">🏛️</span>
-            <h1>Tablero de Inversiones Colectivas (DAO)</h1>
+            <h1>Tablero de Inversiones - Bit-Towns</h1>
         </div>
         <div class="nav-links">
             <a href="profile.html" class="btn-profile">👤 Mi Perfil</a>
@@ -229,19 +251,14 @@
         </div>
 
         <div id="main-content-area">
-            <div class="section-title">Parcelas Urbanas de Amposta</div>
-            <div class="section-desc">Invierte tus Constructors en proyectos comunitarios. Una vez completados, la propiedad es 100% compartida entre todos los inversores del DAO sin un dueño único.</div>
-            
-            <div id="plots-list-container">
-                <div style="text-align: center; color: #a0aec0; padding: 30px;">Cargando inversiones...</div>
-            </div>
+            <!-- Contenido dinámico según la pestaña -->
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
         let currentUser = null;
@@ -263,10 +280,10 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 currentUser = session.user;
-                fetchUserProfile(currentUser.id);
+                await fetchUserProfile(currentUser.id);
             }
 
-            loadPlots();
+            switchTab('colective');
         });
 
         async function fetchUserProfile(userId) {
@@ -367,14 +384,12 @@
             const newStatus = isCompleted ? 'completed' : 'active';
 
             try {
-                // Registrar contribución DAO compartida
                 await supabaseClient.from('plot_contributions').insert({
                     user_id: currentUser.id,
                     plot_id: plotId,
                     amount: 1
                 });
 
-                // Actualizar estado sin asignar owner_id individual
                 await supabaseClient
                     .from('board_plots')
                     .update({
@@ -383,7 +398,6 @@
                     })
                     .eq('id', plotId);
 
-                // Descontar constructor del usuario
                 const newBalance = userConstructorsBalance - 1;
                 await supabaseClient
                     .from('profiles')
@@ -394,7 +408,6 @@
                 document.getElementById('panel-user-constructors').textContent = userConstructorsBalance + ' 🏗️';
 
                 alert(isCompleted ? "🎉 ¡Felicidades! Habéis completado este proyecto DAO colectivo." : "✅ ¡Aportación realizada con éxito!");
-                
                 loadPlots();
 
             } catch (err) {
@@ -411,9 +424,24 @@
             const container = document.getElementById('main-content-area');
             if (mode === 'individual') {
                 container.innerHTML = `
-                    <div class="section-title">🏡 Mis Propiedades Privadas</div>
-                    <div class="section-desc">Gestiona tus viviendas, locales y talleres personales en Amposta.</div>
-                    <div id="private-list-container" style="color: #a0aec0; padding: 20px; text-align: center;">Cargando tus propiedades...</div>
+                    <div class="buy-property-card">
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 8px; font-size: 1.05rem;">➕ Comprar Nueva Propiedad Privada</div>
+                        <div style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 15px;">Adquiere una vivienda, local o taller personal por 2 Constructors (🏗️).</div>
+                        <input type="text" id="new-prop-name" class="form-input" placeholder="Nombre de la propiedad (ej. Loft en Carrer de Sants)..." />
+                        <select id="new-prop-icon" class="form-input">
+                            <option value="🏠">🏠 Casa / Vivienda</option>
+                            <option value="🏢">🏢 Edificio / Oficina</option>
+                            <option value="🏬">🏬 Local Comercial</option>
+                            <option value="🏭">🏭 Taller / Fábrica</option>
+                        </select>
+                        <button class="btn-action" onclick="buyPrivateProperty()" style="background: linear-gradient(90deg, #00ff88, #00f0ff); color: #0b0f19; width: 100%; padding: 10px;">Comprar Propiedad (2 🏗️)</button>
+                    </div>
+
+                    <div class="section-title">Mis Inmuebles Registrados</div>
+                    <div class="section-desc">Gestiona tus propiedades privadas y sube de nivel invirtiendo más Constructors.</div>
+                    <div id="private-list-container">
+                        <div style="text-align: center; color: #a0aec0; padding: 20px;">Cargando tus propiedades...</div>
+                    </div>
                 `;
                 loadUserPrivateProperties();
             } else {
@@ -443,19 +471,119 @@
                         const card = document.createElement('div');
                         card.className = 'plot-card';
                         card.innerHTML = `
-                            <div class="plot-title" style="margin-bottom: 8px;">
-                                <span>${prop.icon || '🏠'}</span>
-                                <span>${prop.name}</span>
+                            <div class="plot-header">
+                                <div class="plot-title">
+                                    <span>${prop.icon || '🏠'}</span>
+                                    <span>${prop.name}</span>
+                                </div>
+                                <span class="plot-badge badge-completed">Nivel ${prop.level || 1}</span>
                             </div>
-                            <div style="color: #00ff88; font-size: 0.85rem;">Nivel ${prop.level} (${prop.total_constructors || prop.level} 🏗️ invertidos en propiedad individual)</div>
+                            <div style="color: #00ff88; font-size: 0.85rem; margin-bottom: 12px;">Total invertido: ${prop.total_constructors || (prop.level * 2)} 🏗️ Constructors</div>
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button class="btn-action" onclick="upgradeProperty(${prop.id}, ${prop.level || 1}, ${prop.total_constructors || 2})">⬆️ Subir de Nivel (+1 🏗️)</button>
+                            </div>
                         `;
                         container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">No tienes propiedades privadas registradas todavía.</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">No tienes propiedades privadas registradas todavía. ¡Utiliza el formulario superior para adquirir una!</div>`;
                 }
             } catch (err) {
                 container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 20px;">Error al cargar las propiedades privadas.</div>`;
+            }
+        }
+
+        async function buyPrivateProperty() {
+            if (!currentUser) {
+                alert("Debes iniciar sesión.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (userConstructorsBalance < 2) {
+                alert("Necesitas al menos 2 Constructors (🏗️) para comprar una propiedad privada.");
+                return;
+            }
+
+            const nameInput = document.getElementById('new-prop-name').value.trim();
+            const iconVal = document.getElementById('new-prop-icon').value;
+            const propName = nameInput || "Vivienda Privada Amposta";
+
+            try {
+                const { error: insertErr } = await supabaseClient
+                    .from('user_properties')
+                    .insert({
+                        user_id: currentUser.id,
+                        name: propName,
+                        icon: iconVal,
+                        level: 1,
+                        total_constructors: 2
+                    });
+
+                if (insertErr) {
+                    alert("Error al registrar la propiedad en Supabase.");
+                    return;
+                }
+
+                const newBalance = userConstructorsBalance - 2;
+                await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                userConstructorsBalance = newBalance;
+                document.getElementById('panel-user-constructors').textContent = userConstructorsBalance + ' 🏗️';
+
+                alert("🎉 ¡Propiedad privada adquirida con éxito!");
+                document.getElementById('new-prop-name').value = '';
+                loadUserPrivateProperties();
+
+            } catch (err) {
+                console.error("Error comprando propiedad:", err);
+                alert("Error al procesar la compra.");
+            }
+        }
+
+        async function upgradeProperty(propId, currentLevel, currentTotal) {
+            if (!currentUser) return;
+
+            if (userConstructorsBalance < 1) {
+                alert("No te quedan Constructors disponibles para subir de nivel.");
+                return;
+            }
+
+            try {
+                const newLevel = currentLevel + 1;
+                const newTotal = currentTotal + 1;
+
+                const { error: updateErr } = await supabaseClient
+                    .from('user_properties')
+                    .update({
+                        level: newLevel,
+                        total_constructors: newTotal
+                    })
+                    .eq('id', propId);
+
+                if (updateErr) {
+                    alert("Error al actualizar la propiedad.");
+                    return;
+                }
+
+                const newBalance = userConstructorsBalance - 1;
+                await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                userConstructorsBalance = newBalance;
+                document.getElementById('panel-user-constructors').textContent = userConstructorsBalance + ' 🏗️';
+
+                alert("⭐ ¡Propiedad mejorada al nivel " + newLevel + "!");
+                loadUserPrivateProperties();
+
+            } catch (err) {
+                console.error("Error mejorando propiedad:", err);
+                alert("Hubo un error al subir de nivel.");
             }
         }
     </script>
