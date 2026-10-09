@@ -61,12 +61,51 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
         }
         .balance-info {
             font-size: 0.95rem;
             font-weight: bold;
+        }
+
+        /* --- NAVEGACIÓN POR PESTAÑAS --- */
+        .tab-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            color: #a0aec0;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn.active {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
 
         /* --- MAPA LEAFLET EN VIVO --- */
@@ -98,13 +137,10 @@
             z-index: 1;
             background: #0b0f19;
         }
-
-        /* Filtro de Estilo Oscuro / Cyberpunk para OpenStreetMap (Sin API Key) */
         #map .leaflet-tile-pane {
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
 
-        /* Marcadores personalizados en el mapa */
         .custom-map-marker {
             background: rgba(11, 15, 25, 0.9);
             border: 2px solid #00f0ff;
@@ -128,7 +164,6 @@
             box-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
         }
 
-        /* Popups de Leaflet personalizados */
         .leaflet-popup-content-wrapper {
             background: #0b0f19 !important;
             border: 1px solid #00f0ff !important;
@@ -167,7 +202,7 @@
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
 
-        /* --- CUADRÍCULA DEL TABLERO --- */
+        /* --- CUADRÍCULA DE PARCELAS COLECTIVAS --- */
         .board-frame {
             background: #060911;
             border: 1px solid rgba(0, 240, 255, 0.3);
@@ -275,6 +310,123 @@
             margin-top: 4px;
         }
 
+        /* --- ESTILOS DE COMPRAS INDIVIDUALES --- */
+        .individual-section-title {
+            color: #00f0ff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .catalog-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .catalog-icon {
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+        }
+        .catalog-name {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+        .catalog-desc {
+            font-size: 0.78rem;
+            color: #a0aec0;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .catalog-price {
+            color: #ffb703;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .btn-buy-individual {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            transition: transform 0.2s;
+        }
+        .btn-buy-individual:hover {
+            transform: scale(1.04);
+        }
+
+        .my-properties-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .my-property-card {
+            background: rgba(13, 19, 34, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
+        }
+        .my-property-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .my-property-icon {
+            font-size: 2.2rem;
+        }
+        .my-property-title {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+        .my-property-level {
+            font-size: 0.8rem;
+            color: #00ff88;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .btn-upgrade {
+            background: rgba(255, 183, 3, 0.15);
+            border: 1px solid #ffb703;
+            color: #ffb703;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-upgrade:hover {
+            background: rgba(255, 183, 3, 0.3);
+            box-shadow: 0 0 12px rgba(255, 183, 3, 0.5);
+            transform: scale(1.04);
+        }
+
         /* Modal Aportar Constructors */
         .modal-overlay {
             position: fixed;
@@ -363,6 +515,9 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
+            .catalog-grid {
+                grid-template-columns: 1fr;
+            }
             #map {
                 height: 280px;
             }
@@ -373,7 +528,7 @@
     <div class="container">
         <div class="header">
             <a href="javascript:history.back()" class="back-btn">← Volver</a>
-            <h1>Tablero & Mapa de Amposta</h1>
+            <h1>Tablero & Ciudad</h1>
         </div>
 
         <div class="user-balance-bar">
@@ -383,29 +538,97 @@
             </div>
         </div>
 
-        <!-- VISTA DE MAPA REAL EN VIVO -->
-        <div class="map-section">
-            <div class="map-header-title">🗺️ Mapa Phygital de Elementos en Amposta</div>
-            <div id="map"></div>
+        <!-- SELECTOR DE PESTAÑAS -->
+        <div class="tab-selector">
+            <button class="tab-btn active" id="tab-colective-btn" onclick="switchTab('colective')">
+                🏛️ Compras Colectivas
+            </button>
+            <button class="tab-btn" id="tab-individual-btn" onclick="switchTab('individual')">
+                🏡 Propiedades Individuales
+            </button>
         </div>
 
-        <!-- CUADRÍCULA DE PARCELAS -->
-        <div class="board-frame">
-            <div class="street-legend">
-                <span>🛣️ C. Major</span>
-                <span>🛣️ Av. de la Ràpita</span>
-                <span>🛣️ C. Sant Sebastià</span>
+        <!-- PESTAÑA 1: COMPRAS COLECTIVAS (MAPA + TABLERO 4x4) -->
+        <div class="tab-content active" id="tab-colective">
+            <div class="map-section">
+                <div class="map-header-title">🗺️ Mapa Phygital de Elementos en Amposta</div>
+                <div id="map"></div>
             </div>
 
-            <div class="board-grid" id="board-grid"></div>
+            <div class="board-frame">
+                <div class="street-legend">
+                    <span>🛣️ C. Major</span>
+                    <span>🛣️ Av. de la Ràpita</span>
+                    <span>🛣️ C. Sant Sebastià</span>
+                </div>
+                <div class="board-grid" id="board-grid"></div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: COMPRAS INDIVIDUALES (CATÁLOGO + MIS PROPIEDADES) -->
+        <div class="tab-content" id="tab-individual">
+            
+            <div class="individual-section-title">🛒 Catálogo de Viviendas & Espacios Privados</div>
+            <div class="catalog-grid">
+                <!-- Parcela 1: Casa Digital (Fácil para empezar) -->
+                <div class="catalog-card">
+                    <div>
+                        <div class="catalog-icon">🏠</div>
+                        <div class="catalog-name">Casa Particular Digital</div>
+                        <div class="catalog-desc">Tu residencia privada en Amposta. Perfecta para dar tus primeros pasos como ciudadano.</div>
+                    </div>
+                    <div>
+                        <div class="catalog-price">Coste: 1 Constructor 🏗️</div>
+                        <button class="btn-buy-individual" onclick="buyIndividualProperty('casa_base', 'Casa Particular Digital', '🏠', 1)">
+                            Adquirir Vivienda (1 🏗️)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parcela 2: Taller Cyberpunk -->
+                <div class="catalog-card">
+                    <div>
+                        <div class="catalog-icon">🛠️</div>
+                        <div class="catalog-name">Taller Cyberpunk</div>
+                        <div class="catalog-desc">Espacio de creación e investigación técnica para proyectos phygitales.</div>
+                    </div>
+                    <div>
+                        <div class="catalog-price">Coste: 3 Constructors 🏗️</div>
+                        <button class="btn-buy-individual" onclick="buyIndividualProperty('taller', 'Taller Cyberpunk', '🛠️', 3)">
+                            Adquirir Taller (3 🏗️)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parcela 3: Apartamento Neón -->
+                <div class="catalog-card">
+                    <div>
+                        <div class="catalog-icon">🏢</div>
+                        <div class="catalog-name">Apartamento Neón</div>
+                        <div class="catalog-desc">Piso de alto nivel ubicado en la avenida principal con vistas al Pont Penjat.</div>
+                    </div>
+                    <div>
+                        <div class="catalog-price">Coste: 5 Constructors 🏗️</div>
+                        <button class="btn-buy-individual" onclick="buyIndividualProperty('apartamento', 'Apartamento Neón', '🏢', 5)">
+                            Adquirir Apartamento (5 🏗️)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="individual-section-title">🗝️ Mis Propiedades Privadas</div>
+            <div class="my-properties-list" id="my-properties-container">
+                <div style="text-align: center; color: #a0aec0; padding: 20px;">Cargando tus propiedades privadas...</div>
+            </div>
+
         </div>
 
         <div class="legal-notice">
-            <p>Bit-Towns — Plano urbano interactivo de Amposta. Haz clic en las parcelas del mapa o la cuadrícula para edificar con tus $CONSTRUCTOR diarios.</p>
+            <p>Bit-Towns — Plano urbano interactivo de Amposta. Participa en las grandes obras comunitarias o edifica y sube de nivel tu vivienda privada.</p>
         </div>
     </div>
 
-    <!-- Modal Invertir Constructors -->
+    <!-- Modal Invertir Constructors (Colectivo) -->
     <div class="modal-overlay" id="invest-modal">
         <div class="modal-card">
             <div id="modal-icon" style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</div>
@@ -429,24 +652,23 @@
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
-        // Coordenadas geográficas reales de los 16 puntos emblemáticos de Amposta
         const PLOT_COORDINATES = {
-            1:  { lat: 40.7138, lng: 0.5786 }, // Pont Penjat Digital
-            2:  { lat: 40.7135, lng: 0.5765 }, // Castell d'Amposta
-            3:  { lat: 40.7118, lng: 0.5772 }, // Mercat Municipal
-            4:  { lat: 40.7065, lng: 0.5720 }, // Parc dels Xiribecs
-            5:  { lat: 40.7125, lng: 0.5780 }, // Hub Bit-Towns
-            6:  { lat: 40.7095, lng: 0.5750 }, // Zona Comercial Ràpita
-            7:  { lat: 40.7080, lng: 0.5715 }, // Estació Autobusos
-            8:  { lat: 40.7050, lng: 0.5755 }, // Centro Deportivo
-            9:  { lat: 40.7108, lng: 0.5745 }, // Biblioteca Comunitària
-            10: { lat: 40.7145, lng: 0.5810 }, // Hub Innovación Ebre
-            11: { lat: 40.7142, lng: 0.5825 }, // Cafetería del Puerto
-            12: { lat: 40.7122, lng: 0.5760 }, // Teatre La Unió
-            13: { lat: 40.7100, lng: 0.5790 }, // Solar Residencial 1
-            14: { lat: 40.7085, lng: 0.5780 }, // Solar Residencial 2
-            15: { lat: 40.7070, lng: 0.5760 }, // Solar Comercial 3
-            16: { lat: 40.7112, lng: 0.5768 }  // Plaza Central Neón
+            1:  { lat: 40.7138, lng: 0.5786 },
+            2:  { lat: 40.7135, lng: 0.5765 },
+            3:  { lat: 40.7118, lng: 0.5772 },
+            4:  { lat: 40.7065, lng: 0.5720 },
+            5:  { lat: 40.7125, lng: 0.5780 },
+            6:  { lat: 40.7095, lng: 0.5750 },
+            7:  { lat: 40.7080, lng: 0.5715 },
+            8:  { lat: 40.7050, lng: 0.5755 },
+            9:  { lat: 40.7108, lng: 0.5745 },
+            10: { lat: 40.7145, lng: 0.5810 },
+            11: { lat: 40.7142, lng: 0.5825 },
+            12: { lat: 40.7122, lng: 0.5760 },
+            13: { lat: 40.7100, lng: 0.5790 },
+            14: { lat: 40.7085, lng: 0.5780 },
+            15: { lat: 40.7070, lng: 0.5760 },
+            16: { lat: 40.7112, lng: 0.5768 }
         };
 
         let map;
@@ -481,6 +703,7 @@
                     document.getElementById('my-constructors').textContent = userConstructors;
 
                     await loadBoardFromSupabase();
+                    await loadMyProperties();
                     subscribeToBoardChanges();
                 } catch (err) {
                     console.error("Error inicial:", err);
@@ -488,12 +711,24 @@
             }
         });
 
-        /* Inicializar el Mapa Leaflet con OpenStreetMap sin API Key */
-        function initMap() {
-            // Centrado en el corazón de Amposta
-            map = L.map('map', { zoomControl: true }).setView([40.7112, 0.5768], 15);
+        /* Cambio de Pestañas */
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            // Capa OpenStreetMap 100% libre sin API key + filtro CSS dark
+            if (tab === 'colective') {
+                document.getElementById('tab-colective-btn').classList.add('active');
+                document.getElementById('tab-colective').classList.add('active');
+                setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+            } else {
+                document.getElementById('tab-individual-btn').classList.add('active');
+                document.getElementById('tab-individual').classList.add('active');
+            }
+        }
+
+        /* Inicializar el Mapa */
+        function initMap() {
+            map = L.map('map', { zoomControl: true }).setView([40.7112, 0.5768], 15);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color: #00f0ff;" target="_blank">OpenStreetMap</a>',
                 maxZoom: 19
@@ -509,23 +744,16 @@
                 `)
                 .order('id', { ascending: true });
 
-            if (error) {
-                console.error("Error al cargar tablero:", error);
-                return;
-            }
-
-            if (plots && plots.length > 0) {
+            if (!error && plots && plots.length > 0) {
                 plotsData = plots;
                 renderBoard(plotsData);
                 updateMapMarkers(plotsData);
             }
         }
 
-        /* Renderizar Cuadrícula */
         function renderBoard(plots) {
             const grid = document.getElementById('board-grid');
             if (!grid) return;
-
             grid.innerHTML = '';
 
             plots.forEach((plot, index) => {
@@ -536,14 +764,12 @@
 
                 const card = document.createElement('div');
                 card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
-                
                 card.onclick = () => {
                     focusPlotOnMap(plot.id);
                     openInvestModal(plot);
                 };
 
                 let ownerHtml = `<div class="plot-status">${current} / ${cost} 🏗️</div>`;
-                
                 if (isCompleted) {
                     const ownerNick = plot.profiles?.nickname || 'Comunidad';
                     ownerHtml = `<div class="owner-badge">👑 ${ownerNick}</div>`;
@@ -558,12 +784,10 @@
                         <div class="progress-bar-fill" style="width: ${percent}%;"></div>
                     </div>
                 `;
-
                 grid.appendChild(card);
             });
         }
 
-        /* Actualizar Marcadores en el Mapa Leaflet */
         function updateMapMarkers(plots) {
             plots.forEach(plot => {
                 const coords = PLOT_COORDINATES[plot.id] || { lat: 40.7112, lng: 0.5768 };
@@ -598,7 +822,6 @@
                     const marker = L.marker([coords.lat, coords.lng], { icon: customIcon })
                         .addTo(map)
                         .bindPopup(popupHtml);
-                    
                     mapMarkers[plot.id] = marker;
                 }
             });
@@ -608,9 +831,7 @@
             const coords = PLOT_COORDINATES[plotId];
             if (coords && map) {
                 map.flyTo([coords.lat, coords.lng], 16, { duration: 1 });
-                if (mapMarkers[plotId]) {
-                    mapMarkers[plotId].openPopup();
-                }
+                if (mapMarkers[plotId]) mapMarkers[plotId].openPopup();
             }
         }
 
@@ -629,6 +850,156 @@
                 .subscribe();
         }
 
+        /* --- LÓGICA DE COMPRAS INDIVIDUALES --- */
+        async function loadMyProperties() {
+            const container = document.getElementById('my-properties-container');
+            if (!container) return;
+
+            if (!currentUser) {
+                container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">Inicia sesión para gestionar tus viviendas.</div>`;
+                return;
+            }
+
+            try {
+                const { data: props, error } = await supabaseClient
+                    .from('user_properties')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error("Error al cargar propiedades:", error);
+                    container.innerHTML = `<div style="text-align: center; color: #a0aec0; padding: 15px;">No se pudieron obtener tus propiedades.</div>`;
+                    return;
+                }
+
+                if (!props || props.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 18px; color: #a0aec0; font-size: 0.85rem; background: rgba(0,0,0,0.2); border-radius: 10px;">
+                            Aún no posees propiedades privadas.<br>
+                            ¡Adquiere tu primera <b>Casa Particular</b> arriba por solo 1 Constructor! 🏠
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                props.forEach(prop => {
+                    const upgradeCost = prop.level + 1; // Fórmula de coste de subida de nivel
+                    const card = document.createElement('div');
+                    card.className = 'my-property-card';
+
+                    card.innerHTML = `
+                        <div class="my-property-info">
+                            <div class="my-property-icon">${prop.icon}</div>
+                            <div>
+                                <div class="my-property-title">${prop.name}</div>
+                                <div class="my-property-level">Nivel ${prop.level} • ${prop.total_constructors || prop.level} 🏗️ invertidos</div>
+                            </div>
+                        </div>
+                        <button class="btn-upgrade" onclick="upgradeProperty('${prop.id}', ${prop.level}, ${upgradeCost})">
+                            🔼 Subir a Nivel ${prop.level + 1} (${upgradeCost} 🏗️)
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error("Excepción propiedades:", err);
+            }
+        }
+
+        async function buyIndividualProperty(type, name, icon, cost) {
+            if (!currentUser) {
+                alert("Debes iniciar sesión para comprar una propiedad.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (userConstructors < cost) {
+                alert(`Necesitas ${cost} Constructor(es) para adquirir esta propiedad. Tu saldo es de ${userConstructors}.`);
+                return;
+            }
+
+            if (!confirm(`¿Deseas adquirir "${name}" por ${cost} Constructor(es)?`)) return;
+
+            try {
+                // 1. Descontar Constructors
+                const newBalance = userConstructors - cost;
+                const { error: profileErr } = await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                if (profileErr) throw profileErr;
+
+                // 2. Insertar propiedad en user_properties
+                const { error: propErr } = await supabaseClient
+                    .from('user_properties')
+                    .insert({
+                        user_id: currentUser.id,
+                        property_type: type,
+                        name: name,
+                        icon: icon,
+                        level: 1,
+                        total_constructors: cost
+                    });
+
+                if (propErr) throw propErr;
+
+                userConstructors = newBalance;
+                document.getElementById('my-constructors').textContent = userConstructors;
+
+                alert(`🎉 ¡Enhorabuena! Has adquirido "${name}". Ahora es de tu propiedad privada.`);
+                await loadMyProperties();
+            } catch (err) {
+                console.error("Error en compra individual:", err);
+                alert("Error al completar la compra: " + err.message);
+            }
+        }
+
+        async function upgradeProperty(propId, currentLevel, upgradeCost) {
+            if (!currentUser) return;
+
+            if (userConstructors < upgradeCost) {
+                alert(`Necesitas ${upgradeCost} Constructors para subir a Nivel ${currentLevel + 1}. Tu saldo actual es ${userConstructors}.`);
+                return;
+            }
+
+            if (!confirm(`¿Subir esta propiedad a Nivel ${currentLevel + 1} por ${upgradeCost} Constructors?`)) return;
+
+            try {
+                // 1. Descontar Constructors
+                const newBalance = userConstructors - upgradeCost;
+                const { error: profileErr } = await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                if (profileErr) throw profileErr;
+
+                // 2. Actualizar nivel de la propiedad
+                const { error: propErr } = await supabaseClient
+                    .from('user_properties')
+                    .update({
+                        level: currentLevel + 1,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', propId);
+
+                if (propErr) throw propErr;
+
+                userConstructors = newBalance;
+                document.getElementById('my-constructors').textContent = userConstructors;
+
+                alert(`✨ ¡Propiedad mejorada a Nivel ${currentLevel + 1}!`);
+                await loadMyProperties();
+            } catch (err) {
+                console.error("Error al mejorar propiedad:", err);
+                alert("Error al subir de nivel: " + err.message);
+            }
+        }
+
+        /* Modal Inversión Colectiva */
         function openInvestModal(plot) {
             if (!currentUser) {
                 alert("Debes iniciar sesión para edificar.");
@@ -679,7 +1050,6 @@
             const newStatus = isNowCompleted ? 'completado' : 'en_construccion';
 
             try {
-                // 1. Restar Constructors al usuario
                 const newBalance = userConstructors - amount;
                 const { error: profileErr } = await supabaseClient
                     .from('profiles')
@@ -688,7 +1058,6 @@
 
                 if (profileErr) throw profileErr;
 
-                // 2. Actualizar parcela en Supabase
                 const updatePayload = {
                     current_constructors: newPlotConstructors,
                     status: newStatus
@@ -704,7 +1073,6 @@
 
                 if (plotErr) throw plotErr;
 
-                // 3. Registrar contribución
                 await supabaseClient
                     .from('plot_contributions')
                     .insert({
