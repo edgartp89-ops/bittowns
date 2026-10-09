@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Ciudad - Bit-Towns</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+        h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .user-balance-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+        .balance-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* TABLERO DE JUEGO (RETÍCULA CON CALLES) */
+        .board-wrapper {
+            background: #060911;
+            border: 2px solid #00f0ff;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .street-label-v {
+            position: absolute;
+            color: rgba(0, 240, 255, 0.25);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            writing-mode: vertical-rl;
+            text-transform: uppercase;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Parcela/Propiedad */
+        .plot-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .plot-card:hover {
+            transform: translateY(-4px);
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .plot-card.completed {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+        }
+
+        .plot-icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .plot-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .plot-status {
+            font-size: 0.7rem;
+            color: #a0aec0;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .owner-badge {
+            font-size: 0.7rem;
+            color: #00ff88;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        /* Modal Aportar Constructors */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #0b0f19;
+            border: 1px solid #00f0ff;
+            border-radius: 16px;
+            padding: 22px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .modal-title {
+            color: #00f0ff;
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .modal-desc {
+            color: #a0aec0;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        .amount-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-modal {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+        }
+        .btn-save {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        .legal-notice {
+            color: #718096;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        @media (max-width: 650px) {
+            .board-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="javascript:history.back()" class="back-btn">← Volver</a>
+            <h1>Tablero de Amposta</h1>
+        </div>
+
+        <div class="user-balance-bar">
+            <span>🏛️ Amposta Digital - Sector Piloto</span>
+            <div class="balance-info">
+                <span>Mis Constructors: <span id="my-constructors" style="color: #ffb703;">...</span> 🏗️</span>
+            </div>
+        </div>
+
+        <!-- TABLERO CORTADO POR TRES CALLES HORIZONTALES Y VERTICALES -->
+        <div class="board-wrapper">
+            <div class="board-grid" id="board-grid">
+                <!-- Se rellena dinámicamente desde Supabase -->
+            </div>
+        </div>
+
+        <div class="legal-notice">
+            <p>Bit-Towns — Edificación colaborativa. Aporta tus Constructors diarios para adueñarte de la ciudad digital.</p>
+        </div>
+    </div>
+
+    <!-- Modal Invertir Constructors -->
+    <div class="modal-overlay" id="invest-modal">
+        <div class="modal-card">
+            <div id="modal-icon" style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</div>
+            <h3 class="modal-title" id="modal-plot-name">Nombre Parcela</h3>
+            <p class="modal-desc" id="modal-plot-desc">Aporta Constructors para completar esta edificación.</p>
+            
+            <input type="number" id="invest-amount" class="amount-input" min="1" value="1">
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeInvestModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="confirmInvestment()">Invertir 🏗️</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
+
+        let supabaseClient;
+        let currentUser = null;
+        let userConstructors = 0;
+        let selectedPlot = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (typeof supabase !== 'undefined') {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                currentUser = session?.user || null;
+
+                if (currentUser) {
+                    const { data: profile } = await supabaseClient
+                        .from('profiles')
+                        .select('constructors')
+                        .eq('id', currentUser.id)
+                        .single();
+                    userConstructors = profile?.constructors || 0;
+                }
+                document.getElementById('my-constructors').textContent = userConstructors;
+
+                await loadBoard();
+                subscribeToBoardChanges();
+            }
+        });
+
+        async function loadBoard() {
+            const { data: plots, error } = await supabaseClient
+                .from('board_plots')
+                .select(`
+                    id, name, category, cost_constructors, current_constructors, status, icon, owner_id,
+                    profiles:owner_id (nickname, avatar)
+                `)
+                .order('id', { ascending: true });
+
+            if (error) {
+                console.error("Error al cargar tablero:", error);
+                return;
+            }
+
+            renderBoard(plots);
+        }
+
+        function renderBoard(plots) {
+            const grid = document.getElementById('board-grid');
+            grid.innerHTML = '';
+
+            plots.forEach(plot => {
+                const isCompleted = plot.current_constructors >= plot.cost_constructors || plot.status === 'completado';
+                const percent = Math.min(100, Math.round((plot.current_constructors / plot.cost_constructors) * 100));
+
+                const card = document.createElement('div');
+                card.className = `plot-card ${isCompleted ? 'completed' : ''}`;
+                card.onclick = () => openInvestModal(plot);
+
+                let ownerHtml = `<div class="plot-status">${plot.current_constructors} / ${plot.cost_constructors} 🏗️</div>`;
+                
+                if (isCompleted) {
+                    const ownerNick = plot.profiles?.nickname || 'Comunidad';
+                    ownerHtml = `<div class="owner-badge">👑 ${ownerNick}</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="plot-icon">${plot.icon || '🏗️'}</div>
+                    <div class="plot-title">${plot.name}</div>
+                    ${ownerHtml}
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function subscribeToBoardChanges() {
+            // Sincronización en tiempo real al hacer una compra
+            supabaseClient
+                .channel('public:board_plots')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'board_plots' }, () => {
+                    loadBoard();
+                })
+                .subscribe();
+        }
+
+        function openInvestModal(plot) {
+            if (!currentUser) {
+                alert("Debes iniciar sesión para construir.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (plot.current_constructors >= plot.cost_constructors) {
+                alert("🏛️ ¡Esta propiedad ya ha sido completada por la comunidad!");
+                return;
+            }
+
+            selectedPlot = plot;
+            document.getElementById('modal-icon').textContent = plot.icon || '🏗️';
+            document.getElementById('modal-plot-name').textContent = plot.name;
+            document.getElementById('modal-plot-desc').textContent = `Progreso actual: ${plot.current_constructors} / ${plot.cost_constructors} Constructors.`;
+            document.getElementById('invest-amount').max = userConstructors;
+            document.getElementById('invest-modal').style.display = 'flex';
+        }
+
+        function closeInvestModal() {
+            document.getElementById('invest-modal').style.display = 'none';
+            selectedPlot = null;
+        }
+
+        async function confirmInvestment() {
+            const amountInput = document.getElementById('invest-amount');
+            const amount = parseInt(amountInput.value);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("Introduce una cantidad válida.");
+                return;
+            }
+
+            if (amount > userConstructors) {
+                alert(`No tienes suficientes Constructors. Tu saldo actual es de ${userConstructors}.`);
+                return;
+            }
+
+            const newPlotConstructors = selectedPlot.current_constructors + amount;
+            const isNowCompleted = newPlotConstructors >= selectedPlot.cost_constructors;
+            const newStatus = isNowCompleted ? 'completado' : 'en_construccion';
+
+            try {
+                // 1. Restar Constructors al perfil del usuario
+                const newBalance = userConstructors - amount;
+                await supabaseClient
+                    .from('profiles')
+                    .update({ constructors: newBalance })
+                    .eq('id', currentUser.id);
+
+                // 2. Registrar la aportación
+                await supabaseClient
+                    .from('plot_contributions')
+                    .insert({
+                        plot_id: selectedPlot.id,
+                        user_id: currentUser.id,
+                        amount: amount
+                    });
+
+                // 3. Actualizar la parcela en el tablero
+                const updatePayload = {
+                    current_constructors: newPlotConstructors,
+                    status: newStatus
+                };
+                if (isNowCompleted) {
+                    updatePayload.owner_id = currentUser.id;
+                }
+
+                await supabaseClient
+                    .from('board_plots')
+                    .update(updatePayload)
+                    .eq('id', selectedPlot.id);
+
+                userConstructors = newBalance;
+                document.getElementById('my-constructors').textContent = userConstructors;
+
+                closeInvestModal();
+                await loadBoard();
+
+                if (isNowCompleted) {
+                    alert(`🎉 ¡Felicidades! Has completado la construcción de "${selectedPlot.name}" y te has convertido en su propietario digital.`);
+                } else {
+                    alert(`🏗️ Has aportado ${amount} Constructor(s) a "${selectedPlot.name}".`);
+                }
+            } catch (err) {
+                console.error("Error al invertir:", err);
+                alert("Ocurrió un error al procesar la inversión.");
+            }
+        }
+    </script>
+</body>
+</html>
