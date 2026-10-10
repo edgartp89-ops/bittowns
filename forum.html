@@ -473,7 +473,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3QBkxNTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
         let currentUser = null;
@@ -481,7 +481,7 @@
         let threadReplyCounts = {};
         let userMessageCounts = {};
         let userProfilesData = {};
-        let replyingToData = null; // Almacenará la información del mensaje que se está respondiendo
+        let replyingToData = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -636,7 +636,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Con botón de Responder por mensaje)
+        // VISTA 2: DETALLE DEL HILO
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -823,16 +823,14 @@
                 return;
             }
             try {
-                const profile = userProfilesData[currentUser.id];
-                const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
-
+                const authorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
                 const { error } = await supabaseClient.from('forum_threads').insert({
                     user_id: currentUser.id,
                     author_name: authorName,
                     title: title,
                     content: content
                 });
-                if (error) { alert("Error al crear el fil."); return; }
+                if (error) { alert("Error al crear el fil: " + error.message); return; }
                 await loadForumData();
                 loadThreadsList();
             } catch (err) { console.error(err); }
@@ -846,8 +844,7 @@
                 return;
             }
             try {
-                const profile = userProfilesData[currentUser.id];
-                const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
+                const authorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
 
                 const insertData = {
                     thread_id: threadId,
@@ -856,14 +853,22 @@
                     content: content
                 };
 
-                // Si se está respondiendo a un mensaje específico, añadimos la cita
                 if (replyingToData) {
                     insertData.reply_to_author = replyingToData.author;
                     insertData.reply_to_content = replyingToData.content;
                 }
 
-                const { error } = await supabaseClient.from('forum_replies').insert(insertData);
-                if (error) { alert("Error al enviar la resposta."); return; }
+                let { error } = await supabaseClient.from('forum_replies').insert(insertData);
+                
+                // Fallback robusto por si las columnas de citas no existen en la base de datos
+                if (error && error.message.includes('column')) {
+                    delete insertData.reply_to_author;
+                    delete insertData.reply_to_content;
+                    const res2 = await supabaseClient.from('forum_replies').insert(insertData);
+                    error = res2.error;
+                }
+
+                if (error) { alert("Error al enviar la resposta: " + error.message); return; }
                 
                 document.getElementById('reply-content').value = '';
                 cancelReplyingTo();
