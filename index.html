@@ -6,17 +6,55 @@
     <title>Bit-Towns</title>
     <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
+        /* Barra Superior Unificada Bit-Towns */
+        .ht-topbar {
+            background-color: #0c0814;
+            color: #ffffff;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #9333ea;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .ht-topbar-nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .ht-topbar-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
+            background-color: #9333ea;
+            box-shadow: 0 0 10px #a855f7;
+        }
+
         body {
             background-color: #0b0f19;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
+            padding-top: 90px; /* Compensación por la barra fija */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             text-align: center;
+            box-sizing: border-box;
         }
         .header-bar {
             width: 100%;
@@ -100,7 +138,7 @@
             display: block;
         }
 
-        /* Menú lateral flotante */
+        /* Menú hamburguesa lateral */
         .side-menu {
             position: fixed;
             top: 0;
@@ -265,17 +303,19 @@
     </style>
 </head>
 <body>
-    <!-- Barra de Navegación Global Bit-Towns -->
-<div class="bt-global-topbar">
-    <div class="bt-topbar-nav">
-        <a href="index.html">🏠 Bit-Towns</a>
-        <a href="board.html">🏛️ Tauler de Govern</a>
-        <a href="forum.html">💬 Fòrum Oficial</a>
+    <!-- Barra Superior Unificada Bit-Towns -->
+    <div class="ht-topbar">
+        <div class="ht-topbar-nav">
+            <a href="index.html">🏠 Bit-Towns</a>
+            <a href="board.html">🏛️ Tauler de Govern</a>
+            <a href="community.html">👥 Comunitat</a>
+            <a href="forum.html">💬 Fòrum Oficial</a>
+        </div>
+        <div style="font-size: 15px;">
+            <a href="profile.html" style="color:#ffffff; text-decoration:none;">👤 Mi Perfil</a>
+        </div>
     </div>
-    <div style="font-size: 15px;">
-        <a href="profile.html" style="color:var(--bt-link); text-decoration:none;">👤 El meu Perfil</a>
-    </div>
-</div>
+
     <!-- Oscurecimiento de fondo -->
     <div id="menu-overlay" class="menu-overlay" onclick="toggleMenu()"></div>
 
@@ -304,7 +344,7 @@
         </div>
     </div>
 
-    <!-- Barra de navegación superior -->
+    <!-- Barra de navegación superior (móvil/idiomas) -->
     <div class="header-bar">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
         <div class="lang-selector">
@@ -376,6 +416,14 @@
         window.logoutUser = logoutUser;
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // Resaltar automáticamente la barra superior activa
+            const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.ht-topbar a').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+
             try {
                 if (typeof supabase !== 'undefined') {
                     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
