@@ -21,60 +21,6 @@
             --bt-neon-glow: rgba(168, 85, 247, 0.35);
         }
 
-        /* Barra Superior Unificada Bit-Towns */
-        .ht-topbar {
-            background-color: var(--bt-bg-top);
-            color: #ffffff;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--bt-accent);
-            box-shadow: 0 0 15px var(--bt-neon-glow);
-            font-weight: bold;
-            width: 100%;
-            box-sizing: border-box;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
-        .ht-topbar-nav {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: nowrap;
-        }
-        .ht-topbar a {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .ht-topbar a:hover, .ht-topbar a.active {
-            background-color: var(--bt-accent);
-            box-shadow: 0 0 10px var(--bt-neon);
-        }
-
-        @media (max-width: 768px) {
-            .ht-topbar {
-                padding: 8px 10px;
-            }
-            .ht-topbar-nav {
-                gap: 6px;
-            }
-            .ht-topbar a {
-                padding: 3px 6px;
-                font-size: 12px;
-            }
-            body {
-                padding-top: 60px !important;
-            }
-        }
-
         body {
             background-color: var(--bt-bg-base);
             color: var(--bt-text-main);
@@ -83,10 +29,40 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            padding-top: 75px; /* Compensación por la barra fija */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+        }
+
+        /* Barra Superior Bit-Towns */
+        .ht-topbar {
+            background-color: var(--bt-bg-top);
+            color: #ffffff;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bt-accent);
+            box-shadow: 0 0 15px var(--bt-neon-glow);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .ht-topbar-nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .ht-topbar-nav a {
+            color: var(--bt-text-main);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
+            background-color: var(--bt-accent);
+            color: #ffffff;
+            box-shadow: 0 0 10px var(--bt-neon);
         }
 
         /* Layout General en Dos Columnas */
@@ -485,15 +461,15 @@
     </style>
 </head>
 <body>
-    <!-- Barra Superior Unificada Bit-Towns -->
+    <!-- Barra Superior Bit-Towns -->
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
-            <a href="community.html">👥 Comunitat</a>
-            <a href="forum.html" class="active">💬 Foro</a>
+            <a href="board.html">🏛️ Tauler de Govern</a>
+            <a href="forum.html" class="active">💬 Fòrum Oficial</a>
         </div>
-        <div>
-            <a href="profile.html">👤 Mi Perfil</a>
+        <div style="font-size: 15px;">
+            <a href="profile.html" style="color:var(--bt-link); text-decoration:none;">👤 El meu Perfil</a>
         </div>
     </div>
 
@@ -516,7 +492,7 @@
                         <li><a href="forum.html"><span>Fòrum General</span> <span id="tree-count" class="ht-badge">0</span></a></li>
                     </ul>
                 </li>
-                <li><a href="board.html"><span>🏛️ Tauler de Govern</span></a></li>
+                <li><a href="board.html"><span>🏛️ Govern Local</span></a></li>
             </ul>
 
             <div class="ht-sidebar-links">
@@ -834,4 +810,223 @@
                                 <div class="ht-post-text">${escapeHtml(thread.content)}</div>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
-                                <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml
+                                <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${mainMsgId}</button>
+                                ${delBtn}
+                            </div>
+                        </div>
+                        <div class="ht-author-panel">
+                            <div class="ht-author-avatar">${userAvatarHtml}</div>
+                            <div>
+                                <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
+                                <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
+                                <div style="font-size:13px; color:var(--bt-text-main); font-weight:bold;">🇪🇸 Amposta</div>
+                                <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                loadReplies(threadId);
+            } catch (err) {
+                console.error("Error al carregar fil:", err);
+            }
+        }
+
+        async function loadReplies(threadId) {
+            const container = document.getElementById('ht-replies-container');
+            try {
+                const { data: replies, error } = await supabaseClient
+                    .from('forum_replies')
+                    .select('*')
+                    .eq('thread_id', threadId)
+                    .order('created_at', { ascending: true });
+
+                if (!error && replies && replies.length > 0) {
+                    container.innerHTML = '';
+                    const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+
+                    replies.forEach((reply, index) => {
+                        const author = getUserNickname(reply.user_id, reply.author_name);
+                        const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
+                        const userMsgCount = userMessageCounts[reply.user_id] || 1;
+                        const userAvatarHtml = renderAvatar(reply.user_id);
+                        const replyMsgId = `${threadId}.${index + 2}`;
+
+                        let quotedHtml = '';
+                        let textContent = reply.content;
+                        if (textContent.startsWith('[QUOTED:')) {
+                            const closeIdx = textContent.indexOf(']');
+                            if (closeIdx !== -1) {
+                                const quoteInfo = textContent.substring(8, closeIdx);
+                                textContent = textContent.substring(closeIdx + 1).trim();
+                                quotedHtml = `<div class="quoted-box">↩️ En resposta a <b>#${quoteInfo}</b></div>`;
+                            }
+                        }
+
+                        let delBtn = '';
+                        if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
+                            delBtn = `<button class="ht-btn ht-btn-danger" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Esborrar</button>`;
+                        }
+
+                        const item = document.createElement('div');
+                        item.className = 'ht-post-box reply-item';
+                        item.innerHTML = `
+                            <div class="ht-post-content">
+                                <div>
+                                    <div class="ht-post-header">
+                                        <span>📅 ${new Date(reply.created_at).toLocaleString()}</span>
+                                        <span><b>ID: #${replyMsgId}</b></span>
+                                    </div>
+                                    ${quotedHtml}
+                                    <div class="ht-post-text">${escapeHtml(textContent)}</div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
+                                    <button class="ht-btn-action" onclick="setReplyingTo('${replyMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(textContent.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${replyMsgId}</button>
+                                    ${delBtn}
+                                </div>
+                            </div>
+                            <div class="ht-author-panel">
+                                <div class="ht-author-avatar">${userAvatarHtml}</div>
+                                <div>
+                                    <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
+                                    <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
+                                    <div style="font-size:13px; color:var(--bt-text-main); font-weight:bold;">🇪🇸 Amposta</div>
+                                    <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                } else {
+                    container.innerHTML = `<div style="text-align: center; color: var(--bt-text-muted); padding: 25px; border: 2px solid var(--bt-border); background:var(--bt-bg-content); font-weight: bold;">Encara no hi ha respostes en aquest fil.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div style="color: #fca5a5; text-align: center; font-weight: bold;">Error al carregar respostes.</div>`;
+            }
+        }
+
+        async function createReply(threadId) {
+            const textarea = document.getElementById('reply-content');
+            let content = textarea.value.trim();
+
+            if (!content) {
+                alert("Escriu una resposta.");
+                return;
+            }
+
+            if (replyingToData) {
+                content = `[QUOTED:${replyingToData.msgId} - ${replyingToData.author}] ${content}`;
+            }
+
+            try {
+                const authorFallback = currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà';
+                const { error } = await supabaseClient.from('forum_replies').insert({
+                    thread_id: threadId,
+                    content: content,
+                    user_id: currentUser.id,
+                    author_name: authorFallback
+                });
+
+                if (error) {
+                    alert("Error al enviar la resposta.");
+                } else {
+                    textarea.value = '';
+                    cancelReplyingTo();
+                    loadReplies(threadId);
+                    loadForumData();
+                }
+            } catch (err) {
+                console.error("Error creando respuesta:", err);
+            }
+        }
+
+        async function createReplyFromBottom(threadId) {
+            const textarea = document.getElementById('reply-content-bottom');
+            let content = textarea.value.trim();
+
+            if (!content) {
+                alert("Escriu una resposta.");
+                return;
+            }
+
+            if (replyingToData) {
+                content = `[QUOTED:${replyingToData.msgId} - ${replyingToData.author}] ${content}`;
+            }
+
+            try {
+                const authorFallback = currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà';
+                const { error } = await supabaseClient.from('forum_replies').insert({
+                    thread_id: threadId,
+                    content: content,
+                    user_id: currentUser.id,
+                    author_name: authorFallback
+                });
+
+                if (error) {
+                    alert("Error al enviar la resposta.");
+                } else {
+                    textarea.value = '';
+                    cancelReplyingTo();
+                    loadReplies(threadId);
+                    loadForumData();
+                }
+            } catch (err) {
+                console.error("Error creando respuesta:", err);
+            }
+        }
+
+        async function deleteReply(replyId, threadId) {
+            if (!confirm("Vols esborrar aquesta resposta?")) return;
+
+            try {
+                const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
+                if (error) {
+                    alert("Error al esborrar la resposta.");
+                } else {
+                    loadReplies(threadId);
+                    loadForumData();
+                }
+            } catch (err) {
+                console.error("Error borrando respuesta:", err);
+            }
+        }
+
+        function setReplyingTo(msgId, authorName, snippet) {
+            replyingToData = { msgId: msgId, author: authorName };
+            document.querySelectorAll('.reply-box-title-el').forEach(el => {
+                el.innerText = `💬 Responent a #${msgId} (${authorName})`;
+            });
+            document.querySelectorAll('.replying-to-banner-el').forEach(el => {
+                el.style.display = 'block';
+                el.innerHTML = `<div class="quoted-box"><b>Respondre a #${msgId} (${authorName}):</b> "${snippet}..."</div>`;
+            });
+            document.querySelectorAll('.cancel-reply-btn-el').forEach(el => {
+                el.style.display = 'inline-block';
+            });
+        }
+
+        function cancelReplyingTo() {
+            replyingToData = null;
+            document.querySelectorAll('.reply-box-title-el').forEach(el => {
+                el.innerText = '💬 Enviar Resposta General al Fil';
+            });
+            document.querySelectorAll('.replying-to-banner-el').forEach(el => {
+                el.style.display = 'none';
+                el.innerHTML = '';
+            });
+            document.querySelectorAll('.cancel-reply-btn-el').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        function filterReplies() {
+            const query = document.getElementById('search-box').value.toLowerCase();
+            const items = document.querySelectorAll('.reply-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? 'grid' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
