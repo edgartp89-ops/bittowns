@@ -10,14 +10,13 @@
         .ht-topbar {
             background-color: #0c0814;
             color: #ffffff;
-            padding: 14px 24px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #9333ea;
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
             font-weight: bold;
-            font-size: 16px;
             width: 100%;
             box-sizing: border-box;
             position: fixed;
@@ -27,19 +26,40 @@
         }
         .ht-topbar-nav {
             display: flex;
-            gap: 20px;
+            gap: 10px;
             align-items: center;
+            flex-wrap: nowrap;
         }
-        .ht-topbar-nav a {
+        /* Estilo unificado para TODOS los enlaces de la barra */
+        .ht-topbar a {
             color: #ffffff;
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 4px 8px;
             border-radius: 4px;
+            font-size: 14px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
+        .ht-topbar a:hover, .ht-topbar a.active {
             background-color: #9333ea;
             box-shadow: 0 0 10px #a855f7;
+        }
+
+        /* Ajuste responsivo compacto para móviles */
+        @media (max-width: 768px) {
+            .ht-topbar {
+                padding: 8px 10px;
+            }
+            .ht-topbar-nav {
+                gap: 6px;
+            }
+            .ht-topbar a {
+                padding: 3px 6px;
+                font-size: 12px;
+            }
+            body {
+                padding-top: 60px !important;
+            }
         }
 
         body {
@@ -48,7 +68,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            padding-top: 90px; /* Compensación por la barra fija */
+            padding-top: 75px; /* Compensación por la barra fija */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -466,11 +486,11 @@
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
-            <a href="board.html">🏛️ Tauler de Govern</a>
-            <a href="forum.html">💬 Fòrum Oficial</a>
+            <a href="community.html">👥 Comunitat</a>
+            <a href="forum.html">💬 Foro</a>
         </div>
-        <div style="font-size: 15px;">
-            <a href="profile.html" style="color:#ffffff; text-decoration:none;">👤 Mi Perfil</a>
+        <div>
+            <a href="profile.html" class="active">👤 Mi Perfil</a>
         </div>
     </div>
 
@@ -828,74 +848,187 @@
                         collectiveContainer.appendChild(linkCard);
                     });
                 } else {
-                    collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin aportaciones colectivas en la ciudad.</div>`;
+                    collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center; padding: 6px;">Sin aportaciones a la DAO todavía.</div>`;
                 }
             } catch (err) {
-                console.error("Error al cargar inversiones colectivas:", err);
+                console.error("Error al cargar aportaciones DAO:", err);
                 collectiveContainer.innerHTML = `<div style="color: #a0aec0; font-size: 0.8rem; text-align: center;">Error de conexión.</div>`;
             }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Resaltar automáticamente la barra superior activa
-            const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-            document.querySelectorAll('.ht-topbar a').forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetUserId = urlParams.get('id');
 
             try {
-                populateModalPresets();
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const loggedUser = session ? session.user : null;
 
-                if (typeof supabase !== 'undefined') {
-                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session && session.user) {
-                        const user = session.user;
-                        document.getElementById('btn-logout').style.display = 'block';
-                        document.getElementById('daily-claim-container').style.display = 'block';
-                        document.getElementById('edit-avatar-btn').style.display = 'flex';
-                        document.getElementById('edit-nickname-btn').style.display = 'inline-block';
+                let profileToLoad = null;
+                const isOwnProfile = !targetUserId || (loggedUser && targetUserId === loggedUser.id);
 
-                        const { data: profile } = await supabaseClient
-                            .from('profiles')
-                            .select('*')
-                            .eq('id', user.id)
-                            .single();
-
-                        activeTargetId = user.id;
-
-                        if (profile) {
-                            const avatarVal = profile.avatar_url || profile.avatar_icon || profile.avatar || PRESET_AVATARS[0];
-                            selectedAvatarVal = avatarVal;
-                            renderAvatarInElement('user-avatar', avatarVal);
-
-                            const nicknameVal = profile.nickname || profile.username || profile.alias || user.email.split('@')[0];
-                            document.getElementById('user-nickname').textContent = nicknameVal;
-
-                            if (profile.created_at) {
-                                document.getElementById('user-created-at').textContent = formatearFecha(profile.created_at);
-                            } else {
-                                document.getElementById('user-created-at').textContent = formatearFecha(user.created_at);
-                            }
-
-                            if (profile.constructors !== undefined) {
-                                userConstructors = profile.constructors;
-                                document.getElementById('user-constructors').textContent = userConstructors;
-                            }
-
-                            lastDailyClaim = profile.last_daily_claim || null;
-                            updateClaimButtonState();
-                            loadUserAllProperties(user.id);
-                        }
+                if (isOwnProfile) {
+                    if (!loggedUser) {
+                        alert("Debes iniciar sesión para ver tu perfil.");
+                        window.location.href = 'login.html';
+                        return;
                     }
+                    activeTargetId = loggedUser.id;
+                    const { data: pData } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', loggedUser.id)
+                        .single();
+                    profileToLoad = pData;
+
+                    document.getElementById('edit-avatar-btn').style.display = 'flex';
+                    document.getElementById('edit-nickname-btn').style.display = 'inline-block';
+                    document.getElementById('btn-logout').style.display = 'block';
+                    document.getElementById('daily-claim-container').style.display = 'block';
+                } else {
+                    activeTargetId = targetUserId;
+                    const { data: pData } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', targetUserId)
+                        .single();
+                    profileToLoad = pData;
+                }
+
+                if (profileToLoad) {
+                    const nickname = profileToLoad.nickname || profileToLoad.username || 'Ciudadano';
+                    const avatarVal = profileToLoad.avatar || PRESET_AVATARS[0];
+                    selectedAvatarVal = avatarVal;
+
+                    document.getElementById('user-nickname').textContent = nickname;
+                    renderAvatarInElement('user-avatar', avatarVal);
+
+                    if (profileToLoad.created_at) {
+                        const fechaFormateada = formatearFecha(profileToLoad.created_at);
+                        if (fechaFormateada) {
+                            document.getElementById('user-created-at').textContent = fechaFormateada;
+                        } else {
+                            document.getElementById('user-created-at').textContent = 'Reciente';
+                        }
+                    } else {
+                        document.getElementById('user-created-at').textContent = 'Reciente';
+                    }
+
+                    if (profileToLoad.role) document.getElementById('user-role').textContent = profileToLoad.role;
+                    if (profileToLoad.xp !== undefined) document.getElementById('user-xp').textContent = profileToLoad.xp + ' XP';
+                    if (profileToLoad.town_balance !== undefined) document.getElementById('user-balance').textContent = profileToLoad.town_balance + ' BT';
+                    
+                    userConstructors = profileToLoad.constructors !== undefined ? profileToLoad.constructors : 1;
+                    document.getElementById('user-constructors').textContent = userConstructors;
+
+                    lastDailyClaim = profileToLoad.last_daily_claim || null;
+                    if (isOwnProfile) {
+                        updateClaimButtonState();
+                    }
+
+                    loadUserAllProperties(activeTargetId);
+                } else {
+                    document.getElementById('user-nickname').textContent = 'Perfil no encontrado';
                 }
             } catch (err) {
-                console.error("Error al inicializar perfil:", err);
+                console.error("Error al cargar perfil:", err);
             }
+
+            populateModalPresets();
         });
+
+        async function logout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            }
+        }
+        window.logout = logout;
+
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'flex';
+        }
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'none';
+        }
+        window.openAvatarModal = openAvatarModal;
+        window.closeAvatarModal = closeAvatarModal;
+
+        function selectPreset(url, element) {
+            selectedAvatarVal = url;
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('custom-avatar-url').value = '';
+        }
+        window.selectPreset = selectPreset;
+
+        function clearPresetSelection() {
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            const customVal = document.getElementById('custom-avatar-url').value.trim();
+            if (customVal) selectedAvatarVal = customVal;
+        }
+        window.clearPresetSelection = clearPresetSelection;
+
+        async function saveAvatar() {
+            const customInput = document.getElementById('custom-avatar-url').value.trim();
+            if (customInput) selectedAvatarVal = customInput;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ avatar: selectedAvatarVal })
+                    .eq('id', activeTargetId);
+
+                if (error) {
+                    alert("Error al actualizar avatar.");
+                } else {
+                    renderAvatarInElement('user-avatar', selectedAvatarVal);
+                    closeAvatarModal();
+                    alert("✨ ¡Avatar actualizado con éxito!");
+                }
+            } catch (err) {
+                console.error("Error guardando avatar:", err);
+            }
+        }
+        window.saveAvatar = saveAvatar;
+
+        function openNicknameModal() {
+            document.getElementById('nickname-modal').style.display = 'flex';
+            document.getElementById('custom-nickname-input').value = document.getElementById('user-nickname').textContent;
+        }
+        function closeNicknameModal() {
+            document.getElementById('nickname-modal').style.display = 'none';
+        }
+        window.openNicknameModal = openNicknameModal;
+        window.closeNicknameModal = closeNicknameModal;
+
+        async function saveNickname() {
+            const newNick = document.getElementById('custom-nickname-input').value.trim();
+            if (!newNick) {
+                alert("El nickname no puede estar vacío.");
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ nickname: newNick })
+                    .eq('id', activeTargetId);
+
+                if (error) {
+                    alert("Error al actualizar el nickname.");
+                } else {
+                    document.getElementById('user-nickname').textContent = newNick;
+                    closeNicknameModal();
+                    alert("✨ ¡Nombre de ciudadano actualizado!");
+                }
+            } catch (err) {
+                console.error("Error guardando nickname:", err);
+            }
+        }
+        window.saveNickname = saveNickname;
     </script>
 </body>
 </html>
