@@ -685,7 +685,7 @@
                 const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
                 const author = getUserNickname(thread.user_id, thread.author_name);
                 const isAdmin = thread.user_id === ADMIN_EMAIL || author.includes('edgartp89');
-                const userMsgCount = userMessageCounts[thread.user_id] al 1;
+                const userMsgCount = userMessageCounts[thread.user_id] || 1;
                 const userAvatarHtml = renderAvatar(thread.user_id);
                 const mainMsgId = `${threadId}.1`;
 
@@ -716,7 +716,7 @@
                                 <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                 <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
                                 <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
-                                <div class="ht-author-stats">Aportacions: <b>${userMessageCounts[thread.user_id] || 1}</b></div>
+                                <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
                             </div>
                         </div>
                     </div>
@@ -753,7 +753,6 @@
                             delReplyBtn = `<button class="ht-btn ht-btn-danger" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Esborrar</button>`;
                         }
 
-                        // Indicador explícito en la cabecera del cajetín a qué ID responde
                         let responseInfoText = 'Resposta general al fil';
                         let quoteHtml = '';
 
