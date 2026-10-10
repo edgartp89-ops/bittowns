@@ -299,7 +299,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 10px;
             border-radius: 4px;
             overflow: hidden;
@@ -458,7 +458,7 @@
         const ADMIN_EMAIL = 'edgartp89@gmail.com';
         let threadReplyCounts = {};
         let userMessageCounts = {};
-        let userProfiles = {}; // Almacenará los avatares y datos de los perfiles
+        let userAvatars = {}; // Almacenará los avatares por user_id
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -485,31 +485,33 @@
 
         async function loadForumData() {
             try {
-                // Cargar hilos, respuestas y perfiles de usuario
-                const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id');
-                const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id');
-                const { data: profiles } = await supabaseClient.from('profiles').select('*');
+                const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id, author_name');
+                const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id, author_name');
 
-                userMessageCounts = {};
                 threadReplyCounts = {};
-                userProfiles = {};
+                userMessageCounts = {};
+                userAvatars = {};
 
-                if (profiles) {
-                    profiles.forEach(p => {
-                        // Mapeamos por user_id (o id)
-                        userProfiles[p.id || p.user_id] = p;
-                    });
-                }
+                // Generar avatares deterministas basados en las iniciales o ID del usuario si no hay imagen personalizada
+                const processUser = (userId, authorName) => {
+                    if (!userId) return;
+                    userMessageCounts[userId] = (userMessageCounts[userId] || 0) + 1;
+                    
+                    if (!userAvatars[userId]) {
+                        // Asignamos un icono/avatar por defecto basado en su nombre o ID de forma única
+                        const initial = authorName ? authorName.charAt(0).toUpperCase() : '👤';
+                        // Generar un color aleatorio basado en el ID para el fondo del avatar
+                        userAvatars[userId] = `<div style="background:#23582b; color:#fff; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:24px;">${initial}</div>`;
+                    }
+                };
 
                 if (threads) {
-                    threads.forEach(t => {
-                        if (t.user_id) userMessageCounts[t.user_id] = (userMessageCounts[t.user_id] || 0) + 1;
-                    });
+                    threads.forEach(t => processUser(t.user_id, t.author_name));
                 }
                 if (replies) {
                     replies.forEach(r => {
                         if (r.thread_id) threadReplyCounts[r.thread_id] = (threadReplyCounts[r.thread_id] || 0) + 1;
-                        if (r.user_id) userMessageCounts[r.user_id] = (userMessageCounts[r.user_id] || 0) + 1;
+                        processUser(r.user_id, r.author_name);
                     });
                 }
                 if (threads && document.getElementById('tree-count')) {
@@ -520,15 +522,8 @@
             }
         }
 
-        // Función para renderizar el avatar según el perfil del usuario
         function renderAvatar(userId) {
-            const profile = userProfiles[userId];
-            if (profile && profile.avatar_url) {
-                return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" />`;
-            } else if (profile && profile.avatar_icon) {
-                return profile.avatar_icon; // Si guardan un emoji o icono por defecto
-            }
-            return '🏛️'; // Icono por defecto si no tiene perfil personalizado
+            return userAvatars[userId] || '🏛️';
         }
 
         // VISTA 1: LISTADO DE HILOS
@@ -599,7 +594,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Con avatar sincronizado de perfil)
+        // VISTA 2: DETALLE DEL HILO
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
