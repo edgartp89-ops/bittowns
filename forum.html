@@ -487,8 +487,6 @@
             try {
                 const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id, author_name');
                 const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id, author_name');
-                
-                // Cargamos la tabla de perfiles y también comprobamos user_metadata por si el avatar está guardado en la sesión
                 const { data: profiles } = await supabaseClient.from('profiles').select('*');
 
                 userMessageCounts = {};
@@ -521,30 +519,31 @@
             }
         }
 
+        // Función para obtener el nick o alias real del usuario
+        function getUserNickname(userId, fallbackAuthorName) {
+            const profile = userProfilesData[userId];
+            if (profile) {
+                const nick = profile.nickname || profile.username || profile.alias || profile.display_name || profile.name;
+                if (nick) return nick;
+            }
+            // Si el autor guardado ya es un nick válido y no un email, lo usamos
+            if (fallbackAuthorName && !fallbackAuthorName.includes('@')) {
+                return fallbackAuthorName;
+            }
+            return 'Ciutadà';
+        }
+
         function renderAvatar(userId) {
-            // 1. Comprobamos si el usuario tiene un perfil guardado en Supabase con cualquier columna de avatar posible
             const profile = userProfilesData[userId];
             if (profile) {
                 const avatarValue = profile.avatar_url || profile.avatar_icon || profile.avatar || profile.photo_url || profile.image;
                 if (avatarValue) {
-                    // Si es una URL o ruta de imagen
                     if (typeof avatarValue === 'string' && (avatarValue.startsWith('http') || avatarValue.startsWith('/') || avatarValue.includes('.'))) {
                         return `<img src="${escapeHtml(avatarValue)}" alt="Avatar" />`;
                     }
-                    // Si es un emoji o icono directo de la librería seleccionada en el perfil
                     return avatarValue;
                 }
             }
-
-            // 2. Si es el usuario actual, comprobamos los metadatos de sesión por si acaso
-            if (currentUser && currentUser.id === userId && currentUser.user_metadata) {
-                const metaAvatar = currentUser.user_metadata.avatar_url || currentUser.user_metadata.avatar;
-                if (metaAvatar) {
-                    return `<img src="${escapeHtml(metaAvatar)}" alt="Avatar" />`;
-                }
-            }
-
-            // 3. Fallback por defecto si no se encuentra avatar configurado
             return '🏛️';
         }
 
@@ -582,7 +581,7 @@
 
                     data.forEach(thread => {
                         const dateFormatted = new Date(thread.created_at).toLocaleString();
-                        const author = thread.author_name || 'Ciutadà';
+                        const author = getUserNickname(thread.user_id, thread.author_name);
                         const repliesCount = threadReplyCounts[thread.id] || 0;
 
                         let delBtn = '';
@@ -661,7 +660,7 @@
 
                 document.getElementById('ht-bc-title').innerText = thread.title;
                 const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
-                const author = thread.author_name || 'Ciutadà';
+                const author = getUserNickname(thread.user_id, thread.author_name);
                 const isAdmin = thread.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                 const userMsgCount = userMessageCounts[thread.user_id] || 1;
                 const userAvatarHtml = renderAvatar(thread.user_id);
@@ -719,7 +718,7 @@
                     const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                     replies.forEach(reply => {
-                        const author = reply.author_name || 'Ciutadà';
+                        const author = getUserNickname(reply.user_id, reply.author_name);
                         const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                         const userMsgCount = userMessageCounts[reply.user_id] || 1;
                         const userAvatarHtml = renderAvatar(reply.user_id);
@@ -774,7 +773,10 @@
                 return;
             }
             try {
-                const authorName = currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà';
+                // Obtenemos el nick real del perfil del usuario logueado
+                const profile = userProfilesData[currentUser.id];
+                const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
+
                 const { error } = await supabaseClient.from('forum_threads').insert({
                     user_id: currentUser.id,
                     author_name: authorName,
@@ -795,7 +797,9 @@
                 return;
             }
             try {
-                const authorName = currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà';
+                const profile = userProfilesData[currentUser.id];
+                const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
+
                 const { error } = await supabaseClient.from('forum_replies').insert({
                     thread_id: threadId,
                     user_id: currentUser.id,
