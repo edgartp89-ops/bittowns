@@ -97,7 +97,7 @@
             width: 100%;
             margin: 0 auto;
             background-color: var(--bt-bg-base);
-            margin-top: 60px; /* Compensación por la barra fija */
+            margin-top: 60px;
         }
         @media (max-width: 900px) {
             .ht-layout {
@@ -327,6 +327,14 @@
             line-height: 1.7;
             white-space: pre-wrap;
             margin-bottom: 20px;
+        }
+        .ht-edit-notice {
+            font-size: 12px;
+            color: var(--bt-text-muted);
+            font-style: italic;
+            margin-top: 12px;
+            border-top: 1px dashed var(--bt-border-dark);
+            padding-top: 6px;
         }
         .quoted-box {
             background: #110b20;
@@ -768,9 +776,20 @@
                 const userAvatarHtml = renderAvatar(thread.user_id);
                 const mainMsgId = `${threadId}.1`;
 
+                let editBtn = '';
                 let delBtn = '';
+                if (currentUser && thread.user_id === currentUser.id) {
+                    editBtn = `<button class="ht-btn-action" onclick="startEditThread(${thread.id})">✏️ Editar</button>`;
+                }
                 if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
                     delBtn = `<button class="ht-btn ht-btn-danger" onclick="deleteThread(${thread.id}, true)">🗑️ Esborrar Fil</button>`;
+                }
+
+                let editNoticeHtml = '';
+                if (thread.updated_at) {
+                    const editorName = getUserNickname(thread.user_id, thread.author_name);
+                    const editDate = new Date(thread.updated_at).toLocaleString();
+                    editNoticeHtml = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
                 }
 
                 document.getElementById('ht-thread-main').innerHTML = `
@@ -782,10 +801,16 @@
                                     <span><b>ID: #${mainMsgId}</b> &bull; Missatge Principal</span>
                                 </div>
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
-                                <div class="ht-post-text">${escapeHtml(thread.content)}</div>
+                                <div class="ht-post-text" id="thread-text-${thread.id}">
+                                    ${escapeHtml(thread.content)}
+                                    ${editNoticeHtml}
+                                </div>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
-                                <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${mainMsgId}</button>
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
+                                <div style="display:flex; gap:8px;">
+                                    <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${mainMsgId}</button>
+                                    ${editBtn}
+                                </div>
                                 ${delBtn}
                             </div>
                         </div>
@@ -827,7 +852,11 @@
                         const userAvatarHtml = renderAvatar(reply.user_id);
                         const replyMsgId = `${threadId}.${index + 2}`;
 
+                        let editReplyBtn = '';
                         let delReplyBtn = '';
+                        if (currentUser && reply.user_id === currentUser.id) {
+                            editReplyBtn = `<button class="ht-btn-action" onclick="startEditReply(${reply.id}, ${threadId})">✏️ Editar</button>`;
+                        }
                         if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
                             delReplyBtn = `<button class="ht-btn ht-btn-danger" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Esborrar</button>`;
                         }
@@ -842,6 +871,13 @@
                             quoteHtml = '';
                         }
 
+                        let editNoticeHtml = '';
+                        if (reply.updated_at) {
+                            const editorName = getUserNickname(reply.user_id, reply.author_name);
+                            const editDate = new Date(reply.updated_at).toLocaleString();
+                            editNoticeHtml = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
+                        }
+
                         const card = document.createElement('div');
                         card.className = 'ht-post-box ht-reply-item';
                         card.innerHTML = `
@@ -852,10 +888,16 @@
                                         <span><b>ID: #${replyMsgId}</b> &bull; ${responseInfoText}</span>
                                     </div>
                                     ${quoteHtml}
-                                    <div class="ht-post-text">${escapeHtml(reply.content)}</div>
+                                    <div class="ht-post-text" id="reply-text-${reply.id}">
+                                        ${escapeHtml(reply.content)}
+                                        ${editNoticeHtml}
+                                    </div>
                                 </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
-                                    <button class="ht-btn-action" onclick="setReplyingTo('${replyMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${replyMsgId}</button>
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="ht-btn-action" onclick="setReplyingTo('${replyMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${replyMsgId}</button>
+                                        ${editReplyBtn}
+                                    </div>
                                     ${delReplyBtn}
                                 </div>
                             </div>
@@ -876,6 +918,81 @@
                 }
             } catch (err) {
                 container.innerHTML = `<div style="color: #fca5a5; text-align: center; font-weight: bold;">Error al carregar respostes.</div>`;
+            }
+        }
+
+        // --- FUNCIONES DE EDICIÓN ---
+        async function startEditThread(threadId) {
+            const textDiv = document.getElementById(`thread-text-${threadId}`);
+            if (!textDiv) return;
+            const { data } = await supabaseClient.from('forum_threads').select('content').eq('id', threadId).single();
+            if (!data) return;
+
+            textDiv.innerHTML = `
+                <textarea id="edit-input-thread-${threadId}" class="ht-textarea">${data.content}</textarea>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                    <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditThread(${threadId})">Guardar Canvis</button>
+                    <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
+                </div>
+            `;
+        }
+
+        async function saveEditThread(threadId) {
+            const newContent = document.getElementById(`edit-input-thread-${threadId}`).value.trim();
+            if (!newContent) {
+                alert("El contenido no puede estar vacío.");
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_threads')
+                    .update({ content: newContent, updated_at: new Date().toISOString() })
+                    .eq('id', threadId);
+
+                if (error) {
+                    alert("Error al guardar la edición: " + error.message);
+                    return;
+                }
+                loadThreadDetail(threadId);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function startEditReply(replyId, threadId) {
+            const textDiv = document.getElementById(`reply-text-${replyId}`);
+            if (!textDiv) return;
+            const { data } = await supabaseClient.from('forum_replies').select('content').eq('id', replyId).single();
+            if (!data) return;
+
+            textDiv.innerHTML = `
+                <textarea id="edit-input-reply-${replyId}" class="ht-textarea">${data.content}</textarea>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                    <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditReply(${replyId}, ${threadId})">Guardar Canvis</button>
+                    <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
+                </div>
+            `;
+        }
+
+        async function saveEditReply(replyId, threadId) {
+            const newContent = document.getElementById(`edit-input-reply-${replyId}`).value.trim();
+            if (!newContent) {
+                alert("El contenido no puede estar vacío.");
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_replies')
+                    .update({ content: newContent, updated_at: new Date().toISOString() })
+                    .eq('id', replyId);
+
+                if (error) {
+                    alert("Error al guardar la edición: " + error.message);
+                    return;
+                }
+                loadThreadDetail(threadId);
+            } catch (err) {
+                console.error(err);
             }
         }
 
