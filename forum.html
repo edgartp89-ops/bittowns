@@ -636,7 +636,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO
+        // VISTA 2: DETALLE DEL HILO (Con cuadro de respuesta arriba y duplicado abajo)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -655,17 +655,27 @@
 
                 <div id="ht-thread-main"></div>
 
+                <!-- CAJA DE RESPUESTA SUPERIOR -->
                 <div class="ht-form-box" style="margin-top: 24px;">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" id="reply-box-title">💬 Enviar Resposta General al Fil</div>
-                    <div id="replying-to-banner" style="display: none; margin-bottom: 10px;"></div>
+                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
+                    <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
                     <textarea id="reply-content" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReply(${threadId})">Enviar Resposta</button>
-                    <button class="ht-btn" id="cancel-reply-btn" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
+                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
                 </div>
 
                 <div style="font-weight: bold; margin: 24px 0 12px 0; font-size: 16px; color: #111;">Respostes de la Comunitat</div>
                 <div id="ht-replies-container">
                     <div style="text-align: center; color: var(--ht-text-muted); padding: 30px; font-weight: bold;">Carregant respostes...</div>
+                </div>
+
+                <!-- CAJA DE RESPUESTA INFERIOR (Duplicada exacta) -->
+                <div class="ht-form-box" style="margin-top: 30px;">
+                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
+                    <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
+                    <textarea id="reply-content-bottom" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
+                    <button class="ht-btn" onclick="createReplyFromBottom(${threadId})">Enviar Resposta</button>
+                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
                 </div>
             `;
 
@@ -756,12 +766,11 @@
                         let responseInfoText = 'Resposta general al fil';
                         let quoteHtml = '';
 
-                        // Solo se muestra la caja de cita si verdaderamente es una respuesta directa a un ID concreto
                         if (reply.reply_to_id && reply.reply_to_author) {
                             responseInfoText = `Respon al missatge <b>#${escapeHtml(reply.reply_to_id)}</b> de @${escapeHtml(reply.reply_to_author)}`;
                             quoteHtml = `<div class="quoted-box"><b>Cita de #${escapeHtml(reply.reply_to_id)} (@${escapeHtml(reply.reply_to_author)}):</b><br>"${escapeHtml(reply.reply_to_content || '')}"</div>`;
                         } else {
-                            quoteHtml = ''; // Sin cita para respuestas generales
+                            quoteHtml = '';
                         }
 
                         const card = document.createElement('div');
@@ -803,23 +812,39 @@
 
         function setReplyingTo(msgId, authorName, contentSnippet) {
             replyingToData = { id: msgId, author: authorName, content: contentSnippet };
-            const banner = document.getElementById('replying-to-banner');
-            banner.style.display = 'block';
-            banner.innerHTML = `<div style="background:#e5f0e3; border:1px solid #99a895; padding:8px 12px; border-radius:3px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
-                <span>💬 Estàs responent al missatge <b>#${msgId}</b> de <b>@${authorName}</b></span>
-                <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[Canviar a general]</a>
-            </div>`;
-            document.getElementById('reply-box-title').innerText = `💬 Responent al missatge #${msgId} (@${authorName})`;
-            document.getElementById('cancel-reply-btn').style.display = 'inline-block';
+            
+            // Actualizamos tanto el banner superior como el inferior
+            document.querySelectorAll('.replying-to-banner-el').forEach(banner => {
+                banner.style.display = 'block';
+                banner.innerHTML = `<div style="background:#e5f0e3; border:1px solid #99a895; padding:8px 12px; border-radius:3px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>💬 Estàs responent al missatge <b>#${msgId}</b> de <b>@${authorName}</b></span>
+                    <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[Canviar a general]</a>
+                </div>`;
+            });
+
+            document.querySelectorAll('.reply-box-title-el').forEach(title => {
+                title.innerText = `💬 Responent al missatge #${msgId} (@${authorName})`;
+            });
+
+            document.querySelectorAll('.cancel-reply-btn-el').forEach(btn => {
+                btn.style.display = 'inline-block';
+            });
+
             document.getElementById('reply-content').focus();
         }
 
         function cancelReplyingTo() {
             replyingToData = null;
-            document.getElementById('replying-to-banner').style.display = 'none';
-            document.getElementById('replying-to-banner').innerHTML = '';
-            document.getElementById('reply-box-title').innerText = '💬 Enviar Resposta General al Fil';
-            document.getElementById('cancel-reply-btn').style.display = 'none';
+            document.querySelectorAll('.replying-to-banner-el').forEach(banner => {
+                banner.style.display = 'none';
+                banner.innerHTML = '';
+            });
+            document.querySelectorAll('.reply-box-title-el').forEach(title => {
+                title.innerText = '💬 Enviar Resposta General al Fil';
+            });
+            document.querySelectorAll('.cancel-reply-btn-el').forEach(btn => {
+                btn.style.display = 'none';
+            });
         }
 
         async function createThread() {
@@ -845,8 +870,17 @@
         }
 
         async function createReply(threadId) {
-            if (!currentUser) return;
             const content = document.getElementById('reply-content').value.trim();
+            await submitReply(threadId, content);
+        }
+
+        async function createReplyFromBottom(threadId) {
+            const content = document.getElementById('reply-content-bottom').value.trim();
+            await submitReply(threadId, content);
+        }
+
+        async function submitReply(threadId, content) {
+            if (!currentUser) return;
             if (!content) {
                 alert("La resposta no pot estar buida.");
                 return;
@@ -861,7 +895,6 @@
                     content: content
                 };
 
-                // Solo incluimos datos de respuesta si se ha seleccionado explícitamente citar un mensaje
                 if (replyingToData) {
                     insertData.reply_to_id = replyingToData.id;
                     insertData.reply_to_author = replyingToData.author;
@@ -875,7 +908,6 @@
                     return; 
                 }
                 
-                document.getElementById('reply-content').value = '';
                 cancelReplyingTo();
                 await loadForumData();
                 loadThreadDetail(threadId);
