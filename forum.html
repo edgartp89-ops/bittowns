@@ -34,32 +34,31 @@
             min-height: 100vh;
         }
 
-        /* Barra Superior Bit-Towns */
+        /* Barra Superior Compacta */
         .ht-topbar {
             background-color: var(--bt-bg-top);
             color: #ffffff;
-            padding: 14px 24px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--bt-accent);
             box-shadow: 0 0 15px var(--bt-neon-glow);
-            font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
         }
         .ht-topbar-nav {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
-        .ht-topbar-nav a {
+        .ht-topbar-nav a, .ht-topbar a {
             color: var(--bt-text-main);
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             transition: all 0.2s ease;
         }
-        .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
+        .ht-topbar-nav a:hover, .ht-topbar-nav a.active, .ht-topbar a:hover {
             background-color: var(--bt-accent);
             color: #ffffff;
             box-shadow: 0 0 10px var(--bt-neon);
@@ -461,15 +460,15 @@
     </style>
 </head>
 <body>
-    <!-- Barra Superior Bit-Towns -->
+    <!-- Barra Superior Compacta -->
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
             <a href="board.html">🏛️ Tauler de Govern</a>
             <a href="forum.html" class="active">💬 Fòrum Oficial</a>
         </div>
-        <div style="font-size: 15px;">
-            <a href="profile.html" style="color:var(--bt-link); text-decoration:none;">👤 El meu Perfil</a>
+        <div>
+            <a href="profile.html">👤 El meu Perfil</a>
         </div>
     </div>
 
