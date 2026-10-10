@@ -458,7 +458,7 @@
         const ADMIN_EMAIL = 'edgartp89@gmail.com';
         let threadReplyCounts = {};
         let userMessageCounts = {};
-        let userProfilesData = {}; // Almacenará los perfiles de Supabase
+        let userProfilesData = {};
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -488,16 +488,15 @@
                 const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id, author_name');
                 const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id, author_name');
                 
-                // Intentamos cargar la tabla de perfiles de la base de datos
-                const { data: profiles, error: profileErr } = await supabaseClient.from('profiles').select('*');
+                // Cargamos la tabla de perfiles y también comprobamos user_metadata por si el avatar está guardado en la sesión
+                const { data: profiles } = await supabaseClient.from('profiles').select('*');
 
                 userMessageCounts = {};
                 threadReplyCounts = {};
                 userProfilesData = {};
 
-                if (!profileErr && profiles) {
+                if (profiles) {
                     profiles.forEach(p => {
-                        // Guardamos el perfil por user_id o id
                         const uid = p.user_id || p.id;
                         if (uid) userProfilesData[uid] = p;
                     });
@@ -523,21 +522,29 @@
         }
 
         function renderAvatar(userId) {
-            // Buscamos si el usuario tiene un perfil con avatar guardado en Supabase
+            // 1. Comprobamos si el usuario tiene un perfil guardado en Supabase con cualquier columna de avatar posible
             const profile = userProfilesData[userId];
             if (profile) {
-                // Si guardó una URL de imagen o un icono seleccionado de la galería
-                if (profile.avatar_url && profile.avatar_url.startsWith('http')) {
-                    return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" />`;
-                }
-                if (profile.avatar_icon) {
-                    return profile.avatar_icon; // Si es un emoji o icono de la librería
-                }
-                if (profile.avatar) {
-                    return profile.avatar;
+                const avatarValue = profile.avatar_url || profile.avatar_icon || profile.avatar || profile.photo_url || profile.image;
+                if (avatarValue) {
+                    // Si es una URL o ruta de imagen
+                    if (typeof avatarValue === 'string' && (avatarValue.startsWith('http') || avatarValue.startsWith('/') || avatarValue.includes('.'))) {
+                        return `<img src="${escapeHtml(avatarValue)}" alt="Avatar" />`;
+                    }
+                    // Si es un emoji o icono directo de la librería seleccionada en el perfil
+                    return avatarValue;
                 }
             }
-            // Si el usuario actual es el logueado, comprobamos si guardó algo en localStorage por si acaso
+
+            // 2. Si es el usuario actual, comprobamos los metadatos de sesión por si acaso
+            if (currentUser && currentUser.id === userId && currentUser.user_metadata) {
+                const metaAvatar = currentUser.user_metadata.avatar_url || currentUser.user_metadata.avatar;
+                if (metaAvatar) {
+                    return `<img src="${escapeHtml(metaAvatar)}" alt="Avatar" />`;
+                }
+            }
+
+            // 3. Fallback por defecto si no se encuentra avatar configurado
             return '🏛️';
         }
 
