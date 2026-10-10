@@ -28,9 +28,9 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Evita que salte de línea */
         }
-        /* Estilo unificado para TODOS los enlaces de la barra (incluido Mi Perfil) */
+        /* Estilo unificado para TODOS los enlaces de la barra */
         .ht-topbar a {
             color: #ffffff;
             text-decoration: none;
@@ -38,13 +38,14 @@
             border-radius: 4px;
             font-size: 14px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
         .ht-topbar a:hover, .ht-topbar a.active {
             background-color: #9333ea;
             box-shadow: 0 0 10px #a855f7;
         }
 
-        /* Ajuste responsivo unificado para móviles */
+        /* Ajuste responsivo compacto para móviles */
         @media (max-width: 768px) {
             .ht-topbar {
                 padding: 8px 10px;
@@ -53,8 +54,8 @@
                 gap: 4px;
             }
             .ht-topbar a {
-                padding: 3px 5px;
-                font-size: 11.5px; /* Tamaño idéntico para todos en móvil */
+                padding: 3px 6px;
+                font-size: 11.5px;
             }
             body {
                 padding-top: 60px !important;
@@ -326,9 +327,9 @@
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
-            <a href="board.html">🏛️ Tauler de Govern</a>
+            <a href="board.html">🏛️ Construcción</a>
             <a href="community.html">👥 Comunitat</a>
-            <a href="forum.html">💬 Fòrum Oficial</a>
+            <a href="forum.html">💬 Foro</a>
         </div>
         <div>
             <a href="profile.html">👤 Mi Perfil</a>
