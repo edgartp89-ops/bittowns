@@ -756,12 +756,12 @@
                         let responseInfoText = 'Resposta general al fil';
                         let quoteHtml = '';
 
-                        // Comprobación robusta de si existe reply_to_id y reply_to_author
+                        // Solo se muestra la caja de cita si verdaderamente es una respuesta directa a un ID concreto
                         if (reply.reply_to_id && reply.reply_to_author) {
                             responseInfoText = `Respon al missatge <b>#${escapeHtml(reply.reply_to_id)}</b> de @${escapeHtml(reply.reply_to_author)}`;
                             quoteHtml = `<div class="quoted-box"><b>Cita de #${escapeHtml(reply.reply_to_id)} (@${escapeHtml(reply.reply_to_author)}):</b><br>"${escapeHtml(reply.reply_to_content || '')}"</div>`;
                         } else {
-                            quoteHtml = `<div class="quoted-box" style="border-left-color: #8ca384; color:#555;">Resposta general al fil (sense citació directa)</div>`;
+                            quoteHtml = ''; // Sin cita para respuestas generales
                         }
 
                         const card = document.createElement('div');
@@ -809,7 +809,7 @@
                 <span>💬 Estàs responent al missatge <b>#${msgId}</b> de <b>@${authorName}</b></span>
                 <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[Canviar a general]</a>
             </div>`;
-            document.getElementById('reply-box-title').innerText = `💬 Responent a #${msgId} (@${authorName})`;
+            document.getElementById('reply-box-title').innerText = `💬 Responent al missatge #${msgId} (@${authorName})`;
             document.getElementById('cancel-reply-btn').style.display = 'inline-block';
             document.getElementById('reply-content').focus();
         }
@@ -861,6 +861,7 @@
                     content: content
                 };
 
+                // Solo incluimos datos de respuesta si se ha seleccionado explícitamente citar un mensaje
                 if (replyingToData) {
                     insertData.reply_to_id = replyingToData.id;
                     insertData.reply_to_author = replyingToData.author;
