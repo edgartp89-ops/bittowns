@@ -756,6 +756,7 @@
                         let responseInfoText = 'Resposta general al fil';
                         let quoteHtml = '';
 
+                        // Comprobación robusta de si existe reply_to_id y reply_to_author
                         if (reply.reply_to_id && reply.reply_to_author) {
                             responseInfoText = `Respon al missatge <b>#${escapeHtml(reply.reply_to_id)}</b> de @${escapeHtml(reply.reply_to_author)}`;
                             quoteHtml = `<div class="quoted-box"><b>Cita de #${escapeHtml(reply.reply_to_id)} (@${escapeHtml(reply.reply_to_author)}):</b><br>"${escapeHtml(reply.reply_to_content || '')}"</div>`;
@@ -866,17 +867,12 @@
                     insertData.reply_to_content = replyingToData.content;
                 }
 
-                let { error } = await supabaseClient.from('forum_replies').insert(insertData);
+                const { error } = await supabaseClient.from('forum_replies').insert(insertData);
                 
-                if (error && error.message.includes('column')) {
-                    delete insertData.reply_to_id;
-                    delete insertData.reply_to_author;
-                    delete insertData.reply_to_content;
-                    const res2 = await supabaseClient.from('forum_replies').insert(insertData);
-                    error = res2.error;
+                if (error) { 
+                    alert("Error al enviar la resposta: " + error.message); 
+                    return; 
                 }
-
-                if (error) { alert("Error al enviar la resposta: " + error.message); return; }
                 
                 document.getElementById('reply-content').value = '';
                 cancelReplyingTo();
