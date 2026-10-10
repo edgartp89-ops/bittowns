@@ -326,13 +326,14 @@
             color: var(--bt-text-main);
             line-height: 1.7;
             white-space: pre-wrap;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
         .ht-edit-notice {
-            font-size: 12px;
+            font-size: 12.5px;
             color: var(--bt-text-muted);
             font-style: italic;
-            margin-top: 12px;
+            margin-top: 10px;
+            margin-bottom: 15px;
             border-top: 1px dashed var(--bt-border-dark);
             padding-top: 6px;
         }
@@ -803,8 +804,8 @@
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
                                 <div class="ht-post-text" id="thread-text-${thread.id}">
                                     ${escapeHtml(thread.content)}
-                                    ${editNoticeHtml}
                                 </div>
+                                ${editNoticeHtml}
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
                                 <div style="display:flex; gap:8px;">
@@ -890,8 +891,8 @@
                                     ${quoteHtml}
                                     <div class="ht-post-text" id="reply-text-${reply.id}">
                                         ${escapeHtml(reply.content)}
-                                        ${editNoticeHtml}
                                     </div>
+                                    ${editNoticeHtml}
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
                                     <div style="display:flex; gap:8px;">
@@ -928,8 +929,10 @@
             const { data } = await supabaseClient.from('forum_threads').select('content').eq('id', threadId).single();
             if (!data) return;
 
+            const cleanContent = data.content ? data.content.trim() : '';
+
             textDiv.innerHTML = `
-                <textarea id="edit-input-thread-${threadId}" class="ht-textarea">${data.content}</textarea>
+                <textarea id="edit-input-thread-${threadId}" class="ht-textarea">${cleanContent}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditThread(${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
@@ -965,8 +968,10 @@
             const { data } = await supabaseClient.from('forum_replies').select('content').eq('id', replyId).single();
             if (!data) return;
 
+            const cleanContent = data.content ? data.content.trim() : '';
+
             textDiv.innerHTML = `
-                <textarea id="edit-input-reply-${replyId}" class="ht-textarea">${data.content}</textarea>
+                <textarea id="edit-input-reply-${replyId}" class="ht-textarea">${cleanContent}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditReply(${replyId}, ${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
