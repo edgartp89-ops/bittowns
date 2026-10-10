@@ -299,7 +299,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 10px;
             border-radius: 4px;
             overflow: hidden;
@@ -307,7 +307,7 @@
         .ht-author-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
         @media (max-width: 768px) {
             .ht-author-avatar { width: 44px; height: 44px; font-size: 20px; margin-bottom: 0; }
@@ -458,7 +458,7 @@
         const ADMIN_EMAIL = 'edgartp89@gmail.com';
         let threadReplyCounts = {};
         let userMessageCounts = {};
-        let userAvatars = {}; // Almacenará los avatares por user_id
+        let userProfilesData = {}; // Almacenará los perfiles de Supabase
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -487,31 +487,31 @@
             try {
                 const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id, author_name');
                 const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id, author_name');
+                
+                // Intentamos cargar la tabla de perfiles de la base de datos
+                const { data: profiles, error: profileErr } = await supabaseClient.from('profiles').select('*');
 
-                threadReplyCounts = {};
                 userMessageCounts = {};
-                userAvatars = {};
+                threadReplyCounts = {};
+                userProfilesData = {};
 
-                // Generar avatares deterministas basados en las iniciales o ID del usuario si no hay imagen personalizada
-                const processUser = (userId, authorName) => {
-                    if (!userId) return;
-                    userMessageCounts[userId] = (userMessageCounts[userId] || 0) + 1;
-                    
-                    if (!userAvatars[userId]) {
-                        // Asignamos un icono/avatar por defecto basado en su nombre o ID de forma única
-                        const initial = authorName ? authorName.charAt(0).toUpperCase() : '👤';
-                        // Generar un color aleatorio basado en el ID para el fondo del avatar
-                        userAvatars[userId] = `<div style="background:#23582b; color:#fff; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:24px;">${initial}</div>`;
-                    }
-                };
+                if (!profileErr && profiles) {
+                    profiles.forEach(p => {
+                        // Guardamos el perfil por user_id o id
+                        const uid = p.user_id || p.id;
+                        if (uid) userProfilesData[uid] = p;
+                    });
+                }
 
                 if (threads) {
-                    threads.forEach(t => processUser(t.user_id, t.author_name));
+                    threads.forEach(t => {
+                        if (t.user_id) userMessageCounts[t.user_id] = (userMessageCounts[t.user_id] || 0) + 1;
+                    });
                 }
                 if (replies) {
                     replies.forEach(r => {
                         if (r.thread_id) threadReplyCounts[r.thread_id] = (threadReplyCounts[r.thread_id] || 0) + 1;
-                        processUser(r.user_id, r.author_name);
+                        if (r.user_id) userMessageCounts[r.user_id] = (userMessageCounts[r.user_id] || 0) + 1;
                     });
                 }
                 if (threads && document.getElementById('tree-count')) {
@@ -523,7 +523,22 @@
         }
 
         function renderAvatar(userId) {
-            return userAvatars[userId] || '🏛️';
+            // Buscamos si el usuario tiene un perfil con avatar guardado en Supabase
+            const profile = userProfilesData[userId];
+            if (profile) {
+                // Si guardó una URL de imagen o un icono seleccionado de la galería
+                if (profile.avatar_url && profile.avatar_url.startsWith('http')) {
+                    return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" />`;
+                }
+                if (profile.avatar_icon) {
+                    return profile.avatar_icon; // Si es un emoji o icono de la librería
+                }
+                if (profile.avatar) {
+                    return profile.avatar;
+                }
+            }
+            // Si el usuario actual es el logueado, comprobamos si guardó algo en localStorage por si acaso
+            return '🏛️';
         }
 
         // VISTA 1: LISTADO DE HILOS
