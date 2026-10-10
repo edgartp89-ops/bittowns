@@ -269,7 +269,7 @@
             margin-bottom: 20px;
         }
 
-        /* Panel de Autor Derecha (Con contador restaurado) */
+        /* Panel de Autor Derecha */
         .ht-author-panel {
             background-color: #f4f8f3;
             border-left: 2px solid var(--ht-border);
@@ -299,9 +299,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 10px;
             border-radius: 4px;
+            overflow: hidden;
+        }
+        .ht-author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         @media (max-width: 768px) {
             .ht-author-avatar { width: 44px; height: 44px; font-size: 20px; margin-bottom: 0; }
@@ -452,6 +458,7 @@
         const ADMIN_EMAIL = 'edgartp89@gmail.com';
         let threadReplyCounts = {};
         let userMessageCounts = {};
+        let userProfiles = {}; // Almacenará los avatares y datos de los perfiles
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -464,7 +471,7 @@
             }
 
             currentUser = session.user;
-            await loadCounts();
+            await loadForumData();
 
             const urlParams = new URLSearchParams(window.location.search);
             const threadId = urlParams.get('id');
@@ -476,13 +483,23 @@
             }
         });
 
-        async function loadCounts() {
+        async function loadForumData() {
             try {
+                // Cargar hilos, respuestas y perfiles de usuario
                 const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id');
                 const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id');
+                const { data: profiles } = await supabaseClient.from('profiles').select('*');
 
-                threadReplyCounts = {};
                 userMessageCounts = {};
+                threadReplyCounts = {};
+                userProfiles = {};
+
+                if (profiles) {
+                    profiles.forEach(p => {
+                        // Mapeamos por user_id (o id)
+                        userProfiles[p.id || p.user_id] = p;
+                    });
+                }
 
                 if (threads) {
                     threads.forEach(t => {
@@ -499,8 +516,19 @@
                     document.getElementById('tree-count').innerText = threads.length;
                 }
             } catch (err) {
-                console.error("Error contadors:", err);
+                console.error("Error cargando datos:", err);
             }
+        }
+
+        // Función para renderizar el avatar según el perfil del usuario
+        function renderAvatar(userId) {
+            const profile = userProfiles[userId];
+            if (profile && profile.avatar_url) {
+                return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" />`;
+            } else if (profile && profile.avatar_icon) {
+                return profile.avatar_icon; // Si guardan un emoji o icono por defecto
+            }
+            return '🏛️'; // Icono por defecto si no tiene perfil personalizado
         }
 
         // VISTA 1: LISTADO DE HILOS
@@ -571,7 +599,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Con contador de mensajes en panel derecho)
+        // VISTA 2: DETALLE DEL HILO (Con avatar sincronizado de perfil)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -619,6 +647,7 @@
                 const author = thread.author_name || 'Ciutadà';
                 const isAdmin = thread.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                 const userMsgCount = userMessageCounts[thread.user_id] || 1;
+                const userAvatarHtml = renderAvatar(thread.user_id);
 
                 let delBtn = '';
                 if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
@@ -642,7 +671,7 @@
                             </div>
                         </div>
                         <div class="ht-author-panel">
-                            <div class="ht-author-avatar">🏛️</div>
+                            <div class="ht-author-avatar">${userAvatarHtml}</div>
                             <div>
                                 <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                 <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
@@ -676,6 +705,7 @@
                         const author = reply.author_name || 'Ciutadà';
                         const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                         const userMsgCount = userMessageCounts[reply.user_id] || 1;
+                        const userAvatarHtml = renderAvatar(reply.user_id);
 
                         let delReplyBtn = '';
                         if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
@@ -699,7 +729,7 @@
                                 </div>
                             </div>
                             <div class="ht-author-panel">
-                                <div class="ht-author-avatar">💬</div>
+                                <div class="ht-author-avatar">${userAvatarHtml}</div>
                                 <div>
                                     <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                     <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Participant'}</div>
@@ -735,7 +765,7 @@
                     content: content
                 });
                 if (error) { alert("Error al crear el fil."); return; }
-                await loadCounts();
+                await loadForumData();
                 loadThreadsList();
             } catch (err) { console.error(err); }
         }
@@ -757,7 +787,7 @@
                 });
                 if (error) { alert("Error al enviar la resposta."); return; }
                 document.getElementById('reply-content').value = '';
-                await loadCounts();
+                await loadForumData();
                 loadThreadDetail(threadId);
             } catch (err) { console.error(err); }
         }
@@ -767,7 +797,7 @@
             try {
                 const { error } = await supabaseClient.from('forum_threads').delete().eq('id', threadId);
                 if (error) { alert("Error al eliminar."); return; }
-                await loadCounts();
+                await loadForumData();
                 if (redirectToList) window.location.href = 'forum.html';
                 else loadThreadsList();
             } catch (err) { console.error(err); }
@@ -778,7 +808,7 @@
             try {
                 const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
                 if (error) { alert("Error al eliminar."); return; }
-                await loadCounts();
+                await loadForumData();
                 loadThreadDetail(threadId);
             } catch (err) { console.error(err); }
         }
