@@ -371,7 +371,6 @@
         ];
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Resaltar automáticamente la barra superior activa si corresponde
             const currentPath = window.location.pathname.split('/').pop() || 'index.html';
             document.querySelectorAll('.ht-topbar a').forEach(link => {
                 if (link.getAttribute('href') === currentPath) {
@@ -674,7 +673,8 @@
                     });
 
                 if (insertErr) {
-                    alert("Error al registrar la propiedad en Supabase.");
+                    console.error("Error Supabase:", insertErr);
+                    alert("Error al registrar la propiedad en Supabase. Revisa si ejecutaste el SQL de la tabla user_properties.");
                     return;
                 }
 
