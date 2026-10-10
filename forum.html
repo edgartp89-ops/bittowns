@@ -284,11 +284,11 @@
         .quoted-box {
             background: #f4f8f3;
             border-left: 4px solid var(--ht-accent);
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-size: 14px;
-            color: #444;
-            margin-bottom: 12px;
-            border-radius: 0 3px 3px 0;
+            color: #333;
+            margin-bottom: 14px;
+            border-radius: 0 4px 4px 0;
         }
 
         /* Panel de Autor Derecha */
@@ -636,7 +636,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO
+        // VISTA 2: DETALLE DEL HILO (Con IDs de mensaje estilo Hattrick)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -687,6 +687,7 @@
                 const isAdmin = thread.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                 const userMsgCount = userMessageCounts[thread.user_id] || 1;
                 const userAvatarHtml = renderAvatar(thread.user_id);
+                const mainMsgId = `${threadId}.1`;
 
                 let delBtn = '';
                 if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
@@ -699,13 +700,13 @@
                             <div>
                                 <div class="ht-post-header">
                                     <span>📅 ${new Date(thread.created_at).toLocaleString()}</span>
-                                    <span>#MissatgePrincipal</span>
+                                    <span><b>#${mainMsgId}</b> (Missatge Principal)</span>
                                 </div>
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
                                 <div class="ht-post-text">${escapeHtml(thread.content)}</div>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
-                                <button class="ht-btn-action" onclick="setReplyingTo('${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon</button>
+                                <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${mainMsgId}</button>
                                 ${delBtn}
                             </div>
                         </div>
@@ -740,11 +741,12 @@
                     container.innerHTML = '';
                     const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
-                    replies.forEach(reply => {
+                    replies.forEach((reply, index) => {
                         const author = getUserNickname(reply.user_id, reply.author_name);
                         const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                         const userMsgCount = userMessageCounts[reply.user_id] || 1;
                         const userAvatarHtml = renderAvatar(reply.user_id);
+                        const replyMsgId = `${threadId}.${index + 2}`;
 
                         let delReplyBtn = '';
                         if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
@@ -752,8 +754,10 @@
                         }
 
                         let quoteHtml = '';
-                        if (reply.reply_to_author && reply.reply_to_content) {
-                            quoteHtml = `<div class="quoted-box"><b>@${escapeHtml(reply.reply_to_author)}:</b> "${escapeHtml(reply.reply_to_content)}"</div>`;
+                        if (reply.reply_to_id && reply.reply_to_author && reply.reply_to_content) {
+                            quoteHtml = `<div class="quoted-box"><b>Respon a #${escapeHtml(reply.reply_to_id)} de @${escapeHtml(reply.reply_to_author)}:</b><br>"${escapeHtml(reply.reply_to_content)}"</div>`;
+                        } else if (reply.reply_to_author && reply.reply_to_content) {
+                            quoteHtml = `<div class="quoted-box"><b>Respon a @${escapeHtml(reply.reply_to_author)}:</b><br>"${escapeHtml(reply.reply_to_content)}"</div>`;
                         }
 
                         const card = document.createElement('div');
@@ -763,13 +767,13 @@
                                 <div>
                                     <div class="ht-post-header">
                                         <span>📅 ${new Date(reply.created_at).toLocaleString()}</span>
-                                        <span>#Rèplica</span>
+                                        <span><b>#${replyMsgId}</b> (Rèplica)</span>
                                     </div>
                                     ${quoteHtml}
                                     <div class="ht-post-text">${escapeHtml(reply.content)}</div>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
-                                    <button class="ht-btn-action" onclick="setReplyingTo('${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon</button>
+                                    <button class="ht-btn-action" onclick="setReplyingTo('${replyMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${replyMsgId}</button>
                                     ${delReplyBtn}
                                 </div>
                             </div>
@@ -793,15 +797,15 @@
             }
         }
 
-        function setReplyingTo(authorName, contentSnippet) {
-            replyingToData = { author: authorName, content: contentSnippet };
+        function setReplyingTo(msgId, authorName, contentSnippet) {
+            replyingToData = { id: msgId, author: authorName, content: contentSnippet };
             const banner = document.getElementById('replying-to-banner');
             banner.style.display = 'block';
             banner.innerHTML = `<div style="background:#e5f0e3; border:1px solid #99a895; padding:8px 12px; border-radius:3px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
-                <span>💬 Responent a <b>@${authorName}</b>: "${contentSnippet}..."</span>
+                <span>💬 Responent al missatge <b>#${msgId}</b> de <b>@${authorName}</b></span>
                 <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[✕]</a>
             </div>`;
-            document.getElementById('reply-box-title').innerText = `💬 Respon a @${authorName}`;
+            document.getElementById('reply-box-title').innerText = `💬 Respon a #${msgId} (@${authorName})`;
             document.getElementById('cancel-reply-btn').style.display = 'inline-block';
             document.getElementById('reply-content').focus();
         }
@@ -854,14 +858,16 @@
                 };
 
                 if (replyingToData) {
+                    insertData.reply_to_id = replyingToData.id;
                     insertData.reply_to_author = replyingToData.author;
                     insertData.reply_to_content = replyingToData.content;
                 }
 
                 let { error } = await supabaseClient.from('forum_replies').insert(insertData);
                 
-                // Fallback robusto por si las columnas de citas no existen en la base de datos
+                // Fallback robusto por si las columnas de cita/ID no existen físicamente en Supabase
                 if (error && error.message.includes('column')) {
+                    delete insertData.reply_to_id;
                     delete insertData.reply_to_author;
                     delete insertData.reply_to_content;
                     const res2 = await supabaseClient.from('forum_replies').insert(insertData);
