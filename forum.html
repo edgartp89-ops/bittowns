@@ -23,7 +23,7 @@
             background-color: var(--ht-bg-base);
             color: var(--ht-text-main);
             font-family: Arial, Tahoma, Verdana, sans-serif;
-            font-size: 16px; /* Tamaño grande y muy legible */
+            font-size: 16px;
             line-height: 1.6;
             margin: 0;
             padding: 0;
@@ -225,7 +225,7 @@
             background: #f7d4d4;
         }
 
-        /* Tarjeta de Mensaje / Publicación Estilo Hattrick de Alto Contraste */
+        /* Tarjeta de Mensaje / Publicación Estilo Hattrick */
         .ht-post-box {
             border: 2px solid var(--ht-border);
             margin-bottom: 18px;
@@ -269,7 +269,7 @@
             margin-bottom: 20px;
         }
 
-        /* Panel de Autor Derecha (Alto contraste) */
+        /* Panel de Autor Derecha (Con contador restaurado) */
         .ht-author-panel {
             background-color: #f4f8f3;
             border-left: 2px solid var(--ht-border);
@@ -311,14 +311,22 @@
             color: var(--ht-link);
             text-decoration: none;
             font-size: 15px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             word-break: break-all;
         }
         .ht-author-club {
             font-size: 13px;
             color: #333333;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+        }
+        .ht-author-stats {
+            font-size: 13px;
+            color: #555555;
+            margin-top: 6px;
+            border-top: 1px dashed #b5c2b0;
+            padding-top: 6px;
+            width: 100%;
         }
 
         /* Formularios y Cajas de Edición */
@@ -443,6 +451,7 @@
         let currentUser = null;
         const ADMIN_EMAIL = 'edgartp89@gmail.com';
         let threadReplyCounts = {};
+        let userMessageCounts = {};
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -469,13 +478,21 @@
 
         async function loadCounts() {
             try {
-                const { data: threads } = await supabaseClient.from('forum_threads').select('id');
-                const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id');
+                const { data: threads } = await supabaseClient.from('forum_threads').select('id, user_id');
+                const { data: replies } = await supabaseClient.from('forum_replies').select('thread_id, user_id');
 
                 threadReplyCounts = {};
+                userMessageCounts = {};
+
+                if (threads) {
+                    threads.forEach(t => {
+                        if (t.user_id) userMessageCounts[t.user_id] = (userMessageCounts[t.user_id] || 0) + 1;
+                    });
+                }
                 if (replies) {
                     replies.forEach(r => {
                         if (r.thread_id) threadReplyCounts[r.thread_id] = (threadReplyCounts[r.thread_id] || 0) + 1;
+                        if (r.user_id) userMessageCounts[r.user_id] = (userMessageCounts[r.user_id] || 0) + 1;
                     });
                 }
                 if (threads && document.getElementById('tree-count')) {
@@ -486,7 +503,7 @@
             }
         }
 
-        // VISTA 1: LISTADO DE HILOS (Hattrick Style - Alto Contraste)
+        // VISTA 1: LISTADO DE HILOS
         async function loadThreadsList() {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -554,7 +571,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Alto Contraste)
+        // VISTA 2: DETALLE DEL HILO (Con contador de mensajes en panel derecho)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -601,6 +618,7 @@
                 const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
                 const author = thread.author_name || 'Ciutadà';
                 const isAdmin = thread.user_id === ADMIN_EMAIL || author.includes('edgartp89');
+                const userMsgCount = userMessageCounts[thread.user_id] || 1;
 
                 let delBtn = '';
                 if (isUserAdmin || (currentUser && thread.user_id === currentUser.id)) {
@@ -629,6 +647,7 @@
                                 <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                 <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
                                 <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
+                                <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
                             </div>
                         </div>
                     </div>
@@ -656,6 +675,7 @@
                     replies.forEach(reply => {
                         const author = reply.author_name || 'Ciutadà';
                         const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
+                        const userMsgCount = userMessageCounts[reply.user_id] || 1;
 
                         let delReplyBtn = '';
                         if (isUserAdmin || (currentUser && reply.user_id === currentUser.id)) {
@@ -684,6 +704,7 @@
                                     <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                     <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Participant'}</div>
                                     <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
+                                    <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
                                 </div>
                             </div>
                         `;
@@ -737,7 +758,7 @@
                 if (error) { alert("Error al enviar la resposta."); return; }
                 document.getElementById('reply-content').value = '';
                 await loadCounts();
-                loadReplies(threadId);
+                loadThreadDetail(threadId);
             } catch (err) { console.error(err); }
         }
 
@@ -758,7 +779,7 @@
                 const { error } = await supabaseClient.from('forum_replies').delete().eq('id', replyId);
                 if (error) { alert("Error al eliminar."); return; }
                 await loadCounts();
-                loadReplies(threadId);
+                loadThreadDetail(threadId);
             } catch (err) { console.error(err); }
         }
 
