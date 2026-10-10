@@ -7,25 +7,24 @@
     <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
         :root {
-            --ht-bg-top: #23582b;
-            --ht-bg-base: #1b4421;
-            --ht-bg-sidebar: #286331;
+            --ht-bg-top: #1b4421;
+            --ht-bg-base: #112e16;
+            --ht-bg-sidebar: #e9f0e8;
             --ht-bg-content: #ffffff;
-            --ht-bg-alt: #f4f6f3;
-            --ht-border: #cccccc;
-            --ht-border-dark: #123017;
-            --ht-text-main: #1f2937;
-            --ht-text-muted: #4b5563;
-            --ht-link: #1a4d2e;
-            --ht-accent: #357a3d;
+            --ht-border: #99a895;
+            --ht-border-dark: #0a1f0d;
+            --ht-text-main: #111111;
+            --ht-text-muted: #333333;
+            --ht-link: #0d381c;
+            --ht-accent: #23582b;
         }
 
         body {
             background-color: var(--ht-bg-base);
             color: var(--ht-text-main);
             font-family: Arial, Tahoma, Verdana, sans-serif;
-            font-size: 14px; /* Aumentado para mejor legibilidad */
-            line-height: 1.5;
+            font-size: 16px; /* Tamaño grande y muy legible */
+            line-height: 1.6;
             margin: 0;
             padding: 0;
             display: flex;
@@ -37,33 +36,33 @@
         .ht-topbar {
             background-color: var(--ht-bg-top);
             color: #ffffff;
-            padding: 12px 20px;
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--ht-border-dark);
+            border-bottom: 3px solid var(--ht-border-dark);
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
         }
         .ht-topbar-nav {
             display: flex;
-            gap: 18px;
+            gap: 20px;
             align-items: center;
         }
         .ht-topbar-nav a {
             color: #ffffff;
             text-decoration: none;
-            padding: 6px 10px;
-            border-radius: 3px;
+            padding: 6px 12px;
+            border-radius: 4px;
         }
         .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
-            background-color: rgba(0, 0, 0, 0.25);
+            background-color: rgba(0, 0, 0, 0.35);
         }
 
         /* Layout General en Dos Columnas */
         .ht-layout {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 300px 1fr;
             flex: 1;
             max-width: 1500px;
             width: 100%;
@@ -78,78 +77,81 @@
 
         /* Panel Izquierdo (Árbol de Foros Hattrick) */
         .ht-sidebar {
-            background-color: #f0f3ef;
-            border-right: 1px solid var(--ht-border);
-            padding: 16px;
+            background-color: var(--ht-bg-sidebar);
+            border-right: 2px solid var(--ht-border);
+            padding: 20px;
             box-sizing: border-box;
-            font-size: 13px;
+            font-size: 15px;
         }
         .ht-sidebar-title {
             font-weight: bold;
             color: #ffffff;
             background-color: var(--ht-accent);
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            border-radius: 2px;
-            font-size: 13px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            border-radius: 3px;
+            font-size: 15px;
         }
         .ht-tabs {
             display: flex;
             gap: 4px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .ht-tab {
-            background: #e2e8e0;
-            border: 1px solid #c5cdc2;
-            padding: 5px 10px;
-            font-size: 12px;
+            background: #d4e2d1;
+            border: 1px solid var(--ht-border);
+            padding: 6px 12px;
+            font-size: 14px;
             cursor: pointer;
-            border-radius: 2px 2px 0 0;
+            border-radius: 3px 3px 0 0;
             text-decoration: none;
-            color: #333;
+            color: #111;
+            font-weight: bold;
         }
         .ht-tab.active {
             background: #ffffff;
             border-bottom: 1px solid #ffffff;
-            font-weight: bold;
+            color: var(--ht-link);
         }
         .ht-tree-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 18px 0;
+            margin: 0 0 20px 0;
         }
         .ht-tree-list li {
-            margin: 5px 0;
+            margin: 6px 0;
         }
         .ht-tree-list a {
             color: var(--ht-link);
+            font-weight: bold;
             text-decoration: none;
             display: flex;
             justify-content: space-between;
-            padding: 4px 6px;
-            font-size: 13px;
+            padding: 6px 8px;
+            font-size: 15px;
         }
         .ht-tree-list a:hover {
             text-decoration: underline;
-            background-color: rgba(53, 122, 61, 0.1);
+            background-color: rgba(35, 88, 43, 0.12);
         }
         .ht-tree-sub {
-            padding-left: 14px;
-            margin-top: 4px;
-            border-left: 1px dotted #999;
+            padding-left: 16px;
+            margin-top: 6px;
+            border-left: 2px dotted #888;
         }
         .ht-sidebar-links {
-            border-top: 1px solid var(--ht-border);
-            padding-top: 12px;
-            margin-top: 12px;
+            border-top: 2px solid var(--ht-border);
+            padding-top: 14px;
+            margin-top: 14px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
         .ht-sidebar-links a {
-            color: #333;
+            color: #111;
+            font-weight: 600;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 14px;
         }
         .ht-sidebar-links a:hover {
             text-decoration: underline;
@@ -157,78 +159,80 @@
 
         /* Contenido Principal Derecho */
         .ht-main {
-            padding: 20px 24px;
+            padding: 24px 30px;
             box-sizing: border-box;
             background-color: #ffffff;
         }
 
         /* Ruta / Migas de Pan Estilo Hattrick */
         .ht-breadcrumbs {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--ht-text-muted);
-            margin-bottom: 14px;
-            background: #f8faf7;
-            padding: 8px 12px;
+            margin-bottom: 18px;
+            background: #f4f8f3;
+            padding: 10px 16px;
             border: 1px solid var(--ht-border);
-            border-radius: 3px;
+            border-radius: 4px;
         }
         .ht-breadcrumbs a {
             color: var(--ht-link);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: bold;
         }
 
         /* Barra de Herramientas del Hilo */
         .ht-toolbar {
-            background: #f0f4ee;
+            background: #f0f5ee;
             border: 1px solid var(--ht-border);
-            padding: 10px 14px;
-            margin-bottom: 18px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            border-radius: 3px;
+            font-size: 15px;
+            border-radius: 4px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
         .ht-toolbar input {
-            padding: 5px 10px;
-            font-size: 13px;
+            padding: 8px 12px;
+            font-size: 15px;
             border: 1px solid var(--ht-border);
-            border-radius: 2px;
-            width: 220px;
+            border-radius: 3px;
+            width: 260px;
+            background: #fff;
+            color: #111;
         }
         .ht-btn {
-            background: #e1e8df;
-            border: 1px solid #b0bcac;
-            padding: 6px 14px;
-            font-size: 13px;
+            background: #e2ebd9;
+            border: 1px solid #8ca384;
+            padding: 8px 16px;
+            font-size: 15px;
             cursor: pointer;
-            border-radius: 2px;
+            border-radius: 3px;
             font-weight: bold;
-            color: #222;
+            color: #111;
         }
         .ht-btn:hover {
-            background: #d4ebd0;
+            background: #c8dcbc;
         }
         .ht-btn-danger {
-            background: #fde8e8;
-            border-color: #f5c2c2;
-            color: #a80000;
+            background: #fce8e8;
+            border-color: #d98282;
+            color: #990000;
         }
         .ht-btn-danger:hover {
-            background: #fbd5d5;
+            background: #f7d4d4;
         }
 
-        /* Tarjeta de Mensaje / Publicación Estilo Hattrick */
+        /* Tarjeta de Mensaje / Publicación Estilo Hattrick de Alto Contraste */
         .ht-post-box {
-            border: 1px solid var(--ht-border);
-            margin-bottom: 14px;
+            border: 2px solid var(--ht-border);
+            margin-bottom: 18px;
             display: grid;
-            grid-template-columns: 1fr 200px;
+            grid-template-columns: 1fr 220px;
             background: #ffffff;
-            border-radius: 3px;
+            border-radius: 4px;
         }
         @media (max-width: 768px) {
             .ht-post-box {
@@ -236,7 +240,7 @@
             }
         }
         .ht-post-content {
-            padding: 16px 20px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -244,31 +248,32 @@
         .ht-post-header {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 14px;
             color: var(--ht-text-muted);
-            border-bottom: 1px solid #eeeeee;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
+            border-bottom: 2px solid #e5e9e2;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            font-weight: bold;
         }
         .ht-post-title {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: bold;
-            color: #111;
-            margin-bottom: 10px;
+            color: #000000;
+            margin-bottom: 12px;
         }
         .ht-post-text {
-            font-size: 13.5px;
-            color: #222;
-            line-height: 1.6;
+            font-size: 16px;
+            color: #111111;
+            line-height: 1.7;
             white-space: pre-wrap;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
-        /* Panel de Autor Derecha (Estilo Hattrick exacto) */
+        /* Panel de Autor Derecha (Alto contraste) */
         .ht-author-panel {
-            background-color: #f9fbf8;
-            border-left: 1px solid var(--ht-border);
-            padding: 16px;
+            background-color: #f4f8f3;
+            border-left: 2px solid var(--ht-border);
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -278,101 +283,106 @@
         @media (max-width: 768px) {
             .ht-author-panel {
                 border-left: none;
-                border-top: 1px solid var(--ht-border);
+                border-top: 2px solid var(--ht-border);
                 flex-direction: row;
                 justify-content: flex-start;
                 gap: 16px;
                 text-align: left;
-                padding: 12px 16px;
+                padding: 16px 20px;
             }
         }
         .ht-author-avatar {
-            width: 56px;
-            height: 56px;
-            background: #e2e8e0;
-            border: 1px solid #b5c2b0;
+            width: 64px;
+            height: 64px;
+            background: #d4e2d1;
+            border: 2px solid #8ca384;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 8px;
-            border-radius: 2px;
+            font-size: 28px;
+            margin-bottom: 10px;
+            border-radius: 4px;
         }
         @media (max-width: 768px) {
-            .ht-author-avatar { width: 40px; height: 40px; font-size: 18px; margin-bottom: 0; }
+            .ht-author-avatar { width: 44px; height: 44px; font-size: 20px; margin-bottom: 0; }
         }
         .ht-author-name {
             font-weight: bold;
             color: var(--ht-link);
             text-decoration: none;
-            font-size: 13px;
-            margin-bottom: 3px;
+            font-size: 15px;
+            margin-bottom: 4px;
             word-break: break-all;
         }
         .ht-author-club {
-            font-size: 11.5px;
-            color: var(--ht-text-muted);
+            font-size: 13px;
+            color: #333333;
+            font-weight: bold;
             margin-bottom: 6px;
         }
 
         /* Formularios y Cajas de Edición */
         .ht-form-box {
-            background: #f4f6f3;
-            border: 1px solid var(--ht-border);
-            padding: 16px;
-            margin-bottom: 20px;
-            border-radius: 3px;
+            background: #f0f5ee;
+            border: 2px solid var(--ht-border);
+            padding: 20px;
+            margin-bottom: 24px;
+            border-radius: 4px;
         }
         .ht-input, .ht-textarea {
             width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--ht-border);
-            border-radius: 2px;
+            padding: 10px 14px;
+            border: 2px solid var(--ht-border);
+            border-radius: 3px;
             font-family: inherit;
-            font-size: 13.5px;
-            margin-bottom: 10px;
+            font-size: 16px;
+            margin-bottom: 12px;
             box-sizing: border-box;
             background: #fff;
+            color: #111;
         }
-        .ht-textarea { min-height: 100px; resize: vertical; }
+        .ht-textarea { min-height: 120px; resize: vertical; }
 
         /* Filas de la lista de hilos */
         .ht-thread-row {
             background: #ffffff;
-            border: 1px solid var(--ht-border);
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            border: 2px solid var(--ht-border);
+            padding: 16px 20px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 2px;
+            border-radius: 4px;
         }
         .ht-thread-row:hover {
             background: #f9fbf8;
+            border-color: var(--ht-accent);
         }
         .ht-thread-link {
             font-weight: bold;
             color: var(--ht-link);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 17px;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .ht-thread-link:hover {
             text-decoration: underline;
         }
         .ht-thread-meta {
-            font-size: 12px;
-            color: var(--ht-text-muted);
+            font-size: 14px;
+            color: #333333;
             display: flex;
-            gap: 16px;
+            gap: 20px;
+            font-weight: 500;
         }
         .ht-badge {
-            background: #e2e8e0;
-            padding: 2px 6px;
-            border-radius: 2px;
+            background: #d4e2d1;
+            padding: 2px 8px;
+            border-radius: 3px;
             font-weight: bold;
-            color: #333;
+            color: #111;
+            border: 1px solid #8ca384;
         }
     </style>
 </head>
@@ -384,7 +394,7 @@
             <a href="board.html">🏛️ Tabler de Govern</a>
             <a href="forum.html" class="active">💬 Fòrum Oficial</a>
         </div>
-        <div style="font-size: 13px;">
+        <div style="font-size: 15px;">
             <a href="profile.html" style="color:#ffffff; text-decoration:none;">👤 Mi Perfil</a>
         </div>
     </div>
@@ -420,7 +430,7 @@
 
         <!-- Panel Principal Derecho -->
         <div class="ht-main" id="ht-main-content">
-            <div style="text-align: center; color: var(--ht-text-muted); padding: 40px;">Carregant fòrum...</div>
+            <div style="text-align: center; color: var(--ht-text-muted); padding: 40px; font-weight: bold;">Carregant fòrum...</div>
         </div>
     </div>
 
@@ -476,7 +486,7 @@
             }
         }
 
-        // VISTA 1: LISTADO DE HILOS (Hattrick Style)
+        // VISTA 1: LISTADO DE HILOS (Hattrick Style - Alto Contraste)
         async function loadThreadsList() {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -485,15 +495,15 @@
                 </div>
 
                 <div class="ht-form-box">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 8px; font-size: 13.5px;">✍️ Crear Nou Fil de Debat</div>
+                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;">✍️ Crear Nou Fil de Debat</div>
                     <input type="text" id="thread-title" class="ht-input" placeholder="Títol del fil..." />
                     <textarea id="thread-content" class="ht-textarea" placeholder="Escriu el teu missatge..."></textarea>
                     <button class="ht-btn" onclick="createThread()">Publicar Fil</button>
                 </div>
 
-                <div style="font-weight: bold; margin-bottom: 10px; font-size: 13.5px; color: #333;">Llistat de fils actius</div>
+                <div style="font-weight: bold; margin-bottom: 12px; font-size: 16px; color: #111;">Llistat de fils actius</div>
                 <div id="ht-threads-container">
-                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px;">Carregant fils...</div>
+                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px; font-weight: bold;">Carregant fils...</div>
                 </div>
             `;
 
@@ -529,7 +539,7 @@
                                     <span>Respostes: <span class="ht-badge">${repliesCount}</span></span>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
                                 <a href="forum.html?id=${thread.id}" class="ht-btn" style="text-decoration:none;">Veure Fil &rarr;</a>
                                 ${delBtn}
                             </div>
@@ -537,19 +547,19 @@
                         listContainer.appendChild(item);
                     });
                 } else {
-                    listContainer.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 30px; border: 1px solid var(--ht-border); background:#f9fbf8;">No hi ha fils actius. Sigues el primer en obrir un debat.</div>`;
+                    listContainer.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 30px; border: 2px solid var(--ht-border); background:#f9fbf8; font-weight: bold;">No hi ha fils actius. Sigues el primer en obrir un debat.</div>`;
                 }
             } catch (err) {
-                listContainer.innerHTML = `<div style="color: #a80000; text-align: center;">Error al carregar els fils.</div>`;
+                listContainer.innerHTML = `<div style="color: #990000; text-align: center; font-weight: bold;">Error al carregar els fils.</div>`;
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Hattrick Exact Layout)
+        // VISTA 2: DETALLE DEL HILO (Alto Contraste)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
                 <div class="ht-breadcrumbs">
-                    <a href="forum.html">Fòrum</a> &raquo; <a href="forum.html">General</a> &raquo; <span id="ht-bc-title">Detall</span>
+                    <a href="forum.html">Fòrum</a> &raquo; <a href="forum.html">General</a> &raquo; <span id="ht-bc-title" style="font-weight:bold;">Detall</span>
                 </div>
 
                 <div class="ht-toolbar">
@@ -563,15 +573,15 @@
 
                 <div id="ht-thread-main"></div>
 
-                <div class="ht-form-box" style="margin-top: 20px;">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 8px; font-size: 13.5px;">💬 Enviar Resposta</div>
+                <div class="ht-form-box" style="margin-top: 24px;">
+                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;">💬 Enviar Resposta</div>
                     <textarea id="reply-content" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReply(${threadId})">Enviar Resposta</button>
                 </div>
 
-                <div style="font-weight: bold; margin: 20px 0 10px 0; font-size: 13.5px; color: #333;">Respostes de la Comunitat</div>
+                <div style="font-weight: bold; margin: 24px 0 12px 0; font-size: 16px; color: #111;">Respostes de la Comunitat</div>
                 <div id="ht-replies-container">
-                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px;">Carregant respostes...</div>
+                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px; font-weight: bold;">Carregant respostes...</div>
                 </div>
             `;
 
@@ -583,7 +593,7 @@
                     .single();
 
                 if (error || !thread) {
-                    container.innerHTML = `<div style="color: #a80000; text-align: center; padding: 40px;">El fil no existeix o ha estat eliminat.</div>`;
+                    container.innerHTML = `<div style="color: #990000; text-align: center; padding: 40px; font-weight: bold;">El fil no existeix o ha estat eliminat.</div>`;
                     return;
                 }
 
@@ -598,7 +608,7 @@
                 }
 
                 document.getElementById('ht-thread-main').innerHTML = `
-                    <div class="ht-post-box" style="border-color: #357a3d;">
+                    <div class="ht-post-box" style="border-color: #23582b;">
                         <div class="ht-post-content">
                             <div>
                                 <div class="ht-post-header">
@@ -608,7 +618,7 @@
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
                                 <div class="ht-post-text">${escapeHtml(thread.content)}</div>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; padding-top:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
                                 <span></span>
                                 ${delBtn}
                             </div>
@@ -618,7 +628,7 @@
                             <div>
                                 <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                 <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
-                                <div style="font-size:11px; color:#555;">🇪🇸 Amposta</div>
+                                <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
                             </div>
                         </div>
                     </div>
@@ -663,7 +673,7 @@
                                     </div>
                                     <div class="ht-post-text">${escapeHtml(reply.content)}</div>
                                 </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; padding-top:10px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
                                     <span></span>
                                     ${delReplyBtn}
                                 </div>
@@ -673,17 +683,17 @@
                                 <div>
                                     <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                     <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Participant'}</div>
-                                    <div style="font-size:11px; color:#555;">🇪🇸 Amposta</div>
+                                    <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
                                 </div>
                             </div>
                         `;
                         container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 20px; border: 1px solid var(--ht-border); background:#f9fbf8;">Encara no hi ha respostes en aquest fil.</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 30px; border: 2px solid var(--ht-border); background:#f9fbf8; font-weight: bold;">Encara no hi ha respostes en aquest fil.</div>`;
                 }
             } catch (err) {
-                container.innerHTML = `<div style="color: #a80000; text-align: center;">Error al carregar respostes.</div>`;
+                container.innerHTML = `<div style="color: #990000; text-align: center; font-weight: bold;">Error al carregar respostes.</div>`;
             }
         }
 
