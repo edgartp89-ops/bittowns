@@ -7,21 +7,23 @@
     <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
         :root {
-            --ht-bg-top: #1b4421;
-            --ht-bg-base: #112e16;
-            --ht-bg-sidebar: #e9f0e8;
-            --ht-bg-content: #ffffff;
-            --ht-border: #99a895;
-            --ht-border-dark: #0a1f0d;
-            --ht-text-main: #111111;
-            --ht-text-muted: #333333;
-            --ht-link: #0d381c;
-            --ht-accent: #23582b;
+            --bt-bg-top: #0c0814;
+            --bt-bg-base: #06040a;
+            --bt-bg-sidebar: #130d22;
+            --bt-bg-content: #18112c;
+            --bt-border: #4a2c82;
+            --bt-border-dark: #2a164f;
+            --bt-text-main: #f3f0ff;
+            --bt-text-muted: #b8aedc;
+            --bt-link: #d8b4fe;
+            --bt-accent: #9333ea;
+            --bt-neon: #a855f7;
+            --bt-neon-glow: rgba(168, 85, 247, 0.35);
         }
 
         body {
-            background-color: var(--ht-bg-base);
-            color: var(--ht-text-main);
+            background-color: var(--bt-bg-base);
+            color: var(--bt-text-main);
             font-family: Arial, Tahoma, Verdana, sans-serif;
             font-size: 16px;
             line-height: 1.6;
@@ -32,15 +34,16 @@
             min-height: 100vh;
         }
 
-        /* Barra Superior Hattrick Classic */
+        /* Barra Superior Bit-Towns */
         .ht-topbar {
-            background-color: var(--ht-bg-top);
+            background-color: var(--bt-bg-top);
             color: #ffffff;
             padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--ht-border-dark);
+            border-bottom: 2px solid var(--bt-accent);
+            box-shadow: 0 0 15px var(--bt-neon-glow);
             font-weight: bold;
             font-size: 16px;
         }
@@ -50,13 +53,16 @@
             align-items: center;
         }
         .ht-topbar-nav a {
-            color: #ffffff;
+            color: var(--bt-text-main);
             text-decoration: none;
             padding: 6px 12px;
             border-radius: 4px;
+            transition: all 0.2s ease;
         }
         .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
-            background-color: rgba(0, 0, 0, 0.35);
+            background-color: var(--bt-accent);
+            color: #ffffff;
+            box-shadow: 0 0 10px var(--bt-neon);
         }
 
         /* Layout General en Dos Columnas */
@@ -67,7 +73,7 @@
             max-width: 1500px;
             width: 100%;
             margin: 0 auto;
-            background-color: #ffffff;
+            background-color: var(--bt-bg-base);
         }
         @media (max-width: 900px) {
             .ht-layout {
@@ -75,10 +81,10 @@
             }
         }
 
-        /* Panel Izquierdo (Árbol de Foros Hattrick) */
+        /* Panel Izquierdo (Árbol de Foros) */
         .ht-sidebar {
-            background-color: var(--ht-bg-sidebar);
-            border-right: 2px solid var(--ht-border);
+            background-color: var(--bt-bg-sidebar);
+            border-right: 2px solid var(--bt-border);
             padding: 20px;
             box-sizing: border-box;
             font-size: 15px;
@@ -86,11 +92,12 @@
         .ht-sidebar-title {
             font-weight: bold;
             color: #ffffff;
-            background-color: var(--ht-accent);
+            background-color: var(--bt-accent);
             padding: 10px 14px;
             margin-bottom: 12px;
-            border-radius: 3px;
+            border-radius: 4px;
             font-size: 15px;
+            box-shadow: 0 0 10px var(--bt-neon-glow);
         }
         .ht-tabs {
             display: flex;
@@ -98,20 +105,21 @@
             margin-bottom: 14px;
         }
         .ht-tab {
-            background: #d4e2d1;
-            border: 1px solid var(--ht-border);
+            background: #23193d;
+            border: 1px solid var(--bt-border);
             padding: 6px 12px;
             font-size: 14px;
             cursor: pointer;
-            border-radius: 3px 3px 0 0;
+            border-radius: 4px 4px 0 0;
             text-decoration: none;
-            color: #111;
+            color: var(--bt-text-muted);
             font-weight: bold;
         }
         .ht-tab.active {
-            background: #ffffff;
-            border-bottom: 1px solid #ffffff;
-            color: var(--ht-link);
+            background: var(--bt-bg-content);
+            border-bottom: 1px solid var(--bt-bg-content);
+            color: var(--bt-link);
+            border-color: var(--bt-accent);
         }
         .ht-tree-list {
             list-style: none;
@@ -122,25 +130,26 @@
             margin: 6px 0;
         }
         .ht-tree-list a {
-            color: var(--ht-link);
+            color: var(--bt-link);
             font-weight: bold;
             text-decoration: none;
             display: flex;
             justify-content: space-between;
             padding: 6px 8px;
             font-size: 15px;
+            border-radius: 3px;
         }
         .ht-tree-list a:hover {
             text-decoration: underline;
-            background-color: rgba(35, 88, 43, 0.12);
+            background-color: rgba(147, 51, 234, 0.15);
         }
         .ht-tree-sub {
             padding-left: 16px;
             margin-top: 6px;
-            border-left: 2px dotted #888;
+            border-left: 2px dotted var(--bt-border);
         }
         .ht-sidebar-links {
-            border-top: 2px solid var(--ht-border);
+            border-top: 2px solid var(--bt-border);
             padding-top: 14px;
             margin-top: 14px;
             display: flex;
@@ -148,12 +157,13 @@
             gap: 8px;
         }
         .ht-sidebar-links a {
-            color: #111;
+            color: var(--bt-text-muted);
             font-weight: 600;
             text-decoration: none;
             font-size: 14px;
         }
         .ht-sidebar-links a:hover {
+            color: var(--bt-link);
             text-decoration: underline;
         }
 
@@ -161,29 +171,29 @@
         .ht-main {
             padding: 24px 30px;
             box-sizing: border-box;
-            background-color: #ffffff;
+            background-color: var(--bt-bg-base);
         }
 
-        /* Ruta / Migas de Pan Estilo Hattrick */
+        /* Ruta / Migas de Pan */
         .ht-breadcrumbs {
             font-size: 14px;
-            color: var(--ht-text-muted);
+            color: var(--bt-text-muted);
             margin-bottom: 18px;
-            background: #f4f8f3;
+            background: var(--bt-bg-sidebar);
             padding: 10px 16px;
-            border: 1px solid var(--ht-border);
+            border: 1px solid var(--bt-border);
             border-radius: 4px;
         }
         .ht-breadcrumbs a {
-            color: var(--ht-link);
+            color: var(--bt-link);
             text-decoration: none;
             font-weight: bold;
         }
 
         /* Barra de Herramientas del Hilo */
         .ht-toolbar {
-            background: #f0f5ee;
-            border: 1px solid var(--ht-border);
+            background: var(--bt-bg-sidebar);
+            border: 1px solid var(--bt-border);
             padding: 12px 18px;
             margin-bottom: 20px;
             display: flex;
@@ -197,55 +207,68 @@
         .ht-toolbar input {
             padding: 8px 12px;
             font-size: 15px;
-            border: 1px solid var(--ht-border);
+            border: 1px solid var(--bt-border);
             border-radius: 3px;
             width: 260px;
-            background: #fff;
-            color: #111;
+            background: var(--bt-bg-content);
+            color: var(--bt-text-main);
+        }
+        .ht-toolbar input:focus {
+            outline: none;
+            border-color: var(--bt-neon);
+            box-shadow: 0 0 8px var(--bt-neon-glow);
         }
         .ht-btn {
-            background: #e2ebd9;
-            border: 1px solid #8ca384;
+            background: #2a164f;
+            border: 1px solid var(--bt-border);
             padding: 8px 16px;
             font-size: 15px;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 4px;
             font-weight: bold;
-            color: #111;
+            color: var(--bt-link);
+            transition: all 0.2s ease;
         }
         .ht-btn:hover {
-            background: #c8dcbc;
+            background: var(--bt-accent);
+            color: #ffffff;
+            box-shadow: 0 0 10px var(--bt-neon);
         }
         .ht-btn-action {
-            background: #d4e2d1;
-            color: var(--ht-link);
-            border: 1px solid #8ca384;
-            padding: 4px 10px;
+            background: #1f1238;
+            color: var(--bt-link);
+            border: 1px solid var(--bt-border);
+            padding: 6px 12px;
             font-size: 13px;
-            border-radius: 3px;
+            border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
         }
         .ht-btn-action:hover {
-            background: #c2d5be;
+            background: var(--bt-accent);
+            color: #ffffff;
+            box-shadow: 0 0 8px var(--bt-neon-glow);
         }
         .ht-btn-danger {
-            background: #fce8e8;
-            border-color: #d98282;
-            color: #990000;
+            background: #3f1515;
+            border-color: #7f2222;
+            color: #fca5a5;
         }
         .ht-btn-danger:hover {
-            background: #f7d4d4;
+            background: #7f2222;
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
         }
 
-        /* Tarjeta de Mensaje / Publicación Estilo Hattrick */
+        /* Tarjeta de Mensaje / Publicación */
         .ht-post-box {
-            border: 2px solid var(--ht-border);
+            border: 2px solid var(--bt-border);
             margin-bottom: 18px;
             display: grid;
             grid-template-columns: 1fr 220px;
-            background: #ffffff;
+            background: var(--bt-bg-content);
             border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         @media (max-width: 768px) {
             .ht-post-box {
@@ -262,8 +285,8 @@
             display: flex;
             justify-content: space-between;
             font-size: 13.5px;
-            color: var(--ht-text-muted);
-            border-bottom: 2px solid #e5e9e2;
+            color: var(--bt-text-muted);
+            border-bottom: 2px solid var(--bt-border-dark);
             padding-bottom: 10px;
             margin-bottom: 14px;
             font-weight: bold;
@@ -271,30 +294,31 @@
         .ht-post-title {
             font-size: 18px;
             font-weight: bold;
-            color: #000000;
+            color: var(--bt-text-main);
             margin-bottom: 12px;
         }
         .ht-post-text {
             font-size: 16px;
-            color: #111111;
+            color: var(--bt-text-main);
             line-height: 1.7;
             white-space: pre-wrap;
             margin-bottom: 20px;
         }
         .quoted-box {
-            background: #f4f8f3;
-            border-left: 4px solid var(--ht-accent);
+            background: #110b20;
+            border-left: 4px solid var(--bt-neon);
             padding: 10px 14px;
             font-size: 14px;
-            color: #333;
+            color: var(--bt-text-muted);
             margin-bottom: 14px;
             border-radius: 0 4px 4px 0;
+            box-shadow: inset 0 0 10px rgba(168, 85, 247, 0.08);
         }
 
         /* Panel de Autor Derecha */
         .ht-author-panel {
-            background-color: #f4f8f3;
-            border-left: 2px solid var(--ht-border);
+            background-color: var(--bt-bg-sidebar);
+            border-left: 2px solid var(--bt-border);
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -305,7 +329,7 @@
         @media (max-width: 768px) {
             .ht-author-panel {
                 border-left: none;
-                border-top: 2px solid var(--ht-border);
+                border-top: 2px solid var(--bt-border);
                 flex-direction: row;
                 justify-content: flex-start;
                 gap: 16px;
@@ -316,8 +340,8 @@
         .ht-author-avatar {
             width: 64px;
             height: 64px;
-            background: #d4e2d1;
-            border: 2px solid #8ca384;
+            background: #23193d;
+            border: 2px solid var(--bt-border);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -325,6 +349,7 @@
             margin-bottom: 10px;
             border-radius: 4px;
             overflow: hidden;
+            box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
         }
         .ht-author-avatar img {
             width: 100%;
@@ -336,67 +361,79 @@
         }
         .ht-author-name {
             font-weight: bold;
-            color: var(--ht-link);
+            color: var(--bt-link);
             text-decoration: none;
             font-size: 15px;
             margin-bottom: 2px;
             word-break: break-all;
         }
+        .ht-author-name:hover {
+            text-decoration: underline;
+            color: var(--bt-neon);
+        }
         .ht-author-club {
             font-size: 13px;
-            color: #333333;
+            color: var(--bt-text-muted);
             font-weight: bold;
             margin-bottom: 4px;
         }
         .ht-author-stats {
             font-size: 13px;
-            color: #555555;
+            color: var(--bt-text-muted);
             margin-top: 6px;
-            border-top: 1px dashed #b5c2b0;
+            border-top: 1px dashed var(--bt-border);
             padding-top: 6px;
             width: 100%;
         }
 
         /* Formularios y Cajas de Edición */
         .ht-form-box {
-            background: #f0f5ee;
-            border: 2px solid var(--ht-border);
+            background: var(--bt-bg-sidebar);
+            border: 2px solid var(--bt-border);
             padding: 20px;
             margin-bottom: 24px;
-            border-radius: 4px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         .ht-input, .ht-textarea {
             width: 100%;
             padding: 10px 14px;
-            border: 2px solid var(--ht-border);
-            border-radius: 3px;
+            border: 2px solid var(--bt-border);
+            border-radius: 4px;
             font-family: inherit;
             font-size: 16px;
             margin-bottom: 12px;
             box-sizing: border-box;
-            background: #fff;
-            color: #111;
+            background: var(--bt-bg-content);
+            color: var(--bt-text-main);
+        }
+        .ht-input:focus, .ht-textarea:focus {
+            outline: none;
+            border-color: var(--bt-neon);
+            box-shadow: 0 0 10px var(--bt-neon-glow);
         }
         .ht-textarea { min-height: 120px; resize: vertical; }
 
         /* Filas de la lista de hilos */
         .ht-thread-row {
-            background: #ffffff;
-            border: 2px solid var(--ht-border);
+            background: var(--bt-bg-content);
+            border: 2px solid var(--bt-border);
             padding: 16px 20px;
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-radius: 4px;
+            transition: all 0.2s ease;
         }
         .ht-thread-row:hover {
-            background: #f9fbf8;
-            border-color: var(--ht-accent);
+            background: #1f1435;
+            border-color: var(--bt-neon);
+            box-shadow: 0 0 10px var(--bt-neon-glow);
         }
         .ht-thread-link {
             font-weight: bold;
-            color: var(--ht-link);
+            color: var(--bt-link);
             text-decoration: none;
             font-size: 17px;
             display: block;
@@ -404,40 +441,41 @@
         }
         .ht-thread-link:hover {
             text-decoration: underline;
+            color: var(--bt-neon);
         }
         .ht-thread-meta {
             font-size: 14px;
-            color: #333333;
+            color: var(--bt-text-muted);
             display: flex;
             gap: 20px;
             font-weight: 500;
         }
         .ht-badge {
-            background: #d4e2d1;
+            background: #23193d;
             padding: 2px 8px;
             border-radius: 3px;
             font-weight: bold;
-            color: #111;
-            border: 1px solid #8ca384;
+            color: var(--bt-link);
+            border: 1px solid var(--bt-border);
         }
     </style>
 </head>
 <body>
-    <!-- Barra Superior Hattrick -->
+    <!-- Barra Superior Bit-Towns -->
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
-            <a href="board.html">🏛️ Tabler de Govern</a>
+            <a href="board.html">🏛️ Tauler de Govern</a>
             <a href="forum.html" class="active">💬 Fòrum Oficial</a>
         </div>
         <div style="font-size: 15px;">
-            <a href="profile.html" style="color:#ffffff; text-decoration:none;">👤 Mi Perfil</a>
+            <a href="profile.html" style="color:var(--bt-link); text-decoration:none;">👤 El meu Perfil</a>
         </div>
     </div>
 
-    <!-- Layout Principal Hattrick -->
+    <!-- Layout Principal -->
     <div class="ht-layout">
-        <!-- Panel Izquierdo: Árbol Estilo Hattrick -->
+        <!-- Panel Izquierdo: Árbol de Foros -->
         <div class="ht-sidebar">
             <div class="ht-sidebar-title">Els meus fòrums</div>
             <div class="ht-tabs">
@@ -466,7 +504,7 @@
 
         <!-- Panel Principal Derecho -->
         <div class="ht-main" id="ht-main-content">
-            <div style="text-align: center; color: var(--ht-text-muted); padding: 40px; font-weight: bold;">Carregant fòrum...</div>
+            <div style="text-align: center; color: var(--bt-text-muted); padding: 40px; font-weight: bold;">Carregant fòrum...</div>
         </div>
     </div>
 
@@ -577,15 +615,15 @@
                 </div>
 
                 <div class="ht-form-box">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;">✍️ Crear Nou Fil de Debat</div>
+                    <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;">✍️ Crear Nou Fil de Debat</div>
                     <input type="text" id="thread-title" class="ht-input" placeholder="Títol del fil..." />
                     <textarea id="thread-content" class="ht-textarea" placeholder="Escriu el teu missatge..."></textarea>
                     <button class="ht-btn" onclick="createThread()">Publicar Fil</button>
                 </div>
 
-                <div style="font-weight: bold; margin-bottom: 12px; font-size: 16px; color: #111;">Llistat de fils actius</div>
+                <div style="font-weight: bold; margin-bottom: 12px; font-size: 16px; color: var(--bt-text-main);">Llistat de fils actius</div>
                 <div id="ht-threads-container">
-                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px; font-weight: bold;">Carregant fils...</div>
+                    <div style="text-align: center; color: var(--bt-text-muted); padding: 30px; font-weight: bold;">Carregant fils...</div>
                 </div>
             `;
 
@@ -629,14 +667,14 @@
                         listContainer.appendChild(item);
                     });
                 } else {
-                    listContainer.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 30px; border: 2px solid var(--ht-border); background:#f9fbf8; font-weight: bold;">No hi ha fils actius. Sigues el primer en obrir un debat.</div>`;
+                    listContainer.innerHTML = `<div style="text-align: center; color: var(--bt-text-muted); padding: 30px; border: 2px solid var(--bt-border); background:var(--bt-bg-content); font-weight: bold;">No hi ha fils actius. Sigues el primer en obrir un debat.</div>`;
                 }
             } catch (err) {
-                listContainer.innerHTML = `<div style="color: #990000; text-align: center; font-weight: bold;">Error al carregar els fils.</div>`;
+                listContainer.innerHTML = `<div style="color: #fca5a5; text-align: center; font-weight: bold;">Error al carregar els fils.</div>`;
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO (Con cuadro de respuesta arriba y duplicado abajo)
+        // VISTA 2: DETALLE DEL HILO
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -657,25 +695,25 @@
 
                 <!-- CAJA DE RESPUESTA SUPERIOR -->
                 <div class="ht-form-box" style="margin-top: 24px;">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
+                    <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
                     <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
                     <textarea id="reply-content" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReply(${threadId})">Enviar Resposta</button>
-                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
+                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#2a164f; color:#fca5a5;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
                 </div>
 
-                <div style="font-weight: bold; margin: 24px 0 12px 0; font-size: 16px; color: #111;">Respostes de la Comunitat</div>
+                <div style="font-weight: bold; margin: 24px 0 12px 0; font-size: 16px; color: var(--bt-text-main);">Respostes de la Comunitat</div>
                 <div id="ht-replies-container">
-                    <div style="text-align: center; color: var(--ht-text-muted); padding: 30px; font-weight: bold;">Carregant respostes...</div>
+                    <div style="text-align: center; color: var(--bt-text-muted); padding: 30px; font-weight: bold;">Carregant respostes...</div>
                 </div>
 
                 <!-- CAJA DE RESPUESTA INFERIOR (Duplicada exacta) -->
                 <div class="ht-form-box" style="margin-top: 30px;">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
+                    <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
                     <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
                     <textarea id="reply-content-bottom" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReplyFromBottom(${threadId})">Enviar Resposta</button>
-                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
+                    <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#2a164f; color:#fca5a5;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
                 </div>
             `;
 
@@ -687,7 +725,7 @@
                     .single();
 
                 if (error || !thread) {
-                    container.innerHTML = `<div style="color: #990000; text-align: center; padding: 40px; font-weight: bold;">El fil no existeix o ha estat eliminat.</div>`;
+                    container.innerHTML = `<div style="color: #fca5a5; text-align: center; padding: 40px; font-weight: bold;">El fil no existeix o ha estat eliminat.</div>`;
                     return;
                 }
 
@@ -705,7 +743,7 @@
                 }
 
                 document.getElementById('ht-thread-main').innerHTML = `
-                    <div class="ht-post-box" style="border-color: #23582b;">
+                    <div class="ht-post-box" style="border-color: var(--bt-accent);">
                         <div class="ht-post-content">
                             <div>
                                 <div class="ht-post-header">
@@ -715,7 +753,7 @@
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
                                 <div class="ht-post-text">${escapeHtml(thread.content)}</div>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
                                 <button class="ht-btn-action" onclick="setReplyingTo('${mainMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${mainMsgId}</button>
                                 ${delBtn}
                             </div>
@@ -725,7 +763,7 @@
                             <div>
                                 <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                 <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Ciutadà'}</div>
-                                <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
+                                <div style="font-size:13px; color:var(--bt-text-main); font-weight:bold;">🇪🇸 Amposta</div>
                                 <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
                             </div>
                         </div>
@@ -785,7 +823,7 @@
                                     ${quoteHtml}
                                     <div class="ht-post-text">${escapeHtml(reply.content)}</div>
                                 </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px;">
                                     <button class="ht-btn-action" onclick="setReplyingTo('${replyMsgId}', '${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon a #${replyMsgId}</button>
                                     ${delReplyBtn}
                                 </div>
@@ -795,7 +833,7 @@
                                 <div>
                                     <a href="profile.html" class="ht-author-name">${escapeHtml(author)}</a>
                                     <div class="ht-author-club">${isAdmin ? '🛡️ Admin' : '💬 Participant'}</div>
-                                    <div style="font-size:13px; color:#111; font-weight:bold;">🇪🇸 Amposta</div>
+                                    <div style="font-size:13px; color:var(--bt-text-main); font-weight:bold;">🇪🇸 Amposta</div>
                                     <div class="ht-author-stats">Aportacions: <b>${userMsgCount}</b></div>
                                 </div>
                             </div>
@@ -803,22 +841,21 @@
                         container.appendChild(card);
                     });
                 } else {
-                    container.innerHTML = `<div style="text-align: center; color: var(--ht-text-muted); padding: 30px; border: 2px solid var(--ht-border); background:#f9fbf8; font-weight: bold;">Encara no hi ha respostes en aquest fil.</div>`;
+                    container.innerHTML = `<div style="text-align: center; color: var(--bt-text-muted); padding: 30px; border: 2px solid var(--bt-border); background:var(--bt-bg-content); font-weight: bold;">Encara no hi ha respostes en aquest fil.</div>`;
                 }
             } catch (err) {
-                container.innerHTML = `<div style="color: #990000; text-align: center; font-weight: bold;">Error al carregar respostes.</div>`;
+                container.innerHTML = `<div style="color: #fca5a5; text-align: center; font-weight: bold;">Error al carregar respostes.</div>`;
             }
         }
 
         function setReplyingTo(msgId, authorName, contentSnippet) {
             replyingToData = { id: msgId, author: authorName, content: contentSnippet };
             
-            // Actualizamos tanto el banner superior como el inferior
             document.querySelectorAll('.replying-to-banner-el').forEach(banner => {
                 banner.style.display = 'block';
-                banner.innerHTML = `<div style="background:#e5f0e3; border:1px solid #99a895; padding:8px 12px; border-radius:3px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
+                banner.innerHTML = `<div style="background:#23193d; border:1px solid var(--bt-border); padding:8px 12px; border-radius:4px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center; color:var(--bt-text-main);">
                     <span>💬 Estàs responent al missatge <b>#${msgId}</b> de <b>@${authorName}</b></span>
-                    <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[Canviar a general]</a>
+                    <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#fca5a5; font-weight:bold; text-decoration:none;">[Canviar a general]</a>
                 </div>`;
             });
 
