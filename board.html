@@ -10,14 +10,13 @@
         .ht-topbar {
             background-color: #0c0814;
             color: #ffffff;
-            padding: 14px 24px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #9333ea;
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
             font-weight: bold;
-            font-size: 16px;
             width: 100%;
             box-sizing: border-box;
             position: fixed;
@@ -27,19 +26,40 @@
         }
         .ht-topbar-nav {
             display: flex;
-            gap: 20px;
+            gap: 10px;
             align-items: center;
+            flex-wrap: nowrap;
         }
-        .ht-topbar-nav a {
+        /* Estilo unificado para TODOS los enlaces de la barra */
+        .ht-topbar a {
             color: #ffffff;
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 4px 8px;
             border-radius: 4px;
+            font-size: 14px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .ht-topbar-nav a:hover, .ht-topbar-nav a.active {
+        .ht-topbar a:hover, .ht-topbar a.active {
             background-color: #9333ea;
             box-shadow: 0 0 10px #a855f7;
+        }
+
+        /* Ajuste responsivo compacto para móviles */
+        @media (max-width: 768px) {
+            .ht-topbar {
+                padding: 8px 10px;
+            }
+            .ht-topbar-nav {
+                gap: 6px;
+            }
+            .ht-topbar a {
+                padding: 3px 6px;
+                font-size: 12px;
+            }
+            body {
+                padding-top: 60px !important;
+            }
         }
 
         body {
@@ -48,7 +68,7 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 0;
-            padding-top: 70px; /* Compensación por la barra fija */
+            padding-top: 75px; /* Compensación por la barra fija */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -60,7 +80,7 @@
             padding: 14px 36px;
             gap: 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            margin-top: 10px;
+            margin-top: 0;
         }
         .tab-btn {
             background: transparent;
@@ -304,12 +324,11 @@
     <div class="ht-topbar">
         <div class="ht-topbar-nav">
             <a href="index.html">🏠 Bit-Towns</a>
-            <a href="board.html" class="active">🏛️ Tauler de Govern</a>
             <a href="community.html">👥 Comunitat</a>
-            <a href="forum.html">💬 Fòrum Oficial</a>
+            <a href="forum.html">💬 Foro</a>
         </div>
-        <div style="font-size: 15px;">
-            <a href="profile.html" style="color:#ffffff; text-decoration:none;">👤 Mi Perfil</a>
+        <div>
+            <a href="profile.html">👤 Mi Perfil</a>
         </div>
     </div>
 
@@ -352,6 +371,14 @@
         ];
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // Resaltar automáticamente la barra superior activa si corresponde
+            const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.ht-topbar a').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -360,7 +387,13 @@
                 await fetchUserProfile(currentUser.id);
             }
 
-            switchTab('colective');
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam === 'individual') {
+                switchTab('individual');
+            } else {
+                switchTab('colective');
+            }
         });
 
         async function fetchUserProfile(userId) {
