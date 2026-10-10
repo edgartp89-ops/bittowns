@@ -216,6 +216,19 @@
         .ht-btn:hover {
             background: #c8dcbc;
         }
+        .ht-btn-action {
+            background: #d4e2d1;
+            color: var(--ht-link);
+            border: 1px solid #8ca384;
+            padding: 4px 10px;
+            font-size: 13px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .ht-btn-action:hover {
+            background: #c2d5be;
+        }
         .ht-btn-danger {
             background: #fce8e8;
             border-color: #d98282;
@@ -267,6 +280,15 @@
             line-height: 1.7;
             white-space: pre-wrap;
             margin-bottom: 20px;
+        }
+        .quoted-box {
+            background: #f4f8f3;
+            border-left: 4px solid var(--ht-accent);
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 12px;
+            border-radius: 0 3px 3px 0;
         }
 
         /* Panel de Autor Derecha */
@@ -451,7 +473,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cxpsktskbvrkwtkolrpl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4cHNrdHNrYnZya3d0a29scnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3QBkxNTc1MjUsImV4cCI6MjEwNzAzMzUyNX0.9RJAEUxalZ3oI9DVWDr8x9s4QPpxWXZwMQBRm9lwVq0';
 
         let supabaseClient;
         let currentUser = null;
@@ -459,6 +481,7 @@
         let threadReplyCounts = {};
         let userMessageCounts = {};
         let userProfilesData = {};
+        let replyingToData = null; // Almacenará la información del mensaje que se está respondiendo
 
         window.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -519,14 +542,12 @@
             }
         }
 
-        // Función para obtener el nick o alias real del usuario
         function getUserNickname(userId, fallbackAuthorName) {
             const profile = userProfilesData[userId];
             if (profile) {
                 const nick = profile.nickname || profile.username || profile.alias || profile.display_name || profile.name;
                 if (nick) return nick;
             }
-            // Si el autor guardado ya es un nick válido y no un email, lo usamos
             if (fallbackAuthorName && !fallbackAuthorName.includes('@')) {
                 return fallbackAuthorName;
             }
@@ -615,7 +636,7 @@
             }
         }
 
-        // VISTA 2: DETALLE DEL HILO
+        // VISTA 2: DETALLE DEL HILO (Con botón de Responder por mensaje)
         async function loadThreadDetail(threadId) {
             const container = document.getElementById('ht-main-content');
             container.innerHTML = `
@@ -635,9 +656,11 @@
                 <div id="ht-thread-main"></div>
 
                 <div class="ht-form-box" style="margin-top: 24px;">
-                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;">💬 Enviar Resposta</div>
+                    <div style="font-weight: bold; color: var(--ht-link); margin-bottom: 10px; font-size: 16px;" id="reply-box-title">💬 Enviar Resposta</div>
+                    <div id="replying-to-banner" style="display: none; margin-bottom: 10px;"></div>
                     <textarea id="reply-content" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReply(${threadId})">Enviar Resposta</button>
+                    <button class="ht-btn" id="cancel-reply-btn" style="display:none; margin-left:8px; background:#ddd;" onclick="cancelReplyingTo()">Cancel·lar</button>
                 </div>
 
                 <div style="font-weight: bold; margin: 24px 0 12px 0; font-size: 16px; color: #111;">Respostes de la Comunitat</div>
@@ -682,7 +705,7 @@
                                 <div class="ht-post-text">${escapeHtml(thread.content)}</div>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
-                                <span></span>
+                                <button class="ht-btn-action" onclick="setReplyingTo('${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(thread.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon</button>
                                 ${delBtn}
                             </div>
                         </div>
@@ -728,6 +751,11 @@
                             delReplyBtn = `<button class="ht-btn ht-btn-danger" onclick="deleteReply(${reply.id}, ${threadId})">🗑️ Esborrar</button>`;
                         }
 
+                        let quoteHtml = '';
+                        if (reply.reply_to_author && reply.reply_to_content) {
+                            quoteHtml = `<div class="quoted-box"><b>@${escapeHtml(reply.reply_to_author)}:</b> "${escapeHtml(reply.reply_to_content)}"</div>`;
+                        }
+
                         const card = document.createElement('div');
                         card.className = 'ht-post-box ht-reply-item';
                         card.innerHTML = `
@@ -737,10 +765,11 @@
                                         <span>📅 ${new Date(reply.created_at).toLocaleString()}</span>
                                         <span>#Rèplica</span>
                                     </div>
+                                    ${quoteHtml}
                                     <div class="ht-post-text">${escapeHtml(reply.content)}</div>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e5e9e2; padding-top:12px;">
-                                    <span></span>
+                                    <button class="ht-btn-action" onclick="setReplyingTo('${escapeHtml(author).replace(/'/g, "\\'")}', '${escapeHtml(reply.content.substring(0, 80)).replace(/'/g, "\\'")}')">💬 Respon</button>
                                     ${delReplyBtn}
                                 </div>
                             </div>
@@ -764,6 +793,27 @@
             }
         }
 
+        function setReplyingTo(authorName, contentSnippet) {
+            replyingToData = { author: authorName, content: contentSnippet };
+            const banner = document.getElementById('replying-to-banner');
+            banner.style.display = 'block';
+            banner.innerHTML = `<div style="background:#e5f0e3; border:1px solid #99a895; padding:8px 12px; border-radius:3px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
+                <span>💬 Responent a <b>@${authorName}</b>: "${contentSnippet}..."</span>
+                <a href="javascript:void(0)" onclick="cancelReplyingTo()" style="color:#990000; font-weight:bold; text-decoration:none;">[✕]</a>
+            </div>`;
+            document.getElementById('reply-box-title').innerText = `💬 Respon a @${authorName}`;
+            document.getElementById('cancel-reply-btn').style.display = 'inline-block';
+            document.getElementById('reply-content').focus();
+        }
+
+        function cancelReplyingTo() {
+            replyingToData = null;
+            document.getElementById('replying-to-banner').style.display = 'none';
+            document.getElementById('replying-to-banner').innerHTML = '';
+            document.getElementById('reply-box-title').innerText = '💬 Enviar Resposta';
+            document.getElementById('cancel-reply-btn').style.display = 'none';
+        }
+
         async function createThread() {
             if (!currentUser) return;
             const title = document.getElementById('thread-title').value.trim();
@@ -773,7 +823,6 @@
                 return;
             }
             try {
-                // Obtenemos el nick real del perfil del usuario logueado
                 const profile = userProfilesData[currentUser.id];
                 const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
 
@@ -800,14 +849,24 @@
                 const profile = userProfilesData[currentUser.id];
                 const authorName = (profile && (profile.nickname || profile.username || profile.alias || profile.display_name)) || currentUser.email.split('@')[0];
 
-                const { error } = await supabaseClient.from('forum_replies').insert({
+                const insertData = {
                     thread_id: threadId,
                     user_id: currentUser.id,
                     author_name: authorName,
                     content: content
-                });
+                };
+
+                // Si se está respondiendo a un mensaje específico, añadimos la cita
+                if (replyingToData) {
+                    insertData.reply_to_author = replyingToData.author;
+                    insertData.reply_to_content = replyingToData.content;
+                }
+
+                const { error } = await supabaseClient.from('forum_replies').insert(insertData);
                 if (error) { alert("Error al enviar la resposta."); return; }
+                
                 document.getElementById('reply-content').value = '';
+                cancelReplyingTo();
                 await loadForumData();
                 loadThreadDetail(threadId);
             } catch (err) { console.error(err); }
@@ -844,6 +903,7 @@
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
