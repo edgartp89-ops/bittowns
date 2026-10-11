@@ -307,19 +307,31 @@
             </div>
         </div>
 
-        <!-- 4. Sistema de Batallas y Ligas -->
+        <!-- 4. Sistema de Batallas, Órdenes Tácticas y Ligas -->
         <div class="wp-section">
-            <h2>⚔️ 4. Sistema de Batallas y Ligas</h2>
+            <h2>⚔️ 4. Sistema de Batallas, Estrategia y Ligas</h2>
             <p>
-                La competición se divide en dos vertientes interconectadas que funcionan mediante temporadas periódicas:
+                En Bit-Towns, la victoria no depende únicamente de tener más puntos acumulados: <b>la estrategia táctica en cada enfrentamiento puede inclinar la balanza a favor del contrincante más ingenioso</b>.
             </p>
+
+            <h3>🎯 Órdenes Tácticas e Instrucciones de Combate</h3>
+            <p>
+                Antes de cada jornada de simulación, los ciudadanos configuran sus <b>Órdenes e Instrucciones de Batalla</b>. Estas directrices estratégicas modifican la conducta del simulador y aplican bonificadores y penalizadores condicionales durante las distintas fases del combate:
+            </p>
+            <div class="wp-grid">
+                <div class="wp-card">
+                    <h4>🛡️ Postura Táctica (Ofensiva / Defensiva / Equilibrada)</h4>
+                    <p>Permite potenciar atributos específicos a costa de asumir riesgos frente a contraataques o estilos rivales.</p>
+                </div>
+                <div class="wp-card">
+                    <h4>⚡ Instrucciones Especiales</h4>
+                    <p>Configuración de prioridades de choque (presión al punto débil del rival, contraofensiva en fase tardía, ahorro de recursos o bloqueo de reputación).</p>
+                </div>
+            </div>
 
             <h3>🏆 Competición Individual (Ligas de 4 a 6 Ciudadanos)</h3>
             <p>
-                Cada ciudadano queda encuadrado en un grupo de <b>4 a 6 participantes</b> de nivel similar. A lo largo de la temporada se celebran jornadas de batalla mediante un <b>simulador de combates</b> automatizado.
-            </p>
-            <p>
-                El simulador enfrenta los parámetros acumulados del Ciudadano A contra el Ciudadano B, ejecutando un cálculo que determina el resultado de victoria o derrota en función de sus atributos acumulados y coeficientes de estrategia.
+                Cada ciudadano queda encuadrado en un grupo de <b>4 a 6 participantes</b> de nivel similar. A lo largo de la temporada se celebran jornadas donde el <b>simulador de combates</b> cruza tanto los parámetros acumulados como las órdenes elegidas por cada duelista.
             </p>
 
             <h3>📉 Ascensos y Descensos Individuales</h3>
@@ -329,10 +341,7 @@
 
             <h3>🛡️ Guerra de Barrios (Entre Temporadas)</h3>
             <p>
-                Al concluir la liga individual, se activa el evento de <b>Batalla de Barrios</b>. Los ciudadanos representantes de cada federación se enfrentan en duelos individuales puntuables.
-            </p>
-            <p>
-                Los puntos sumados por cada duelista determinan qué barrio se proclama campeón de Amposta y qué barrios <b>ascienden o descienden en la Liga Global de Federaciones</b>, obteniendo bonificadores únicos para sus vecinos en la siguiente temporada.
+                Al concluir la liga individual, se activa el evento de <b>Batalla de Barrios</b>. Los ciudadanos representantes de cada federación coordinan sus órdenes tácticas para enfrentarse en duelos individuales puntuables que determinarán qué barrios <b>ascienden o descienden en la Liga Global de Federaciones</b>.
             </p>
         </div>
 
@@ -367,6 +376,16 @@
         <div class="wp-section">
             <h2>❓ Preguntas Frecuentes (FAQ)</h2>
             <p>Resuelve las dudas más comunes sobre la dinámica y el funcionamiento de Bit-Towns:</p>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Un jugador con menos puntos de poder puede ganar a uno con más puntos?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <b>Sí, rotundamente.</b> Las órdenes tácticas e instrucciones elegidas antes del combate tienen un peso crucial en el simulador. Si eliges una estrategia que neutraliza la postura del rival o aprovechas sus puntos débiles condicionales, puedes remontar combates frente a ciudadanos con mayor poder base.
+                </div>
+            </div>
 
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
@@ -414,27 +433,17 @@
                     <span class="faq-toggle-icon">▼</span>
                 </div>
                 <div class="faq-answer">
-                    El simulador analiza de forma objetiva los parámetros de poder, experiencia acumulada y bonificadores de cada contrincante. Genera un desglose del combate en varias fases, determinando el ganador en función del balance final de fuerzas.
+                    El simulador analiza tanto los parámetros acumulados como las órdenes e instrucciones tácticas de ambos combatientes. Ejecuta una simulación por fases evaluando bonificadores condicionales y contrarrestos, determinando el ganador en función del rendimiento estratégico resultante.
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>¿Qué pasa si desdiendo de categoría en la liga?</span>
+                    <span>¿Qué pasa si desciendo de categoría en la liga?</span>
                     <span class="faq-toggle-icon">▼</span>
                 </div>
                 <div class="faq-answer">
-                    Si desciendes a una división inferior, competirás contra un grupo de ciudadanos de un rango de poder más accesible, lo que te facilitará rehacer tu estrategia, sumar victorias y luchar por el ascenso en la siguiente temporada.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>¿Los usuarios veteranos son siempre invencibles?</span>
-                    <span class="faq-toggle-icon">▼</span>
-                </div>
-                <div class="faq-answer">
-                    No. Aunque la antigüedad concede base de poder, el sistema de ligas agrupa a los jugadores por categorías de nivel equivalente. Además, la participación constante en la temporada actual aplica multiplicadores temporales que permiten a ciudadanos nuevos competir con éxito.
+                    Si desciendes a una división inferior, competirás contra un grupo de ciudadanos de un rango de poder más accesible, lo que te facilitará rehacer tu estrategia táctica, sumar victorias y luchar por el ascenso en la siguiente temporada.
                 </div>
             </div>
 
