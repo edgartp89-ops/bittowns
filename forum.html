@@ -334,6 +334,13 @@
             margin-bottom: 14px;
             text-align: left !important;
         }
+        .ht-post-text img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--bt-border);
+        }
         .ht-edit-notice {
             font-size: 12.5px;
             color: var(--bt-text-muted);
@@ -439,7 +446,7 @@
         }
         .ht-input, .ht-textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border: 2px solid var(--bt-border);
             border-radius: 4px;
             font-family: inherit;
@@ -455,7 +462,7 @@
             border-color: var(--bt-neon);
             box-shadow: 0 0 10px var(--bt-neon-glow);
         }
-        .ht-textarea { min-height: 120px; resize: vertical; }
+        .ht-textarea { min-height: 220px; resize: vertical; }
 
         /* Filas de la lista de hilos */
         .ht-thread-row {
@@ -659,6 +666,55 @@
             return '🏛️';
         }
 
+        // --- FUNCIONES DE FORMATO E IMAGEN ---
+        function getFormattingToolbar(textareaId) {
+            return `
+                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                    <button type="button" class="ht-btn-action" onclick="insertFormatting('${textareaId}', '[b]', '[/b]')"><b>B</b></button>
+                    <button type="button" class="ht-btn-action" onclick="insertFormatting('${textareaId}', '[i]', '[/i]')"><i>I</i></button>
+                    <button type="button" class="ht-btn-action" onclick="promptInsertImage('${textareaId}')">🖼️ Imatge</button>
+                </div>
+            `;
+        }
+
+        function insertFormatting(textareaId, tagStart, tagEnd) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea) return;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selectedText = text.substring(start, end);
+            textarea.value = text.substring(0, start) + tagStart + selectedText + tagEnd + text.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + tagStart.length, end + tagStart.length);
+        }
+
+        function promptInsertImage(textareaId) {
+            const url = prompt("Introdueix l'enllaç URL de la imatge:");
+            if (!url) return;
+            const textarea = document.getElementById(textareaId);
+            if (!textarea) return;
+            const start = textarea.selectionStart;
+            const text = textarea.value;
+            const imgTag = `[img]${url}[/img]`;
+            textarea.value = text.substring(0, start) + imgTag + text.substring(start);
+            textarea.focus();
+        }
+
+        function formatPostContent(text) {
+            if (!text) return '';
+            let escaped = escapeHtml(text);
+            // Negrita [b]...[/b] o **...**
+            escaped = escaped.replace(/[b]([\s\S]*?)\[\/b\]/g, '<strong>$1</strong>');
+            escaped = escaped.replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>');
+            // Cursiva [i]...[/i] o *...*
+            escaped = escaped.replace(/[i]([\s\S]*?)\[\/i\]/g, '<em>$1</em>');
+            escaped = escaped.replace(/\*([\s\S]*?)\*/g, '<em>$1</em>');
+            // Imatges [img]...[/img]
+            escaped = escaped.replace(/[img]([\s\S]*?)\[\/img\]/g, '<img src="$1" alt="Imatge" />');
+            return escaped;
+        }
+
         // VISTA 1: LISTADO DE HILOS
         async function loadThreadsList() {
             const container = document.getElementById('ht-main-content');
@@ -670,6 +726,7 @@
                 <div class="ht-form-box">
                     <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;">✍️ Crear Nou Fil de Debat</div>
                     <input type="text" id="thread-title" class="ht-input" placeholder="Títol del fil..." />
+                    ${getFormattingToolbar('thread-content')}
                     <textarea id="thread-content" class="ht-textarea" placeholder="Escriu el teu missatge..."></textarea>
                     <button class="ht-btn" onclick="createThread()">Publicar Fil</button>
                 </div>
@@ -750,6 +807,7 @@
                 <div class="ht-form-box" style="margin-top: 24px;">
                     <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
                     <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
+                    ${getFormattingToolbar('reply-content')}
                     <textarea id="reply-content" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReply(${threadId})">Enviar Resposta</button>
                     <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#2a164f; color:#fca5a5;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
@@ -764,6 +822,7 @@
                 <div class="ht-form-box" style="margin-top: 30px;">
                     <div style="font-weight: bold; color: var(--bt-link); margin-bottom: 10px; font-size: 16px;" class="reply-box-title-el">💬 Enviar Resposta General al Fil</div>
                     <div class="replying-to-banner-el" style="display: none; margin-bottom: 10px;"></div>
+                    ${getFormattingToolbar('reply-content-bottom')}
                     <textarea id="reply-content-bottom" class="ht-textarea" placeholder="Escriu la teva rèplica..."></textarea>
                     <button class="ht-btn" onclick="createReplyFromBottom(${threadId})">Enviar Resposta</button>
                     <button class="ht-btn cancel-reply-btn-el" style="display:none; margin-left:8px; background:#2a164f; color:#fca5a5;" onclick="cancelReplyingTo()">Respondre a tot el fil</button>
@@ -816,7 +875,7 @@
                                     <span><b>ID: #${mainMsgId}</b> &bull; Missatge Principal</span>
                                 </div>
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
-                                <div class="ht-post-text" id="thread-text-${thread.id}">${escapeHtml(thread.content)}</div>
+                                <div class="ht-post-text" id="thread-text-${thread.id}">${formatPostContent(thread.content)}</div>
                                 <div id="thread-notice-${thread.id}">${editNoticeHtml}</div>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
@@ -902,7 +961,7 @@
                                         <span><b>ID: #${replyMsgId}</b> &bull; ${responseInfoText}</span>
                                     </div>
                                     ${quoteHtml}
-                                    <div class="ht-post-text" id="reply-text-${reply.id}">${escapeHtml(reply.content)}</div>
+                                    <div class="ht-post-text" id="reply-text-${reply.id}">${formatPostContent(reply.content)}</div>
                                     <div id="reply-notice-${reply.id}">${editNoticeHtml}</div>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
@@ -940,7 +999,8 @@
             const currentContent = activeThreadsData[threadId] || textDiv.innerText;
 
             textDiv.innerHTML = `
-                <textarea id="edit-input-thread-${threadId}" class="ht-textarea" style="text-align:left;">${currentContent.trim()}</textarea>
+                ${getFormattingToolbar(`edit-input-thread-${threadId}`)}
+                <textarea id="edit-input-thread-${threadId}" class="ht-textarea" style="text-align:left; min-height:250px;">${currentContent.trim()}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditThread(${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
@@ -967,7 +1027,7 @@
                 }
                 
                 activeThreadsData[threadId] = newContent;
-                document.getElementById(`thread-text-${threadId}`).innerText = newContent;
+                document.getElementById(`thread-text-${threadId}`).innerHTML = formatPostContent(newContent);
                 
                 const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
                 const editDate = new Date().toLocaleString();
@@ -984,7 +1044,8 @@
             const currentContent = activeRepliesData[replyId] || textDiv.innerText;
 
             textDiv.innerHTML = `
-                <textarea id="edit-input-reply-${replyId}" class="ht-textarea" style="text-align:left;">${currentContent.trim()}</textarea>
+                ${getFormattingToolbar(`edit-input-reply-${replyId}`)}
+                <textarea id="edit-input-reply-${replyId}" class="ht-textarea" style="text-align:left; min-height:250px;">${currentContent.trim()}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditReply(${replyId}, ${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
@@ -1011,7 +1072,7 @@
                 }
 
                 activeRepliesData[replyId] = newContent;
-                document.getElementById(`reply-text-${replyId}`).innerText = newContent;
+                document.getElementById(`reply-text-${replyId}`).innerHTML = formatPostContent(newContent);
 
                 const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
                 const editDate = new Date().toLocaleString();
