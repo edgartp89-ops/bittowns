@@ -956,25 +956,28 @@
             }
             try {
                 const nowIso = new Date().toISOString();
-                const { error } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('forum_threads')
                     .update({ content: newContent, updated_at: nowIso })
-                    .eq('id', threadId);
+                    .eq('id', threadId)
+                    .select();
 
                 if (error) {
-                    alert("Error al guardar la edición: " + error.message);
+                    alert("Error al guardar la edición en Supabase: " + error.message);
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    alert("Aviso: No se pudo actualizar en la base de datos. Revisa las políticas RLS (Row Level Security) de Supabase para la tabla forum_threads.");
                     return;
                 }
                 
-                activeThreadsData[threadId] = newContent;
-                document.getElementById(`thread-text-${threadId}`).innerText = newContent;
-                
-                const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
-                const editDate = new Date().toLocaleString();
-                document.getElementById(`thread-notice-${threadId}`).innerHTML = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
+                // Recargamos el hilo desde la base de datos para asegurar persistencia real tras actualizar
+                await loadThreadDetail(threadId);
 
             } catch (err) {
                 console.error(err);
+                alert("Error inesperado al guardar la edición.");
             }
         }
 
@@ -1000,25 +1003,27 @@
             }
             try {
                 const nowIso = new Date().toISOString();
-                const { error } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('forum_replies')
                     .update({ content: newContent, updated_at: nowIso })
-                    .eq('id', replyId);
+                    .eq('id', replyId)
+                    .select();
 
                 if (error) {
-                    alert("Error al guardar la edición: " + error.message);
+                    alert("Error al guardar la edición en Supabase: " + error.message);
                     return;
                 }
 
-                activeRepliesData[replyId] = newContent;
-                document.getElementById(`reply-text-${replyId}`).innerText = newContent;
+                if (!data || data.length === 0) {
+                    alert("Aviso: No se pudo actualizar la respuesta en la base de datos. Revisa las políticas RLS de Supabase.");
+                    return;
+                }
 
-                const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
-                const editDate = new Date().toLocaleString();
-                document.getElementById(`reply-notice-${replyId}`).innerHTML = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
+                await loadThreadDetail(threadId);
 
             } catch (err) {
                 console.error(err);
+                alert("Error inesperado al guardar la respuesta.");
             }
         }
 
