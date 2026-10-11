@@ -3,130 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whitepaper - Bit-Towns</title>
+    <title>Whitepaper & FAQ — Bit-Towns</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
     <style>
+        :root {
+            --bt-bg-top: #0c0814;
+            --bt-bg-base: #06040a;
+            --bt-bg-sidebar: #130d22;
+            --bt-bg-content: #18112c;
+            --bt-border: #4a2c82;
+            --bt-border-dark: #2a164f;
+            --bt-text-main: #f3f0ff;
+            --bt-text-muted: #b8aedc;
+            --bt-link: #d8b4fe;
+            --bt-accent: #9333ea;
+            --bt-neon: #a855f7;
+            --bt-neon-glow: rgba(168, 85, 247, 0.35);
+        }
+
         body {
-            background-color: #0b0f19;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bt-bg-base);
+            color: var(--bt-text-main);
+            font-family: Arial, Tahoma, Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
         }
-        .container {
-            max-width: 600px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .header {
+
+        /* Barra Superior Bit-Towns Unificada */
+        .ht-topbar {
+            background-color: var(--bt-bg-top);
+            color: #ffffff;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-        .back-btn {
-            color: #00f0ff;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: rgba(0, 240, 255, 0.05);
+            border-bottom: 2px solid var(--bt-accent);
+            box-shadow: 0 0 15px var(--bt-neon-glow);
             font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
-        .back-btn:hover {
-            background: rgba(0, 240, 255, 0.2);
+        .ht-topbar-nav {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: nowrap;
         }
-        h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, #00f0ff, #7000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .ht-topbar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .ht-topbar a:hover, .ht-topbar a.active {
+            background-color: var(--bt-accent);
+            box-shadow: 0 0 10px var(--bt-neon);
+        }
+
+        /* Contenedor Principal */
+        .wp-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 80px auto 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        /* Héroe / Cabecera del Whitepaper */
+        .wp-header {
+            background: var(--bt-bg-sidebar);
+            border: 2px solid var(--bt-border);
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px var(--bt-neon-glow);
+        }
+        .wp-header h1 {
+            color: var(--bt-link);
+            font-size: 32px;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 10px var(--bt-neon);
+        }
+        .wp-header p {
+            color: var(--bt-text-muted);
+            font-size: 16px;
             margin: 0;
         }
-        .subtitle {
-            color: #a0aec0;
-            font-size: 0.95rem;
-            margin-bottom: 25px;
-            text-align: center;
+
+        /* Secciones del Documento */
+        .wp-section {
+            background: var(--bt-bg-content);
+            border: 2px solid var(--bt-border);
+            border-radius: 6px;
+            padding: 26px 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        .section-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .section-card h2 {
+        .wp-section h2 {
+            color: #ffffff;
+            font-size: 22px;
+            border-bottom: 2px solid var(--bt-border-dark);
+            padding-bottom: 10px;
             margin-top: 0;
-            color: #00f0ff;
-            font-size: 1.15rem;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        .section-card p, .section-card li {
-            color: #a0aec0;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        ul {
-            padding-left: 20px;
-            margin: 10px 0 0 0;
-        }
-        .legal-notice {
-            color: #718096;
-            font-size: 0.75rem;
-            line-height: 1.4;
-            text-align: center;
+        .wp-section h3 {
+            color: var(--bt-link);
+            font-size: 18px;
             margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 15px;
+            margin-bottom: 10px;
+        }
+        .wp-section p {
+            font-size: 15.5px;
+            color: var(--bt-text-main);
+            margin-bottom: 14px;
+            line-height: 1.7;
+        }
+
+        /* Rejilla de Características */
+        .wp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .wp-card {
+            background: var(--bt-bg-sidebar);
+            border: 1px solid var(--bt-border);
+            border-radius: 4px;
+            padding: 16px 20px;
+        }
+        .wp-card h4 {
+            color: var(--bt-neon);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }
+        .wp-card p {
+            font-size: 14px;
+            margin: 0;
+            color: var(--bt-text-muted);
+        }
+
+        /* Estilos de la Sección FAQ */
+        .faq-item {
+            border: 1px solid var(--bt-border-dark);
+            background: var(--bt-bg-sidebar);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 14px 18px;
+            font-weight: bold;
+            color: var(--bt-link);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+        .faq-question:hover {
+            background: rgba(147, 51, 234, 0.2);
+        }
+        .faq-answer {
+            padding: 16px 18px;
+            border-top: 1px solid var(--bt-border-dark);
+            background: var(--bt-bg-content);
+            color: var(--bt-text-main);
+            font-size: 15px;
+            line-height: 1.6;
+            display: none;
+        }
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+        .faq-toggle-icon {
+            font-size: 14px;
+            color: var(--bt-neon);
+            transition: transform 0.2s ease;
+        }
+        .faq-item.active .faq-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Adaptación Móvil */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            .wp-container {
+                margin-top: 70px;
+                padding: 0 12px;
+            }
+            .wp-header {
+                padding: 20px;
+            }
+            .wp-header h1 {
+                font-size: 24px;
+            }
+            .wp-section {
+                padding: 18px 16px;
+            }
+            .wp-section h2 {
+                font-size: 19px;
+            }
+            .wp-section p {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-btn">← Volver</a>
-            <h1>Whitepaper</h1>
-        </div>
-        <p class="subtitle">Documento Oficial & Arquitectura de Bit-Towns</p>
 
-        <div class="section-card">
-            <h2>🌍 1. Visión General</h2>
-            <p>Bit-Towns es un Social-MMO "Phygital" que fusiona la geografía del mundo real con el desarrollo urbano digital, el comercio local y la gobernanza democrática descentralizada. Arrancamos con un piloto inmersivo en Amposta.</p>
+    <!-- Barra Superior Bit-Towns Unificada -->
+    <div class="ht-topbar">
+        <div class="ht-topbar-nav">
+            <a href="index.html">🏠 Bit-Towns</a>
+            <a href="board.html">🏛️ Tauler</a>
+            <a href="forum.html">💬 Fòrum</a>
+            <a href="whitepaper.html" class="active">📜 Whitepaper</a>
         </div>
-
-        <div class="section-card">
-            <h2>⚙️ 2. Mecánicas del Juego</h2>
-            <p>La experiencia combina el entorno físico y digital mediante bucles diarios:</p>
-            <ul>
-                <li><strong>Quests & XP:</strong> Misiones en ubicaciones reales de la ciudad para ganar experiencia y avanzar de nivel.</li>
-                <li><strong>Token $TOWN:</strong> Activo de utilidad diseñado para dinamizar la economía interna y el comercio de proximidad.</li>
-                <li><strong>Identidad SBT:</strong> Tokens Soulbound que acreditan la reputación y los logros ciudadanos de forma intransferible.</li>
-            </ul>
-        </div>
-
-        <div class="section-card">
-            <h2>🏛️ 3. Gobernanza y Economía Local</h2>
-            <p>Las decisiones del ecosistema se toman de manera democrática mediante votaciones comunitarias. Conectamos directamente a los usuarios con los comercios y espacios de la ciudad, generando un impacto real y sostenible en el territorio.</p>
-        </div>
-
-        <div class="section-card">
-            <h2>🚀 4. Roadmap del Piloto</h2>
-            <p><strong>Fase 1:</strong> Lanzamiento de infraestructura digital y comunidad inicial.<br>
-            <strong>Fase 2:</strong> Despliegue del mapa interactivo y primeras pruebas piloto en Amposta.<br>
-            <strong>Fase 3:</strong> Integración de comercios locales y despliegue del sistema de recompensas.</p>
-        </div>
-
-        <div class="legal-notice">
-            <p>Bit-Towns és un projecte en fase de desenvolupament conceptual. Els elements econòmics i tècnics descrits estan subjectes a modificacions durant les fases de validació.</p>
+        <div>
+            <a href="profile.html">👤 Mi Perfil</a>
         </div>
     </div>
+
+    <!-- Contenido Principal -->
+    <div class="wp-container">
+
+        <!-- Cabecera / Intro -->
+        <div class="wp-header">
+            <h1>📜 Whitepaper & Visión General</h1>
+            <p>Guía oficial de funcionamiento, economía social y dinámicas competitivas de <b>Bit-Towns Amposta</b>.</p>
+        </div>
+
+        <!-- 1. Visión y Concepto -->
+        <div class="wp-section">
+            <h2>🏙️ 1. ¿Qué es Bit-Towns?</h2>
+            <p>
+                <b>Bit-Towns</b> es una plataforma de simulación cívica y juego de estrategia social ambientada en una versión digital de la ciudad de Amposta. 
+                Cada jugador encarna a un <b>Ciudadano</b> que forma parte activa del tejido urbano, participando en el debate público, gestionando propiedades, 
+                acumulando influencia y defendiendo el honor de su barrio en competiciones periódicas.
+            </p>
+            <p>
+                A través de la interacción en el foro, el uso del Tauler de proyectos locales y la gestión de la reputación, los ciudadanos construyen una trayectoria vital que se traduce directamente en su <b>Poder Ciudadano</b>.
+            </p>
+        </div>
+
+        <!-- 2. Barrios y Federaciones -->
+        <div class="wp-section">
+            <h2>🛡️ 2. Barrios y Federaciones</h2>
+            <p>
+                La ciudad se divide en diferentes barrios emblemáticos (<i>Grau, Valletes, Pla d'Empúries, Xanqueta, Centre...</i>). Al unirse a la ciudad, cada ciudadano se filia a un barrio concreto, el cual opera como una verdadera <b>Federación</b>.
+            </p>
+            <div class="wp-grid">
+                <div class="wp-card">
+                    <h4>Identidad y Pertenece</h4>
+                    <p>Pertenecer a un barrio concede voz dentro de su comunidad local y contribuye al marcador colectivo de la federación.</p>
+                </div>
+                <div class="wp-card">
+                    <h4>Cooperación Vecinal</h4>
+                    <p>Los ciudadanos más experimentados de cada barrio ayudan y orientan a las nuevas incorporaciones para fortalecer el grupo en las batallas entre barrios.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Parámetros de Poder y Vida del Ciudadano -->
+        <div class="wp-section">
+            <h2>⚡ 3. Parámetros de Poder del Ciudadano</h2>
+            <p>
+                Un ciudadano no gana poder de la noche a la mañana: **los puntos de poder se acumulan con los años de vida en la ciudad** y con la participación real en la comunidad.
+            </p>
+            <div class="wp-grid">
+                <div class="wp-card">
+                    <h4>⏳ Antigüedad y Residencia</h4>
+                    <p>La permanencia activa en la ciudad incrementa los atributos de experiencia e influencia histórica.</p>
+                </div>
+                <div class="wp-card">
+                    <h4>💬 Participación en la Comunitat</h4>
+                    <p>Publicar, aportar propuestas en el Tauler y contribuir a debates saludables suma bonificadores directos de reputación.</p>
+                </div>
+                <div class="wp-card">
+                    <h4>🏛️ Gestión de Propiedades</h4>
+                    <p>La administración y conservación de infraestructuras o parcelas privadas genera valor cívico acumulado.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Sistema de Batallas y Ligas -->
+        <div class="wp-section">
+            <h2>⚔️ 4. Sistema de Batallas y Ligas</h2>
+            <p>
+                La competición se divide en dos vertientes interconectadas que funcionan mediante temporadas periódicas:
+            </p>
+
+            <h3>🏆 Competición Individual (Ligas de 4 a 6 Ciudadanos)</h3>
+            <p>
+                Cada ciudadano queda encuadrado en un grupo de **4 a 6 participantes** de nivel similar. A lo largo de la temporada se celebran jornadas de batalla mediante un **simulador de combates** automatizado.
+            </p>
+            <p>
+                El simulador enfrenta los parámetros acumulados del Ciudadano A contra el Ciudadano B, ejecutando un cálculo que determina el resultado de victoria o derrota en función de sus atributos acumulados y coeficientes de estrategia.
+            </p>
+
+            <h3>📉 Ascensos y Descensos Individuales</h3>
+            <p>
+                Al finalizar cada temporada, la clasificación del grupo determina los movimientos: los primeros clasificados **ascienden** a divisiones superiores, mientras que los últimos **descienden** de categoría.
+            </p>
+
+            <h3>🛡️ Guerra de Barrios (Entre Temporadas)</h3>
+            <p>
+                Al concluir la liga individual, se activa el evento de **Batalla de Barrios**. Los ciudadanos representantes de cada federación se enfrentan en duelos individuales puntuables.
+            </p>
+            <p>
+                Los puntos sumados por cada duelista determinan qué barrio se proclama campeón de Amposta y qué barrios **ascienden o descienden en la Liga Global de Federaciones**, obteniendo bonificadores únicos para sus vecinos en la siguiente temporada.
+            </p>
+        </div>
+
+        <!-- 5. Preguntas Frecuentes (FAQ) -->
+        <div class="wp-section">
+            <h2>❓ Preguntas Frecuentes (FAQ)</h2>
+            <p>Resuelve las dudas más comunes sobre la dinámica y el funcionamiento de Bit-Towns:</p>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Cómo se consiguen más Puntos de Poder?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    El poder se acumula progresivamente con el tiempo mediante la antigüedad de tu cuenta, tu actividad en el fòrum, la participación en las votaciones del Tauler y el mantenimiento de tus propiedades en la ciudad.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Puedo cambiarme de Barrio?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Sí, pero la solicitud de cambio de barrio tiene un período de carencia y requiere la aceptación del traslado para evitar desequilibrios en las batallas entre federaciones.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Cómo funciona el Simulador de Batallas?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    El simulador analiza de forma objetiva los parámetros de poder, experiencia acumulada y bonificadores de cada contrincante. Genera un desglose del combate en varias fases, determinando el ganador en función del balance final de fuerzas.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Qué pasa si desciendo de categoría en la liga?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Si desciendes a una división inferior, competirás contra un grupo de ciudadanos de un rango de poder más accesible, lo que te facilitará rehacer tu estrategia, sumar victorias y luchar por el ascenso en la siguiente temporada.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Los usuarios veteranos son siempre invencibles?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    No. Aunque la antigüedad concede base de poder, el sistema de ligas agrupa a los jugadores por categorías de nivel equivalente. Además, la participación constante en la temporada actual aplica multiplicadores temporales que permiten a ciudadanos nuevos competir con éxito.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>¿Qué ventajas obtiene mi Barrio si ganamos la liga de federaciones?</span>
+                    <span class="faq-toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    El barrio ganador obtiene ventajas pasivas durante la siguiente temporada, como descuentos en proyectos del Tauler, insignias exclusivas en el foro y mayor presupuesto comunitario para todos sus integrantes.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Función para abrir y cerrar preguntas frecuentes
+        function toggleFaq(element) {
+            const item = element.parentElement;
+            item.classList.toggle('active');
+        }
+    </script>
 </body>
 </html>
