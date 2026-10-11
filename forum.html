@@ -196,6 +196,7 @@
             padding: 24px 30px;
             box-sizing: border-box;
             background-color: var(--bt-bg-base);
+            text-align: left !important;
         }
 
         /* Ruta / Migas de Pan */
@@ -207,6 +208,7 @@
             padding: 10px 16px;
             border: 1px solid var(--bt-border);
             border-radius: 4px;
+            text-align: left !important;
         }
         .ht-breadcrumbs a {
             color: var(--bt-link);
@@ -293,6 +295,7 @@
             background: var(--bt-bg-content);
             border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            text-align: left !important;
         }
         @media (max-width: 768px) {
             .ht-post-box {
@@ -304,6 +307,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            text-align: left !important;
         }
         .ht-post-header {
             display: flex;
@@ -320,6 +324,7 @@
             font-weight: bold;
             color: var(--bt-text-main);
             margin-bottom: 12px;
+            text-align: left !important;
         }
         .ht-post-text {
             font-size: 16px;
@@ -327,6 +332,7 @@
             line-height: 1.7;
             white-space: pre-wrap;
             margin-bottom: 14px;
+            text-align: left !important;
         }
         .ht-edit-notice {
             font-size: 12.5px;
@@ -336,6 +342,7 @@
             margin-bottom: 15px;
             border-top: 1px dashed var(--bt-border-dark);
             padding-top: 6px;
+            text-align: left !important;
         }
         .quoted-box {
             background: #110b20;
@@ -346,6 +353,7 @@
             margin-bottom: 14px;
             border-radius: 0 4px 4px 0;
             box-shadow: inset 0 0 10px rgba(168, 85, 247, 0.08);
+            text-align: left !important;
         }
 
         /* Panel de Autor Derecha */
@@ -427,6 +435,7 @@
             margin-bottom: 24px;
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: left !important;
         }
         .ht-input, .ht-textarea {
             width: 100%;
@@ -439,6 +448,7 @@
             box-sizing: border-box;
             background: var(--bt-bg-content);
             color: var(--bt-text-main);
+            text-align: left !important;
         }
         .ht-input:focus, .ht-textarea:focus {
             outline: none;
@@ -458,6 +468,7 @@
             align-items: center;
             border-radius: 4px;
             transition: all 0.2s ease;
+            text-align: left !important;
         }
         .ht-thread-row:hover {
             background: #1f1435;
@@ -553,6 +564,8 @@
         let userMessageCounts = {};
         let userProfilesData = {};
         let replyingToData = null;
+        let activeThreadsData = {};
+        let activeRepliesData = {};
 
         window.addEventListener('DOMContentLoaded', async () => {
             const currentPath = window.location.pathname.split('/').pop() || 'index.html';
@@ -769,6 +782,7 @@
                     return;
                 }
 
+                activeThreadsData[thread.id] = thread.content;
                 document.getElementById('ht-bc-title').innerText = thread.title;
                 const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
                 const author = getUserNickname(thread.user_id, thread.author_name);
@@ -802,10 +816,8 @@
                                     <span><b>ID: #${mainMsgId}</b> &bull; Missatge Principal</span>
                                 </div>
                                 <div class="ht-post-title">📌 ${escapeHtml(thread.title)}</div>
-                                <div class="ht-post-text" id="thread-text-${thread.id}">
-                                    ${escapeHtml(thread.content)}
-                                </div>
-                                ${editNoticeHtml}
+                                <div class="ht-post-text" id="thread-text-${thread.id}">${escapeHtml(thread.content)}</div>
+                                <div id="thread-notice-${thread.id}">${editNoticeHtml}</div>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
                                 <div style="display:flex; gap:8px;">
@@ -847,6 +859,7 @@
                     const isUserAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                     replies.forEach((reply, index) => {
+                        activeRepliesData[reply.id] = reply.content;
                         const author = getUserNickname(reply.user_id, reply.author_name);
                         const isAdmin = reply.user_id === ADMIN_EMAIL || author.includes('edgartp89');
                         const userMsgCount = userMessageCounts[reply.user_id] || 1;
@@ -889,10 +902,8 @@
                                         <span><b>ID: #${replyMsgId}</b> &bull; ${responseInfoText}</span>
                                     </div>
                                     ${quoteHtml}
-                                    <div class="ht-post-text" id="reply-text-${reply.id}">
-                                        ${escapeHtml(reply.content)}
-                                    </div>
-                                    ${editNoticeHtml}
+                                    <div class="ht-post-text" id="reply-text-${reply.id}">${escapeHtml(reply.content)}</div>
+                                    <div id="reply-notice-${reply.id}">${editNoticeHtml}</div>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--bt-border-dark); padding-top:12px; flex-wrap:wrap; gap:8px;">
                                     <div style="display:flex; gap:8px;">
@@ -923,16 +934,13 @@
         }
 
         // --- FUNCIONES DE EDICIÓN ---
-        async function startEditThread(threadId) {
+        function startEditThread(threadId) {
             const textDiv = document.getElementById(`thread-text-${threadId}`);
             if (!textDiv) return;
-            const { data } = await supabaseClient.from('forum_threads').select('content').eq('id', threadId).single();
-            if (!data) return;
-
-            const cleanContent = data.content ? data.content.trim() : '';
+            const currentContent = activeThreadsData[threadId] || textDiv.innerText;
 
             textDiv.innerHTML = `
-                <textarea id="edit-input-thread-${threadId}" class="ht-textarea">${cleanContent}</textarea>
+                <textarea id="edit-input-thread-${threadId}" class="ht-textarea" style="text-align:left;">${currentContent.trim()}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditThread(${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
@@ -947,31 +955,36 @@
                 return;
             }
             try {
+                const nowIso = new Date().toISOString();
                 const { error } = await supabaseClient
                     .from('forum_threads')
-                    .update({ content: newContent, updated_at: new Date().toISOString() })
+                    .update({ content: newContent, updated_at: nowIso })
                     .eq('id', threadId);
 
                 if (error) {
                     alert("Error al guardar la edición: " + error.message);
                     return;
                 }
-                loadThreadDetail(threadId);
+                
+                activeThreadsData[threadId] = newContent;
+                document.getElementById(`thread-text-${threadId}`).innerText = newContent;
+                
+                const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
+                const editDate = new Date().toLocaleString();
+                document.getElementById(`thread-notice-${threadId}`).innerHTML = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
+
             } catch (err) {
                 console.error(err);
             }
         }
 
-        async function startEditReply(replyId, threadId) {
+        function startEditReply(replyId, threadId) {
             const textDiv = document.getElementById(`reply-text-${replyId}`);
             if (!textDiv) return;
-            const { data } = await supabaseClient.from('forum_replies').select('content').eq('id', replyId).single();
-            if (!data) return;
-
-            const cleanContent = data.content ? data.content.trim() : '';
+            const currentContent = activeRepliesData[replyId] || textDiv.innerText;
 
             textDiv.innerHTML = `
-                <textarea id="edit-input-reply-${replyId}" class="ht-textarea">${cleanContent}</textarea>
+                <textarea id="edit-input-reply-${replyId}" class="ht-textarea" style="text-align:left;">${currentContent.trim()}</textarea>
                 <div style="margin-top: 8px; display: flex; gap: 8px;">
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px;" onclick="saveEditReply(${replyId}, ${threadId})">Guardar Canvis</button>
                     <button class="ht-btn" style="padding: 6px 12px; font-size: 14px; background:#2a164f; color:#fca5a5;" onclick="loadThreadDetail(${threadId})">Cancel·lar</button>
@@ -986,16 +999,24 @@
                 return;
             }
             try {
+                const nowIso = new Date().toISOString();
                 const { error } = await supabaseClient
                     .from('forum_replies')
-                    .update({ content: newContent, updated_at: new Date().toISOString() })
+                    .update({ content: newContent, updated_at: nowIso })
                     .eq('id', replyId);
 
                 if (error) {
                     alert("Error al guardar la edición: " + error.message);
                     return;
                 }
-                loadThreadDetail(threadId);
+
+                activeRepliesData[replyId] = newContent;
+                document.getElementById(`reply-text-${replyId}`).innerText = newContent;
+
+                const editorName = getUserNickname(currentUser.id, currentUser.email ? currentUser.email.split('@')[0] : 'Ciutadà');
+                const editDate = new Date().toLocaleString();
+                document.getElementById(`reply-notice-${replyId}`).innerHTML = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
+
             } catch (err) {
                 console.error(err);
             }
