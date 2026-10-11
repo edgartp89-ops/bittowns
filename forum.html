@@ -72,22 +72,6 @@
             box-shadow: 0 0 10px var(--bt-neon);
         }
 
-        @media (max-width: 768px) {
-            .ht-topbar {
-                padding: 8px 10px;
-            }
-            .ht-topbar-nav {
-                gap: 6px;
-            }
-            .ht-topbar a {
-                padding: 3px 6px;
-                font-size: 12px;
-            }
-            body {
-                padding-top: 60px !important;
-            }
-        }
-
         /* Layout General en Dos Columnas */
         .ht-layout {
             display: grid;
@@ -98,11 +82,6 @@
             margin: 0 auto;
             background-color: var(--bt-bg-base);
             margin-top: 60px;
-        }
-        @media (max-width: 900px) {
-            .ht-layout {
-                grid-template-columns: 1fr;
-            }
         }
 
         /* Panel Izquierdo (Árbol de Foros) */
@@ -297,11 +276,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             text-align: left !important;
         }
-        @media (max-width: 768px) {
-            .ht-post-box {
-                grid-template-columns: 1fr;
-            }
-        }
         .ht-post-content {
             padding: 20px 24px;
             display: flex;
@@ -367,17 +341,6 @@
             text-align: center;
             justify-content: center;
         }
-        @media (max-width: 768px) {
-            .ht-author-panel {
-                border-left: none;
-                border-top: 2px solid var(--bt-border);
-                flex-direction: row;
-                justify-content: flex-start;
-                gap: 16px;
-                text-align: left;
-                padding: 16px 20px;
-            }
-        }
         .ht-author-avatar {
             width: 64px;
             height: 64px;
@@ -396,9 +359,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-        }
-        @media (max-width: 768px) {
-            .ht-author-avatar { width: 44px; height: 44px; font-size: 20px; margin-bottom: 0; }
         }
         .ht-author-name {
             font-weight: bold;
@@ -501,6 +461,81 @@
             font-weight: bold;
             color: var(--bt-link);
             border: 1px solid var(--bt-border);
+        }
+
+        /* =========================================================
+           ADAPTACIÓN COMPACTA PARA DISPOSITIVOS MÓVILES (< 768px)
+           ========================================================= */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding-top: 60px !important;
+            }
+            .ht-topbar {
+                padding: 8px 10px;
+            }
+            .ht-topbar-nav {
+                gap: 6px;
+            }
+            .ht-topbar a {
+                padding: 3px 6px;
+                font-size: 12px;
+            }
+            .ht-layout {
+                grid-template-columns: 1fr;
+            }
+            .ht-main {
+                padding: 14px 12px;
+            }
+            .ht-post-box {
+                grid-template-columns: 1fr;
+            }
+            .ht-post-content {
+                padding: 14px 14px;
+            }
+            .ht-post-header {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+            .ht-post-title {
+                font-size: 16px;
+            }
+            .ht-post-text {
+                font-size: 14.5px;
+                line-height: 1.5;
+                margin-bottom: 10px;
+            }
+            .ht-author-panel {
+                border-left: none;
+                border-top: 2px solid var(--bt-border);
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 12px;
+                text-align: left;
+                padding: 12px 14px;
+            }
+            .ht-author-avatar { 
+                width: 44px; 
+                height: 44px; 
+                font-size: 20px; 
+                margin-bottom: 0; 
+            }
+            .ht-author-stats {
+                margin-top: 2px;
+                padding-top: 2px;
+                border-top: none;
+            }
+            .ht-textarea { 
+                min-height: 140px; 
+                font-size: 14.5px;
+            }
+            .ht-input {
+                font-size: 14.5px;
+            }
+            .quoted-box {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -968,11 +1003,10 @@
                 }
 
                 if (!data || data.length === 0) {
-                    alert("Aviso: No se pudo actualizar en la base de datos. Revisa las políticas RLS (Row Level Security) de Supabase para la tabla forum_threads.");
+                    alert("Aviso: No se pudo actualizar en la base de datos. Revisa las políticas RLS (Row Level Security) de Supabase.");
                     return;
                 }
                 
-                // Recargamos el hilo desde la base de datos para asegurar persistencia real tras actualizar
                 await loadThreadDetail(threadId);
 
             } catch (err) {
@@ -1015,7 +1049,7 @@
                 }
 
                 if (!data || data.length === 0) {
-                    alert("Aviso: No se pudo actualizar la respuesta en la base de datos. Revisa las políticas RLS de Supabase.");
+                    alert("Aviso: No se pudo actualizar la respuesta en la base de datos.");
                     return;
                 }
 
