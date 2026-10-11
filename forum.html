@@ -328,6 +328,7 @@
             border-radius: 0 4px 4px 0;
             box-shadow: inset 0 0 10px rgba(168, 85, 247, 0.08);
             text-align: left !important;
+            white-space: pre-wrap;
         }
 
         /* Panel de Autor Derecha */
@@ -848,7 +849,8 @@
                     editNoticeHtml = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
                 }
 
-                const quoteText = thread.content.substring(0, 100);
+                // Cita completa del mensaje principal
+                const quoteText = thread.content;
 
                 document.getElementById('ht-thread-main').innerHTML = `
                     <div class="ht-post-box" style="border-color: var(--bt-accent);">
@@ -937,7 +939,8 @@
                             editNoticeHtml = `<div class="ht-edit-notice">Mensaje editado por el usuario ${escapeHtml(editorName)} en ${editDate}</div>`;
                         }
 
-                        const quoteText = reply.content.substring(0, 100);
+                        // Cita completa de la respuesta
+                        const quoteText = reply.content;
 
                         const card = document.createElement('div');
                         card.className = 'ht-post-box ht-reply-item';
