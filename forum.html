@@ -487,9 +487,13 @@
             .ht-main {
                 padding: 14px 12px;
             }
+
+            /* Flexbox inverso para poner la info de usuario ARRIBA en móvil */
             .ht-post-box {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column-reverse;
             }
+
             .ht-post-content {
                 padding: 14px 14px;
             }
@@ -505,19 +509,21 @@
                 line-height: 1.5;
                 margin-bottom: 10px;
             }
+
+            /* Panel de autor superior */
             .ht-author-panel {
                 border-left: none;
-                border-top: 2px solid var(--bt-border);
+                border-bottom: 2px solid var(--bt-border);
                 flex-direction: row;
                 justify-content: flex-start;
                 gap: 12px;
                 text-align: left;
-                padding: 12px 14px;
+                padding: 10px 14px;
             }
             .ht-author-avatar { 
-                width: 44px; 
-                height: 44px; 
-                font-size: 20px; 
+                width: 40px; 
+                height: 40px; 
+                font-size: 18px; 
                 margin-bottom: 0; 
             }
             .ht-author-stats {
@@ -1003,7 +1009,7 @@
                 }
 
                 if (!data || data.length === 0) {
-                    alert("Aviso: No se pudo actualizar en la base de datos. Revisa las políticas RLS (Row Level Security) de Supabase.");
+                    alert("Aviso: No se pudo actualizar en la base de datos.");
                     return;
                 }
                 
